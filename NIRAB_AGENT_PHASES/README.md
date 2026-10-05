@@ -1,12 +1,19 @@
-# NIRAB Agent Implementation Phases
+# NIRAB — Final Code Closure Phases 7–9
 
-Execute in order:
+هذه الحزمة تكمل المراحل الست السابقة، وبعدها يتم **Code Freeze** والانتقال إلى Staging/Deployment/Configuration/Smoke Testing.
 
-1. `01_PHASE_COMPANY_BRANCH_FINANCIAL_MODEL.md`
-2. `02_PHASE_BRANCH_TEAMS_DISPATCH_SCHEDULING.md`
-3. `03_PHASE_SERVICES_PRICING_QUOTATIONS.md`
-4. `04_PHASE_PROOF_COMPLETION_CASH_AUDIT.md`
-5. `05_PHASE_PAYMENTS_ODOO_ZATCA.md`
-6. `06_PHASE_QUALITY_COMMS_ANALYTICS_INFRA.md`
+الترتيب الإلزامي:
+1. `07_PHASE_SECURITY_LEGACY_CLEANUP.md`
+2. `08_PHASE_OPERATIONS_ADMIN_UI_CLOSURE.md`
+3. `09_PHASE_CUSTOMER_WORKFLOW_CODE_FREEZE.md`
 
-Do not skip prerequisites. Each phase contains its own build-only verification rules.
+قرار قاعدة البيانات النهائي:
+- MySQL 8 + Spatial.
+- لا PostgreSQL/PostGIS في هذه الدورة.
+
+قواعد الاختبار:
+- لا تشغيل بيئة كاملة.
+- لا migrations فعلية.
+- لا external integrations.
+- لا heavy tests.
+- فقط syntax/analyze/build verification عند توفر الأدوات.
