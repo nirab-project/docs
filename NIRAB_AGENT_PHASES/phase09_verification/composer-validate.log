@@ -1,0 +1,8 @@
+./composer.json is valid, but with a few warnings
+See https://getcomposer.org/doc/04-schema.md for details on the schema
+# General warnings
+- require.madnest/madzipper : unbound version constraints (*) should be avoided
+- require.matanyadaev/laravel-eloquent-spatial : unbound version constraints (*) should be avoided
+- require.mercadopago/dx-php : unbound version constraints (*) should be avoided
+- require.paypal/rest-api-sdk-php : unbound version constraints (*) should be avoided
+- require.rap2hpoutre/fast-excel : unbound version constraints (*) should be avoided

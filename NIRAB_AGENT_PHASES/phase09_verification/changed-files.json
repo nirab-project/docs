@@ -1,0 +1,108 @@
+[
+  {
+    "project": "Admin Panel",
+    "modified": [
+      "Modules/BidModule/Http/Controllers/APi/V1/Customer/PostBidController.php",
+      "Modules/BidModule/Http/Controllers/APi/V1/Customer/PostController.php",
+      "Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php",
+      "Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php",
+      "Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php",
+      "Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php",
+      "Modules/BookingModule/Http/Controllers/Api/V1/Serviceman/BookingController.php",
+      "Modules/BookingModule/Http/Controllers/Api/V1/Serviceman/DispatchController.php",
+      "Modules/BookingModule/Http/Traits/BookingScopes.php",
+      "Modules/BookingModule/Http/Traits/BookingTrait.php",
+      "Modules/BookingModule/Services/AvailabilityService.php",
+      "Modules/BookingModule/Services/BookingAssignmentService.php",
+      "Modules/BookingModule/Services/BookingExecutionService.php",
+      "Modules/BookingModule/Services/TrackingService.php",
+      "Modules/PaymentModule/Http/Controllers/PaymentController.php",
+      "Modules/PaymentModule/Lib/PaymentResponse.php",
+      "Modules/PaymentModule/Traits/PaymentHelperTrait.php",
+      "Modules/ProviderManagement/Services/BranchAssignmentService.php",
+      "Modules/TransactionModule/Lib/Transaction.php",
+      "app/Http/Middleware/ProtectPersonalData.php",
+      "app/Lib/Constant.php",
+      "app/Lib/Helpers.php",
+      "resources/lang/ar/lang.php",
+      "resources/lang/en/lang.php"
+    ],
+    "added": [
+      "Modules/BookingModule/Services/BookingWorkflowService.php"
+    ],
+    "whitespace_check": 0
+  },
+  {
+    "project": "User app and web",
+    "modified": [
+      "assets/language/ar.json",
+      "assets/language/en.json",
+      "lib/feature/booking/controller/booking_details_controller.dart",
+      "lib/feature/booking/controller/service_booking_controller.dart",
+      "lib/feature/booking/model/booking_details_model.dart",
+      "lib/feature/booking/view/booking_details_screen.dart",
+      "lib/feature/booking/view/web_booking_details_screen.dart",
+      "lib/feature/booking/widget/booking_details_section.dart",
+      "lib/feature/booking/widget/booking_invoices_panel.dart",
+      "lib/feature/booking/widget/regular/booking_summery_widget.dart",
+      "lib/feature/checkout/controller/checkout_controller.dart",
+      "lib/feature/checkout/controller/schedule_controller.dart",
+      "lib/feature/checkout/repo/checkout_repo.dart",
+      "lib/feature/checkout/repo/schedule_repo.dart",
+      "lib/feature/checkout/view/custom_post_checkout_screen.dart",
+      "lib/feature/checkout/widget/custom_post/cart_summary.dart",
+      "lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart",
+      "lib/feature/checkout/widget/order_details_section/customer_location_info.dart",
+      "lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart",
+      "lib/feature/checkout/widget/order_details_section/service_schedule.dart",
+      "lib/feature/checkout/widget/order_details_section/weekly_repeat_booking_schedule.dart",
+      "lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart",
+      "lib/feature/create_post/controller/create_post_controller.dart",
+      "lib/feature/create_post/repository/create_post_repo.dart",
+      "lib/feature/my_post/view/provider_offer_details_screen.dart",
+      "lib/feature/my_post/widgets/provider_bidding_notification_dialog.dart",
+      "lib/theme/custom_theme_colors.dart"
+    ],
+    "added": [
+      "lib/feature/booking/widget/booking_workflow_panel.dart",
+      "lib/feature/checkout/widget/order_details_section/available_repeat_time_picker.dart",
+      "lib/feature/checkout/widget/order_details_section/available_slot_picker.dart"
+    ],
+    "whitespace_check": 0
+  },
+  {
+    "project": "Provider app",
+    "modified": [
+      "assets/language/ar.json",
+      "assets/language/en.json",
+      "lib/feature/booking_details/controller/booking_details_controller.dart",
+      "lib/feature/booking_details/model/bookings_details_model.dart",
+      "lib/feature/booking_details/widget/regular_booking/booking_details.dart",
+      "lib/feature/booking_details/widget/regular_booking/booking_summery_widget.dart",
+      "lib/feature/booking_details/widget/repeat_booking/repeat_booking_details.dart",
+      "lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart",
+      "lib/feature/booking_details/widget/status_change_dropdown_button.dart",
+      "lib/theme/custom_theme_colors.dart"
+    ],
+    "added": [
+      "lib/feature/booking_details/widget/booking_workflow_panel.dart"
+    ],
+    "whitespace_check": 0
+  },
+  {
+    "project": "Service man app",
+    "modified": [
+      "assets/language/ar.json",
+      "assets/language/en.json",
+      "lib/feature/booking_details/controller/booking_details_controller.dart",
+      "lib/feature/booking_details/model/booking_details_model.dart",
+      "lib/feature/booking_details/view/booking_details_screen.dart",
+      "lib/feature/booking_details/widget/booking_details_widget.dart",
+      "lib/feature/booking_details/widget/booking_summery_widget.dart",
+      "lib/feature/booking_details/widget/service_execution_panel.dart",
+      "lib/theme/custom_theme_colors.dart"
+    ],
+    "added": [],
+    "whitespace_check": 0
+  }
+]

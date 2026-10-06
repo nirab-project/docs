@@ -1,0 +1,17 @@
+{
+  "php_syntax_files": 25,
+  "php_syntax": "passed",
+  "composer_validate_exit_code": 0,
+  "dart_format_files": 44,
+  "dart_format_exit_code": 0,
+  "customer_analyze_exit_code": 0,
+  "customer_analyze_errors": 0,
+  "customer_analyze_warnings": 0,
+  "customer_analyze_infos": 19,
+  "customer_web_build_exit_code": 0,
+  "provider_compile": "Not run: package_config.json unavailable",
+  "serviceman_compile": "Not run: package_config.json unavailable",
+  "migrations_added": 0,
+  "runtime_environment_started": false,
+  "heavy_tests_run": false
+}

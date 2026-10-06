@@ -1,0 +1,56 @@
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\controller\booking_details_controller.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\controller\service_booking_controller.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\model\booking_details_model.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\view\booking_details_screen.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\view\web_booking_details_screen.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\widget\booking_details_section.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\widget\booking_invoices_panel.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\booking\widget\booking_workflow_panel.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\controller\checkout_controller.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\controller\schedule_controller.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\repo\checkout_repo.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\repo\schedule_repo.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\view\custom_post_checkout_screen.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\order_details_section\available_repeat_time_picker.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\order_details_section\available_slot_picker.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\order_details_section\custom_repeat_booking_schedule.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\order_details_section\daily_repeat_booking_schedule.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\order_details_section\service_schedule.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\order_details_section\weekly_repeat_booking_schedule.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\checkout\widget\proceed_to_checkout_button_widget.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\my_post\view\provider_offer_details_screen.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\User app and web\lib\feature\my_post\widgets\provider_bidding_notification_dialog.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\controller\booking_details_controller.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\model\bookings_details_model.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\widget\booking_workflow_panel.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\widget\regular_booking\booking_details.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\widget\repeat_booking\repeat_booking_details.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\widget\repeat_booking\repeat_booking_service_log.dart
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Provider app\lib\feature\booking_details\widget\status_change_dropdown_button.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Service man app\lib\feature\booking_details\controller\booking_details_controller.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Service man app\lib\feature\booking_details\model\booking_details_model.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Service man app\lib\feature\booking_details\view\booking_details_screen.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted C:\Users\PC\Desktop\Projects\nirab-project\Service man app\lib\feature\booking_details\widget\booking_details_widget.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:flutter_lints/flutter.yaml" in include.
+Formatted 41 files (33 changed) in 59.23 seconds.
