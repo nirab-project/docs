@@ -1,0 +1,60 @@
+Analyzing Provider app...                                       
+
+   info - Use the null-aware marker '?' rather than a null check via an 'if' - lib\common\widgets\custom_alert_dialog_widget.dart:50:9 - use_null_aware_elements
+   info - Function literals shouldn't be passed to 'forEach' - lib\feature\auth\controller\sign_up_controller.dart:494:12 - avoid_function_literals_in_foreach_calls
+   info - Empty catch block - lib\feature\auth\repository\auth_repo.dart:180:19 - empty_catches
+   info - Statements in an if should be enclosed in a block - lib\feature\auth\view\sign_up_screen.dart:40:7 - curly_braces_in_flow_control_structures
+   info - Function literals shouldn't be passed to 'forEach' - lib\feature\auth\widgets\file_upload_field_widget.dart:40:25 - avoid_function_literals_in_foreach_calls
+   info - Unnecessary use of multiple underscores - lib\feature\auth\widgets\file_upload_field_widget.dart:109:37 - unnecessary_underscores
+   info - Statements in an if should be enclosed in a block - lib\feature\booking_details\controller\booking_details_controller.dart:66:7 - curly_braces_in_flow_control_structures
+   info - The import of 'package:url_launcher/url_launcher.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium_provider/util/core_export.dart' - lib\feature\booking_details\widget\booking_workflow_panel.dart:3:8 - unnecessary_import
+   info - Unnecessary constructor invocation - lib\feature\booking_details\widget\status_change_dropdown_button.dart:24:24 - prefer_collection_literals
+   info - 'of' is deprecated and shouldn't be used. This will be removed in v6.0.0. please use `ShowcaseView.get()` instead - lib\feature\category\view\category_screen.dart:35:74 - deprecated_member_use
+   info - 'startShowCase' is deprecated and shouldn't be used. This will be removed in v6.0.0. please use `ShowcaseView.get().startShowCase` instead - lib\feature\category\view\category_screen.dart:35:86 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\feature\custom_post\view\provider_offer_screen.dart:288:25 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\feature\custom_post\view\provider_offer_screen.dart:304:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\dashboard\view\payment_screen.dart:81:7 - curly_braces_in_flow_control_structures
+   info - 'ShowCaseWidget' is deprecated and shouldn't be used. This will be removed in v6.0.0. Please use `ShowcaseView.register()` instead - lib\feature\nav\bottom_nav_screen.dart:96:7 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\feature\payement_information\view\add_payment_info_screen.dart:176:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\payement_information\view\payment_information_screen.dart:31:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\profile\controller\user_controller.dart:455:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\profile\controller\user_controller.dart:475:7 - curly_braces_in_flow_control_structures
+   info - Use the null-aware marker '?' rather than a null check via an 'if' - lib\feature\profile\repository\user_repo.dart:64:7 - use_null_aware_elements
+   info - Statements in an if should be enclosed in a block - lib\feature\profile\view\account_information\view\account_information.dart:24:7 - curly_braces_in_flow_control_structures
+   info - Function literals shouldn't be passed to 'forEach' - lib\feature\profile\widgets\update_additional_files_widget.dart:40:25 - avoid_function_literals_in_foreach_calls
+   info - Unnecessary use of multiple underscores - lib\feature\profile\widgets\update_additional_files_widget.dart:111:37 - unnecessary_underscores
+   info - The import of 'package:url_launcher/url_launcher.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium_provider/util/core_export.dart' - lib\feature\quality\view\branch_quality_screen.dart:3:8 - unnecessary_import
+   info - Statements in an if should be enclosed in a block - lib\feature\quality\view\branch_quality_screen.dart:30:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\quality\view\branch_quality_screen.dart:125:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\quality\view\branch_quality_screen.dart:166:43 - curly_braces_in_flow_control_structures
+   info - The import of 'package:url_launcher/url_launcher.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium_provider/util/core_export.dart' - lib\feature\reporting\view\branch_cash_operations_screen.dart:3:8 - unnecessary_import
+   info - Statements in an if should be enclosed in a block - lib\feature\reporting\view\branch_cash_operations_screen.dart:79:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\reporting\view\branch_cash_operations_screen.dart:86:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\reporting\view\branch_cash_operations_screen.dart:144:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\reporting\view\branch_cash_operations_screen.dart:189:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\reporting\view\business_report.dart:10:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\reporting\view\transaction_report.dart:25:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\operations\workforce_editors.dart:96:13 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\operations\workforce_editors.dart:147:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\operations\workforce_editors.dart:270:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\branch_operations_screen.dart:70:31 - curly_braces_in_flow_control_structures
+   info - The import of 'package:google_maps_flutter/google_maps_flutter.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium_provider/util/core_export.dart' - lib\feature\serviceman\view\branch_service_areas_screen.dart:4:8 - unnecessary_import
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\branch_service_areas_screen.dart:75:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\branch_service_areas_screen.dart:395:13 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\branch_service_availability_screen.dart:38:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\branch_service_availability_screen.dart:62:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\team_management_screen.dart:34:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\team_management_screen.dart:52:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\technician_operations_screen.dart:51:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\technician_operations_screen.dart:72:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\technician_operations_screen.dart:135:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\technician_operations_screen.dart:150:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\technician_operations_screen.dart:165:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\serviceman\view\technician_operations_screen.dart:427:49 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\subscriptions\controller\business_subscription_controller.dart:153:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\subscriptions\view\business\business_plan_screen.dart:77:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\transaction\view\withdraw_list_screen.dart:31:7 - curly_braces_in_flow_control_structures
+   info - Empty catch block - lib\helper\notification_helper.dart:127:25 - empty_catches
+   info - Empty catch block - lib\helper\notification_helper.dart:318:19 - empty_catches
+
+56 issues found. (ran in 27.1s)

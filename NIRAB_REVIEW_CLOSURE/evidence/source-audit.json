@@ -1,0 +1,26 @@
+[
+  {
+    "component": "Admin Panel",
+    "source_tree_sha": "ed9385b0f9cd6898e5ec3fc7bea08a6fa9076222",
+    "json_files": 83,
+    "merge_conflicts": []
+  },
+  {
+    "component": "User app and web",
+    "source_tree_sha": "7bcd40c221067dca937f6acaa10f449558aad7b9",
+    "json_files": 10,
+    "merge_conflicts": []
+  },
+  {
+    "component": "Provider app",
+    "source_tree_sha": "285089005b434c282098dc1c029c034365db7fca",
+    "json_files": 42,
+    "merge_conflicts": []
+  },
+  {
+    "component": "Service man app",
+    "source_tree_sha": "30b78090df48304f890cbd381c796900ee57b6c3",
+    "json_files": 39,
+    "merge_conflicts": []
+  }
+]

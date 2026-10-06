@@ -1,0 +1,58 @@
+[
+  {
+    "name": "php-lint",
+    "files": 1119,
+    "failed": [],
+    "exit_code": 0
+  },
+  {
+    "name": "payment-unit-tests",
+    "exit_code": 0,
+    "command": [
+      "C:/Users/PC/.config/herd/bin/php84/php.exe",
+      "vendor/phpunit/phpunit/phpunit",
+      "--no-configuration",
+      "--bootstrap",
+      "vendor/autoload.php",
+      "tests/Unit/PaymentClosureTest.php"
+    ],
+    "log": "logs/payment-unit-tests.log"
+  },
+  {
+    "name": "nirab-operations",
+    "exit_code": 0,
+    "command": [
+      "node",
+      "--check",
+      "public/assets/admin-module/js/nirab-operations.js"
+    ],
+    "log": "logs/nirab-operations.log"
+  },
+  {
+    "name": "nirab-workforce",
+    "exit_code": 0,
+    "command": [
+      "node",
+      "--check",
+      "public/assets/admin-module/js/nirab-workforce.js"
+    ],
+    "log": "logs/nirab-workforce.log"
+  },
+  {
+    "name": "blade-compile",
+    "exit_code": 0,
+    "command": [
+      "C:/Users/PC/.config/herd/bin/php84/php.exe",
+      "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\NIRAB-REVIEW-CLOSURE\\scripts\\compile_blade.php",
+      "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\Admin Panel",
+      "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\NIRAB-REVIEW-CLOSURE\\evidence\\compiled-blade"
+    ],
+    "log": "logs/blade-compile.log"
+  },
+  {
+    "name": "compiled-blade-lint",
+    "files": 447,
+    "failed": [],
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "android_sdk": "C:\\Users\\PC\\AppData\\Local\\Android\\Sdk",
+  "platforms": [],
+  "build_tools": [],
+  "android_builds": "BLOCKED_MISSING_SDK_PLATFORMS_AND_BUILD_TOOLS",
+  "ios_builds": "BLOCKED_WINDOWS_HOST",
+  "runtime_and_migrations": "NOT_RUN_PER_REVIEW_SCOPE"
+}
