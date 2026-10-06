@@ -1,0 +1,30 @@
+RELEASE-HOTFIX-01 — 2026-10-07
+Backend commit: 8b7f21607520709f5459577d8088f14c7a164489
+Scope: lightweight CLI/source checks only; no application or environment startup.
+
+PHP version: 8.4.24
+php -l Modules/BidModule/Http/Controllers/APi/V1/Customer/PostController.php: PASS
+php -l resources/lang/ar/journey.php: PASS
+php -l resources/lang/en/journey.php: PASS
+php -l docker/verify-module-statuses.php: PASS
+Git Bash bash -n docker/start.sh: PASS (syntax only; script not executed)
+
+Standalone module verifier (no Laravel/Composer/DB/file writes):
+- Tracked disabled modules_statuses.json: rejected; exit 78.
+- Missing file argument: rejected; exit 78.
+- Approved core fixture, with AI/AddonModule/Gateways false: accepted; exit 0.
+- Malformed JSON fixture: rejected; exit 78.
+- BookingModule string "true" fixture: rejected; exit 78.
+All fixtures were temporary and removed; operational/template statuses unchanged.
+
+journey translation keys match: 8.
+Modified backend sources decode as UTF-8 without replacement characters.
+docker/start.sh contains LF line endings; docker/*.sh is pinned to LF in Git attributes.
+Backend git diff --check and staged diff --check: PASS.
+Docs git diff --check: PASS.
+All 253 migration source inventory hashes match their source files.
+No routes, migrations, Dart, dependencies, lockfiles, secrets or live data changed.
+
+Not run: Laravel/Artisan, Docker build/start, Flutter build/run/analyze, migrations,
+database queries, Unit/Integration/E2E/load tests, payments, notifications,
+scheduler/workers, deployment, push or manual acceptance.

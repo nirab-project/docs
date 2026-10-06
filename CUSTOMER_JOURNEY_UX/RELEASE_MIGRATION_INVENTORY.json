@@ -1,0 +1,1528 @@
+{
+  "release": "RELEASE-HOTFIX-01",
+  "date": "2026-10-07",
+  "scope": "Source inventory only. Not the deployed Pending list. Optional module migrations may not be discovered at runtime.",
+  "backend_base_commit": "2c878a7b350b5f65d4e69f6529b294929670b6ab",
+  "count": 253,
+  "migrations": [
+    {
+      "file": "database/migrations/2016_06_01_000001_create_oauth_auth_codes_table.php",
+      "migration": "2016_06_01_000001_create_oauth_auth_codes_table",
+      "sha256": "e2faa7c15d0fbb2808e64a5ca64b710b268ff4d485c6677d3a9c3a42f79e08d8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2016_06_01_000002_create_oauth_access_tokens_table.php",
+      "migration": "2016_06_01_000002_create_oauth_access_tokens_table",
+      "sha256": "2190d89b3fd9be810c6dafeaf71abb9245c7c3bd8e729d64e79371d5db4d6834",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2016_06_01_000003_create_oauth_refresh_tokens_table.php",
+      "migration": "2016_06_01_000003_create_oauth_refresh_tokens_table",
+      "sha256": "2ed2297f42393b430eb352f2ab9c30569461011c89ce9cfbedd1178fe9526d0a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2016_06_01_000004_create_oauth_clients_table.php",
+      "migration": "2016_06_01_000004_create_oauth_clients_table",
+      "sha256": "84a7eab65f9cf5cd5d5a75157a00a811e3832ad218f4e6c0a3b5c767b270fdde",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2016_06_01_000005_create_oauth_personal_access_clients_table.php",
+      "migration": "2016_06_01_000005_create_oauth_personal_access_clients_table",
+      "sha256": "87b0066563d36322f24a5d0fb95a3c6278e8830bc95cc27d09ef47e452b246e6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2025_08_20_102246_add_response_to_route_search_histories_table.php",
+      "migration": "2025_08_20_102246_add_response_to_route_search_histories_table",
+      "sha256": "138ce4ecbab646f47f74ef812e9f95ac6e507d0b50e56826e7ff89ddb67f68e1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2026_09_23_075344_create_failed_jobs_table.php",
+      "migration": "2026_09_23_075344_create_failed_jobs_table",
+      "sha256": "1b2dc826a38de3e6cdd351fc5e0b96689440086e8027454453347036f1860ef3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "database/migrations/2026_10_04_120200_create_durable_database_queue.php",
+      "migration": "2026_10_04_120200_create_durable_database_queue",
+      "sha256": "5d8f55aec348f7f596ba196c1fbdba7d15c4b0481fb611b00206ceaec678acb1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/AdminModule/Database/Migrations/2025_03_16_122656_create_route_search_histories_table.php",
+      "migration": "2025_03_16_122656_create_route_search_histories_table",
+      "sha256": "f8a427c3b1613733dded07ed7a766abda0e9099e1dc536394e283bee7f9a4979",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/AI/database/migrations/2025_09_03_172258_create_ai_settings_table.php",
+      "migration": "2025_09_03_172258_create_ai_settings_table",
+      "sha256": "c0d50d2214e7c6fb8f614111c15ff615c6a5392f58f7dc628c59ed41e319a12f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/AI/database/migrations/2025_09_03_202802_create_ai_setting_logs_table.php",
+      "migration": "2025_09_03_202802_create_ai_setting_logs_table",
+      "sha256": "5509bd9b79d07706e08a25c610f604d178d0688e4fb75e1c472a943b3a59e80f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2023_04_29_185100_create_posts_table.php",
+      "migration": "2023_04_29_185100_create_posts_table",
+      "sha256": "32a93c78893ef2732caf275116053b2206341ef2751d4fbfff82ab5f91a2bdec",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2023_04_29_185107_create_post_additional_instructions_table.php",
+      "migration": "2023_04_29_185107_create_post_additional_instructions_table",
+      "sha256": "007bf84942eafff8f73973d2d83addeec1e3d74e2e2d8528bd4c2dea9495f011",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2023_04_29_185114_create_post_bids_table.php",
+      "migration": "2023_04_29_185114_create_post_bids_table",
+      "sha256": "d40bcdafe3240b7708b63b11cec0ef5ab3babb6b74307c3b0eaf208cef2e040a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2023_04_29_185127_create_ignored_posts_table.php",
+      "migration": "2023_04_29_185127_create_ignored_posts_table",
+      "sha256": "e8a02d970aabe3d847235a2246974e0f993db01057f259f724584fed4f5622b2",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2023_05_17_144146_add_col_to_posts_table.php",
+      "migration": "2023_05_17_144146_add_col_to_posts_table",
+      "sha256": "e89d8c3b37d1e2bb8d8ef71e5b2a5aa042de44347bafd0f3ade161c716b9de70",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2023_07_17_184044_add_is_guest_col_to_posts_table.php",
+      "migration": "2023_07_17_184044_add_is_guest_col_to_posts_table",
+      "sha256": "1f96597fce33352239b1c567e86e1e6c7835111fd8c4e789f78865c0472542e1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2024_01_29_115651_create_post_additional_information_table.php",
+      "migration": "2024_01_29_115651_create_post_additional_information_table",
+      "sha256": "25995e74044c33e2c8462124159551e663d147f1d428651a94a2a80e716dbad9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BidModule/Database/Migrations/2026_10_01_110100_create_branch_quotation_workflow.php",
+      "migration": "2026_10_01_110100_create_branch_quotation_workflow",
+      "sha256": "8e58f503904630cc72cc98d876607d63f74cb52808145b02441c8da9c9e70498",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BlogManagement/Database/Migrations/2026_05_22_000001_create_blog_settings_table.php",
+      "migration": "2026_05_22_000001_create_blog_settings_table",
+      "sha256": "fb222a1df72a9f37190e09c6aa0226b4399aed79e532e4d526cb7e28f0e96d9f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BlogManagement/Database/Migrations/2026_05_22_000002_create_blog_categories_table.php",
+      "migration": "2026_05_22_000002_create_blog_categories_table",
+      "sha256": "47a5571eca24c189c896ebb2f11eeeaea9c8a86afee93ad101941ea6136152e3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BlogManagement/Database/Migrations/2026_05_22_000003_create_blog_authors_table.php",
+      "migration": "2026_05_22_000003_create_blog_authors_table",
+      "sha256": "c943706a5599a6b22129dc7616090b863788efd33182a4acb477c6dc6d2e0574",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BlogManagement/Database/Migrations/2026_05_22_000004_create_blogs_table.php",
+      "migration": "2026_05_22_000004_create_blogs_table",
+      "sha256": "cfe9d57d7e6d536d873367369a9a20587e2cfe2affa73818004b5d22f266dfef",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BlogManagement/Database/Migrations/2026_05_22_000005_create_blog_drafts_table.php",
+      "migration": "2026_05_22_000005_create_blog_drafts_table",
+      "sha256": "d0e7a44b4fad6446b9eb2b76d7c75c3512e0af306be734231d46ed9fc6fabd2b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_06_05_061932_create_bookings_table.php",
+      "migration": "2022_06_05_061932_create_bookings_table",
+      "sha256": "bc720ed506e4814862c1e07da93e64bfe644e4a261738d64a761c0c24c819eed",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_06_05_063828_create_booking_details_table.php",
+      "migration": "2022_06_05_063828_create_booking_details_table",
+      "sha256": "67c545fc54abd421141581edabeedb1c6ad6d3a0277ed151cf3e4d28f307e862",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_06_05_065027_create_booking_status_histories_table.php",
+      "migration": "2022_06_05_065027_create_booking_status_histories_table",
+      "sha256": "d86b84691605f1957b6af66ddc3c48f98f901fa7f79cd88c909dace5c541d889",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_06_05_065040_create_booking_schedule_histories_table.php",
+      "migration": "2022_06_05_065040_create_booking_schedule_histories_table",
+      "sha256": "3a563aef9cbfc8f06bbbbd5fe78742d62353c9da9835d4493a904aa410233682",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_06_11_074614_category_sub_added_booking.php",
+      "migration": "2022_06_11_074614_category_sub_added_booking",
+      "sha256": "dd50812d493dfe497453eb425b96bad3104eeca529eef6a4c591fc44b4a7a00c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_06_19_063119_add_serviceman_col.php",
+      "migration": "2022_06_19_063119_add_serviceman_col",
+      "sha256": "d075232d0d0fa2d98e3cdf100a64cc50b8fa00e8ea9b01a8ca71c96b16350555",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_07_19_040550_change-col-name.php",
+      "migration": "2022_07_19_040550_change-col-name",
+      "sha256": "18ecc0395704fb5edcc6dfa2abade5a6dfa85d69f60629006d65df16d9cff6a9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_07_21_104205_add_booking_id_col.php",
+      "migration": "2022_07_21_104205_add_booking_id_col",
+      "sha256": "c5c89d6b3dcd361c2f32a877ff8256f980b7622a203f455f3d79288aa24871d0",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_08_06_031433_add_col_in_booking_table.php",
+      "migration": "2022_08_06_031433_add_col_in_booking_table",
+      "sha256": "5185597e0ff71672654210ae893b3bb7aa9182494a3041a50c4aa9b2c152871c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_08_06_031649_add_col_in_booking_details_table.php",
+      "migration": "2022_08_06_031649_add_col_in_booking_details_table",
+      "sha256": "8e0008d90fdeeb0f55cde67ec64a43ddc686443a8279abd2356e4f0f02f1336f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_08_31_070329_col_add_to_booking_details_table.php",
+      "migration": "2022_08_31_070329_col_add_to_booking_details_table",
+      "sha256": "123f8d8d85d722f580f02d2b4d4581ccc8f2d3c10c0295e8a947932b4009a3f7",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_09_12_062925_col_add_to_booking_table.php",
+      "migration": "2022_09_12_062925_col_add_to_booking_table",
+      "sha256": "404ca1cb31895fd07057df8a35c540411cf2be26fd8dd0a95f09f0c041b0241b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2022_11_29_232809_create_booking_details_amounts_table.php",
+      "migration": "2022_11_29_232809_create_booking_details_amounts_table",
+      "sha256": "bea1c61162720190cdb261ea0a502b314d35e44392e50c51f3e3ae8cee96f623",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_01_16_152849_add_col_to_booking_details_amounts_table.php",
+      "migration": "2023_01_16_152849_add_col_to_booking_details_amounts_table",
+      "sha256": "731624faf86b74c3c9fa569219a0f20479287e3b7e58ea0658ebaa8d75d75b1a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_05_30_102205_add_additional_charge_col_to_bookings_table.php",
+      "migration": "2023_05_30_102205_add_additional_charge_col_to_bookings_table",
+      "sha256": "25a4b856ad5b1ab248ed70f76bd2102cab7b1fc81c64c5b5df09be0925e2a73c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_05_31_103005_add_col_to_bookings_table.php",
+      "migration": "2023_05_31_103005_add_col_to_bookings_table",
+      "sha256": "a75e651dad64dde69aaba9e7a7107a0e663017e68f428f9d12a436bad1bb463d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_06_11_221500_add_removed_coupon_amount_col_in_booking_table.php",
+      "migration": "2023_06_11_221500_add_removed_coupon_amount_col_in_booking_table",
+      "sha256": "c7cd0c27bc7ddc5f7187f38ada29530429aac7ce9354944c6ebef7aebb804f5d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_06_26_154947_add_column_to_bookings_table.php",
+      "migration": "2023_06_26_154947_add_column_to_bookings_table",
+      "sha256": "e7129ec2eca38fb8c35bec691d3ce47842a6e793fcdb4c2b9a001630d8e2b9e6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_07_12_110032_add_is_guest_column_to_bookings_table.php",
+      "migration": "2023_07_12_110032_add_is_guest_column_to_bookings_table",
+      "sha256": "02537ad9570fa347a2adb4a29a4861e85d404ec5e4710312433ef9aed408dd81",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_07_13_094337_add_is_guest_column_to_booking_schedule_histories_table.php",
+      "migration": "2023_07_13_094337_add_is_guest_column_to_booking_schedule_histories_table",
+      "sha256": "f0eed22483bc894d11dbb0afcf27d6e09a8d09dba7754bc5cd54593035bd02a1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_07_13_094413_add_is_guest_column_to_booking_status_histories_table.php",
+      "migration": "2023_07_13_094413_add_is_guest_column_to_booking_status_histories_table",
+      "sha256": "5a460334dd9fae20f70024c703cc198f962c41745e1f0a46c63117d7bc68f2d2",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_07_17_142048_add_is_verified_col_to_bookings_table.php",
+      "migration": "2023_07_17_142048_add_is_verified_col_to_bookings_table",
+      "sha256": "a23a09f435af6296d39555bd21d9f5d0c356412b5ee65c7805f037c131d582e3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_07_29_133252_create_booking_partial_payments_table.php",
+      "migration": "2023_07_29_133252_create_booking_partial_payments_table",
+      "sha256": "3a8e464ddc3542469f49cfef71710b2932ea0745fc4d087c1768edbe576bf6c8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_08_07_153312_create_booking_offline_payments_table.php",
+      "migration": "2023_08_07_153312_create_booking_offline_payments_table",
+      "sha256": "a2b27bb7be9b09506d90fcd84679f10b821ba53eda7688437fe4dbd48830590c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2023_08_10_182955_add_fee_column_to_bookings_table.php",
+      "migration": "2023_08_10_182955_add_fee_column_to_bookings_table",
+      "sha256": "f03836a2c5d56e48afc0af9efea5273035f7bf6b40e7df07511f0ed976caff44",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_01_28_080833_create_booking_additional_information_table.php",
+      "migration": "2024_01_28_080833_create_booking_additional_information_table",
+      "sha256": "f4c9265b012c94d3893e86239510dd1244d4ca3d2c1015cd46cb76f2b1d56b30",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_02_29_140738_add_col_to_booking_offline_payments_table.php",
+      "migration": "2024_02_29_140738_add_col_to_booking_offline_payments_table",
+      "sha256": "4a59cddae71008717ab30caab5a36a676c23791a1241e7550ad2434f21397223",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_03_27_102042_add_total_referral_discount_amount_to_bookings_table.php",
+      "migration": "2024_03_27_102042_add_total_referral_discount_amount_to_bookings_table",
+      "sha256": "fb8e692b214830ba23f94ed6100d40b7d8fe1541ab4f33369a14857f0e934136",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_06_25_113732_create_subscription_booking_types_table.php",
+      "migration": "2024_06_25_113732_create_subscription_booking_types_table",
+      "sha256": "a14db835b48d41230e4eabe8966900aea2b2059640a27272a753b9e4a6b9a145",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_07_11_130225_create_subscription_subscriber_bookings_table.php",
+      "migration": "2024_07_11_130225_create_subscription_subscriber_bookings_table",
+      "sha256": "56db797604d3e9c43d4f4189ea8e58b72c065814efedbd8ee90444618283778b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_17_123023_create_booking_repeats_table.php",
+      "migration": "2024_10_17_123023_create_booking_repeats_table",
+      "sha256": "74484f221afe7b2ade4fbe25b8e42c32720ce5986fbdb495196d866683ad790a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_19_103658_add_to_col_bookings_table.php",
+      "migration": "2024_10_19_103658_add_to_col_bookings_table",
+      "sha256": "0bf82c1360d03467f6ffae7a05a08b44147e7465de0115dabb61091d9dc5479a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_19_133157_create_booking_repeat_details_table.php",
+      "migration": "2024_10_19_133157_create_booking_repeat_details_table",
+      "sha256": "08d7b5dc75d3a1674fc6adc2f8065e57503653d527d88e782900ab308363760b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_21_174902_add_to_col_booking_details_amounts_table.php",
+      "migration": "2024_10_21_174902_add_to_col_booking_details_amounts_table",
+      "sha256": "2da9bfc3b88c9bb14ba112b8fe105ecd6778b315592fb9bf1456e2184ba8e713",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_22_115400_add_to_col_booking_schedule_histories_table.php",
+      "migration": "2024_10_22_115400_add_to_col_booking_schedule_histories_table",
+      "sha256": "e5471ef82e23a403f9b705445f6879faf849b49d5057cef9c44553384f7389b0",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_22_115502_add_to_col_booking_status_histories_table.php",
+      "migration": "2024_10_22_115502_add_to_col_booking_status_histories_table",
+      "sha256": "2d62f516407536151acddddf3f4cdb3ab32a2fb82eeadeb826392c5505baab0c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_10_24_160708_create_booking_ignores_table.php",
+      "migration": "2024_10_24_160708_create_booking_ignores_table",
+      "sha256": "a0ac487df9b41e28c0ca457209f89c0ce8f0fe97e1f8b6e5c32f706b220edd17",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_11_02_114859_create_booking_repeat_histories_table.php",
+      "migration": "2024_11_02_114859_create_booking_repeat_histories_table",
+      "sha256": "a8a4a0c3f249fc86cca36a48600e67bee5d3f44743d985d462d24b9c8fa053f1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2024_12_29_151439_add_payment_status_and_denied_note_to_booking_offline_payments_table.php",
+      "migration": "2024_12_29_151439_add_payment_status_and_denied_note_to_booking_offline_payments_table",
+      "sha256": "35110e4961331051cb03b17cc57650764fac754789a56a514d854445466bc20e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2025_03_10_122542_add_service_location_in_booking_table.php",
+      "migration": "2025_03_10_122542_add_service_location_in_booking_table",
+      "sha256": "c2131b377666d569a3eec13d11db0bf73f00b14454c1f40b9d50659013b68349",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2025_03_18_112120_add_col_to_booking_repeats_table.php",
+      "migration": "2025_03_18_112120_add_col_to_booking_repeats_table",
+      "sha256": "60ab85f23f689dbfa9e7958cefd766cfb56db51611f03e3967c72d1816b00c52",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2025_03_18_120858_add_col_to_bookings_table.php",
+      "migration": "2025_03_18_120858_add_col_to_bookings_table",
+      "sha256": "16d60a5a8021056d3855e861b4b330f4cd07cba3ef6d2f455ac5b004119e4d9f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_01_100200_create_booking_dispatch_tables.php",
+      "migration": "2026_10_01_100200_create_booking_dispatch_tables",
+      "sha256": "55b8523f08e207ff93751979339e13fd8362e48c9b14a419a3bd17d9f3cc7106",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_04_100000_create_execution_cash_audit_tables.php",
+      "migration": "2026_10_04_100000_create_execution_cash_audit_tables",
+      "sha256": "6c10fbc37de84d3509395a32eaa87c8708cf66348374906cfd4a86c7ed57bb31",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_04_120000_create_quality_communications_packages.php",
+      "migration": "2026_10_04_120000_create_quality_communications_packages",
+      "sha256": "84ae03a296e2e6aff239f38d837836b5008518054bb686f52660265b013353af",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_04_120100_add_operational_query_indexes.php",
+      "migration": "2026_10_04_120100_add_operational_query_indexes",
+      "sha256": "0de40c59060752a159dc61d053db858edf95a440ed697474f94fcd67e646b6c1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_06_230000_create_booking_checkout_snapshots.php",
+      "migration": "2026_10_06_230000_create_booking_checkout_snapshots",
+      "sha256": "3c28299f4b28e31253a7ecc61e16e32c365f4b7bba1ad99deae5fa00fa0d1c61",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_06_235100_create_atomic_booking_numbers.php",
+      "migration": "2026_10_06_235100_create_atomic_booking_numbers",
+      "sha256": "6aeea2abb5c51592a8e847f19714ef4057c12ef281296f38a01172fa1985e72f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BookingModule/Database/Migrations/2026_10_07_000001_create_visit_booking_requests.php",
+      "migration": "2026_10_07_000001_create_visit_booking_requests",
+      "sha256": "8305c0d3227c5a6b5d3887a8a677ec778976fc2d3e703b7a9fdffbf735deef69",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2022_05_25_054015_create_business_settings_table.php",
+      "migration": "2022_05_25_054015_create_business_settings_table",
+      "sha256": "f770930ca85f328915e89049829c0ef90324deba0d8734928bae155cde27c87d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2022_08_28_044249_col_change_to_business_settings_table.php",
+      "migration": "2022_08_28_044249_col_change_to_business_settings_table",
+      "sha256": "17aaf7a9a2c5e76e49584a3d383315ba3b50187ac9348c6261534cadcf8186d3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2023_10_31_171211_create_translations_table.php",
+      "migration": "2023_10_31_171211_create_translations_table",
+      "sha256": "301dd8ed1286d2994958562495c4ce5affd2627d9c70a6c83bafbce2767bdb62",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2023_11_07_182712_create_landing_page_features_table.php",
+      "migration": "2023_11_07_182712_create_landing_page_features_table",
+      "sha256": "4662784f04aeb2af0b7f358802f0dae4cde43cc13b40aa85f0291ded7bdd8c43",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2023_11_08_092558_create_landing_page_specialities_table.php",
+      "migration": "2023_11_08_092558_create_landing_page_specialities_table",
+      "sha256": "deda3adbb5c2d9b984418e99ce0ff6b5944049587b1eb08496656c1984e504c7",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2023_11_08_094847_create_landing_page_testimonials_table.php",
+      "migration": "2023_11_08_094847_create_landing_page_testimonials_table",
+      "sha256": "5df59ae705ddad4a28063f9fd16f1297c29d3bb6c3614ac2a6671c5fbc3cd080",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2023_11_16_110101_create_data_settings_table.php",
+      "migration": "2023_11_16_110101_create_data_settings_table",
+      "sha256": "0eb905deea45865f06157398c6129282a3b1ab953e0872cae64fd2b653605b7e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_21_105847_create_subscription_packages_table.php",
+      "migration": "2024_05_21_105847_create_subscription_packages_table",
+      "sha256": "12d6fac257b08bec7df9d2440c3ab305145e1d4e8448edc8d7659e3e19dccd2f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_21_105930_create_subscription_package_features_table.php",
+      "migration": "2024_05_21_105930_create_subscription_package_features_table",
+      "sha256": "47266be8e2c045b9ccef8af0719337e8b50494b5f3d08cfcd7f630f2c6064289",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_21_105958_create_subscription_package_limits_table.php",
+      "migration": "2024_05_21_105958_create_subscription_package_limits_table",
+      "sha256": "133ceecbcb93120b2db95e404fb1b07a7b8cc7ebb73ba484fddad7199fb84225",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_22_152625_create_storages_table.php",
+      "migration": "2024_05_22_152625_create_storages_table",
+      "sha256": "14db4feb614e4ba7d46abac64e4a84e3241e7913bf2b80d01dafa6c7379301ce",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_26_100825_create_package_subscribers_table.php",
+      "migration": "2024_05_26_100825_create_package_subscribers_table",
+      "sha256": "5acd58234640b351b0dbd2e12393de47200d0e32e01ce31d30f4811e8b6a039d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_26_100851_create_package_subscriber_features_table.php",
+      "migration": "2024_05_26_100851_create_package_subscriber_features_table",
+      "sha256": "c25c98f0c4d284210bb1419cabd98a062bb9a8ba3f7010ea25a3f5864fd1570c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_26_100918_create_package_subscriber_limits_table.php",
+      "migration": "2024_05_26_100918_create_package_subscriber_limits_table",
+      "sha256": "24cc89db2e1e72c8f22e568b06ef7651bc490fcb16c2f49b1e51e42e1efe430f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_05_28_170817_create_package_subscriber_logs_table.php",
+      "migration": "2024_05_28_170817_create_package_subscriber_logs_table",
+      "sha256": "6a8a9a3881e548508f3548d1e22e547dc343f55c8f5bd4085a40868798e00762",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_06_02_173558_add_to_col_package_subscriber_table.php",
+      "migration": "2024_06_02_173558_add_to_col_package_subscriber_table",
+      "sha256": "cb16c77f131c7a0a942223a2dd2e144bf055f799ec76240104898a09df56fd9f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_06_04_142029_rename_col_package_subscriber_features_tabel.php",
+      "migration": "2024_06_04_142029_rename_col_package_subscriber_features_tabel",
+      "sha256": "677d793a05348e07e2d696b932bc8272e3f8e33cf626847b6c12062a594c8609",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_06_06_160149_add_to_col_transaction_id_to_package_subscriber_logs_tabel.php",
+      "migration": "2024_06_06_160149_add_to_col_transaction_id_to_package_subscriber_logs_tabel",
+      "sha256": "61db33b7a02a32503d6efb7c7130a8d03ef70761782bb168345141cfa4219667",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_06_11_115322_add_to_col_package_subscription_tabel.php",
+      "migration": "2024_06_11_115322_add_to_col_package_subscription_tabel",
+      "sha256": "ac2859037c9efc0045677ea2b7d68232e3dd16c0e95767d9af56a72bb15ff224",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_06_12_152132_add_is_notified_in_package_subscribers.php",
+      "migration": "2024_06_12_152132_add_is_notified_in_package_subscribers",
+      "sha256": "4c7f2c459eea4b546359e0f2349f04beb11548251beca4bcc6fb1a3b840444e7",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_08_01_085757_create_login_setups_table.php",
+      "migration": "2024_08_01_085757_create_login_setups_table",
+      "sha256": "fb6a95385462edf0863112ee8c4f96ac76ff0c8430b5f48c12e3e8013b8c4e08",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_08_04_171331_create_notification_setups_table.php",
+      "migration": "2024_08_04_171331_create_notification_setups_table",
+      "sha256": "3216276547f4b5c496ac99c588796b9cb609a835090b6c255969c657cb60cfbb",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_08_06_204700_create_provider_notification_setups_table.php",
+      "migration": "2024_08_06_204700_create_provider_notification_setups_table",
+      "sha256": "ad06eaf72b55308b59fcd0b74da70846d423ff7a563c2d956c22c7db9b3bdcb5",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_09_05_173819_create_seo_settings_table.php",
+      "migration": "2024_09_05_173819_create_seo_settings_table",
+      "sha256": "98a7bca89e06b225ce3f0e9a9099e17c8e00da4f3956b8620bd2f4530698299e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_09_07_132218_create_error_logs_table.php",
+      "migration": "2024_09_07_132218_create_error_logs_table",
+      "sha256": "3efaab9f8e93b1012c1e58a253c76b9a367e0c934b476bc74482109eb371cd28",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_09_21_145743_create_cron_jobs_table.php",
+      "migration": "2024_09_21_145743_create_cron_jobs_table",
+      "sha256": "eb5ebd7043ae2e1448e42d50e3a3219b6043a35e7276b5c23c8bbd0604a4ac0e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2024_09_25_133132_add_to_col_cron_jobs_table.php",
+      "migration": "2024_09_25_133132_add_to_col_cron_jobs_table",
+      "sha256": "bc007be001ff2668f7f555c69ed930359a11aff2b4a43dedd9a347e3027907de",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2025_07_10_124538_create_business_page_settings_table.php",
+      "migration": "2025_07_10_124538_create_business_page_settings_table",
+      "sha256": "e916b5c6bcfa44775164b7b06a9c0c6b962b60c2a766dac3e80b3ec0cb887984",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2025_07_14_200727_create_settings_tutorials_table.php",
+      "migration": "2025_07_14_200727_create_settings_tutorials_table",
+      "sha256": "ad891049db18e3f492a3a4667425e14cceed417899679ad168a715178ae91965",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2025_07_26_161742_add_key_type_column_in_notification_setups_table.php",
+      "migration": "2025_07_26_161742_add_key_type_column_in_notification_setups_table",
+      "sha256": "89e90a742c6042f0732751bf8ee535e67b4bf0751f6ff84488394a506c71ece8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2026_06_08_120100_normalize_additional_data_setup_fields.php",
+      "migration": "2026_06_08_120100_normalize_additional_data_setup_fields",
+      "sha256": "37800d7d4ae672086ddcf60e48538388fb99f9621d5b2cc0895451d20f9d6ac3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2026_06_30_120000_seed_provider_verified_notification_rows.php",
+      "migration": "2026_06_30_120000_seed_provider_verified_notification_rows",
+      "sha256": "b1c20c3d093fd7fe2f2cce5577b0f4dbb089feea7a65f7d53218077fc6cc33a6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/BusinessSettingsModule/Database/Migrations/2026_06_30_130000_seed_customer_subscription_notification_rows.php",
+      "migration": "2026_06_30_130000_seed_customer_subscription_notification_rows",
+      "sha256": "6a10f8faa834420cd6240186fd8881fc69ad4573762a38a4856a7e28ec5da977",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2022_06_22_082434_create_carts_table.php",
+      "migration": "2022_06_22_082434_create_carts_table",
+      "sha256": "f820c0c14234651b90a6a323069f278ad7be93abd8d73a879e05776be7a161fa",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2022_07_31_113436_add_new_col_campaign.php",
+      "migration": "2022_07_31_113436_add_new_col_campaign",
+      "sha256": "68a56e0c585bdd0e2e3de359811ee86eb1c5fe43181276c67ad74d8da9a8b89e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2023_02_05_200352_create_added_to_carts_table.php",
+      "migration": "2023_02_05_200352_create_added_to_carts_table",
+      "sha256": "3249930e9acbdb2a71fe7a6cf62c9951121ca7e4b8704d8b85af2de4f778123f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2023_02_08_174014_add_provider_id_to_carts_table.php",
+      "migration": "2023_02_08_174014_add_provider_id_to_carts_table",
+      "sha256": "9e97fa80d7d53aecc067ec6d1b5e731f81a8bcf2964e2b03e94facab4d41f8b0",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2023_07_12_105915_add_is_guest_column_to_carts_table.php",
+      "migration": "2023_07_12_105915_add_is_guest_column_to_carts_table",
+      "sha256": "9361b6132fdaf595f89c7630a454cfa891adc6056bea7ea104117f5145c520db",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2023_07_12_105941_add_is_guest_column_to_added_to_carts_table.php",
+      "migration": "2023_07_12_105941_add_is_guest_column_to_added_to_carts_table",
+      "sha256": "67c86f983a469c490adcbd126690027603ecd8708c668f8bcb491745cc6f04c4",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CartModule/Database/Migrations/2024_10_21_141011_add_to_col_carts_table.php",
+      "migration": "2024_10_21_141011_add_to_col_carts_table",
+      "sha256": "28575463f20c6e394f4a4128f2181b2bea8e9c9d1b15cd0a7da57036bdbf8544",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CategoryManagement/Database/Migrations/2022_03_06_035439_create_categories_table.php",
+      "migration": "2022_03_06_035439_create_categories_table",
+      "sha256": "fbe619045aeef1646ccd58f4e7c38c9afad7a62677d580d053887e8f42983844",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CategoryManagement/Database/Migrations/2022_03_06_042053_create_category_zone_table.php",
+      "migration": "2022_03_06_042053_create_category_zone_table",
+      "sha256": "ee364364a13e655b973a61760d2d89bf85a465a8e3735c60951c7fb5dc5a5499",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CategoryManagement/Database/Migrations/2023_01_27_001826_add_col_to_categories_table.php",
+      "migration": "2023_01_27_001826_add_col_to_categories_table",
+      "sha256": "a92efb66a0d421d7aa6f37dbf2dd2b79701a4725d3f7eea586f8684abfea7b40",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CategoryManagement/Database/Migrations/2026_01_13_125810_add_slug_col_to_categories_table.php",
+      "migration": "2026_01_13_125810_add_slug_col_to_categories_table",
+      "sha256": "65741c67458561024ea39de0417683b746af5b0c7a14b9da6bfa5611f261a77e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_07_31_093836_create_channel_lists_table.php",
+      "migration": "2022_07_31_093836_create_channel_lists_table",
+      "sha256": "91301ef2a8c6d99ad53ad71fe9c540e1888ac991b4820f80c42bf15127c91d3b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_07_31_093916_create_channel_users_table.php",
+      "migration": "2022_07_31_093916_create_channel_users_table",
+      "sha256": "72e7da1709a93c49a0ff43549b811e85fa1ca918a133d793f4c3179f10f4966c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_07_31_094036_create_channel_conversations_table.php",
+      "migration": "2022_07_31_094036_create_channel_conversations_table",
+      "sha256": "a1b704d41b986d914cde1f2c6dacbe78e7b976da201b8e3116ec09698e3655b5",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_07_31_104246_create_conversation_files_table.php",
+      "migration": "2022_07_31_104246_create_conversation_files_table",
+      "sha256": "52b29f211954e5fd60b2dcac527f84d32d158d94811b01eae9955202aff4f794",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_08_02_054322_update_col_type.php",
+      "migration": "2022_08_02_054322_update_col_type",
+      "sha256": "fa8a1c05a3489e162273cb73068afe7b8c76015f5bffd9b0997e1c55adb35b9b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_08_21_031258_add_col_to_channel_list.php",
+      "migration": "2022_08_21_031258_add_col_to_channel_list",
+      "sha256": "cfade64961c1f025bb14f30ee2b7a3effec9954d74d2115e71629234c3ddfcf1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2022_08_21_033729_add_col_to_channel_user_table.php",
+      "migration": "2022_08_21_033729_add_col_to_channel_user_table",
+      "sha256": "2eb2a36237436fee6860c2d2e5437191eb6ff2b2c0e2bfe7517636438da60739",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2024_02_10_183058_rename_file_name_col_to_conversation_files_table.php",
+      "migration": "2024_02_10_183058_rename_file_name_col_to_conversation_files_table",
+      "sha256": "e88e664cee0c17a72e8a1cfd0eeacdbddeb2acfd087d82fbce14a4cbe9930c16",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ChattingModule/Database/Migrations/2024_02_10_184243_add_original_file_name_col_to_conversation_files_table.php",
+      "migration": "2024_02_10_184243_add_original_file_name_col_to_conversation_files_table",
+      "sha256": "ef947f4e0749d9e0836c8173598d2c73ea0df9b512f7d8ea72ad82d6f6cf863b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerModule/Database/Migrations/2022_07_17_064031_add_addres_type.php",
+      "migration": "2022_07_17_064031_add_addres_type",
+      "sha256": "8d625fc69964103d048d2d79b2db518fa407695b212def19912512855e27efd8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerModule/Database/Migrations/2022_07_17_071324_add_addres_type1.php",
+      "migration": "2022_07_17_071324_add_addres_type1",
+      "sha256": "e81226864e6675cf098e42815e42e4c363c0037fbb5a6f157e7d7009d2b980f9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerModule/Database/Migrations/2023_02_05_225314_create_searched_data_table.php",
+      "migration": "2023_02_05_225314_create_searched_data_table",
+      "sha256": "8333979616a1864fd8b98c577a5ee5ff4e6c72138155dde7d139c95d356d6363",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerModule/Database/Migrations/2023_07_19_111811_add_house_and_street_col_in_user_addresses_table.php",
+      "migration": "2023_07_19_111811_add_house_and_street_col_in_user_addresses_table",
+      "sha256": "460d347c54fdee281c906dc6a34cd9a210af7af45c4940d651625f10b06fd8e9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerModule/Database/Migrations/2025_03_04_142506_create_subscribe_newsletters_table.php",
+      "migration": "2025_03_04_142506_create_subscribe_newsletters_table",
+      "sha256": "1367ba00a870184c57c1b70d43e1d9f866b6205ee2c61bbe78bd14e6c4d2d7c6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_10_000001_create_subscription_plans_table.php",
+      "migration": "2026_06_10_000001_create_subscription_plans_table",
+      "sha256": "ab69154aac3f7566c4d0532785b4626460f481c91869c54e910a01f82f153b4c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_10_000002_create_customer_subscriptions_table.php",
+      "migration": "2026_06_10_000002_create_customer_subscriptions_table",
+      "sha256": "f5c075fc5d20a451cc2162c9391abce7143f7cd337bad235a8c7f09c5a720fcb",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_10_000003_create_subscription_faqs_table.php",
+      "migration": "2026_06_10_000003_create_subscription_faqs_table",
+      "sha256": "90f767c8a34a403c21d4d88672249d1209d98108159c498c4a797628e9962899",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_10_000004_add_total_pro_discount_amount_to_bookings_table.php",
+      "migration": "2026_06_10_000004_add_total_pro_discount_amount_to_bookings_table",
+      "sha256": "40e97cd06c4f58b8ab5059332e8b8fb0720e8f627cbcca590c615f31144167cd",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_11_000001_add_plan_type_to_customer_subscriptions_table.php",
+      "migration": "2026_06_11_000001_add_plan_type_to_customer_subscriptions_table",
+      "sha256": "03dcc6c977067dc28c8419b8b4b2a2f8b33deba9cadb886bc0ff4296953ddbb6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_27_000001_add_total_pro_service_fee_discount_amount_to_bookings_table.php",
+      "migration": "2026_06_27_000001_add_total_pro_service_fee_discount_amount_to_bookings_table",
+      "sha256": "37bb472c935f438eb4b79ebe3e58a9c53476915cdd6240d708e1db252f21261e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/CustomerSubscriptionModule/Database/Migrations/2026_06_28_000001_move_subscription_terms_to_business_settings.php",
+      "migration": "2026_06_28_000001_move_subscription_terms_to_business_settings",
+      "sha256": "8112c6c75129a0f01f84942e7913a78d32b1a383be2a82b5ca48157a8dc34e52",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/OdooIntegration/Database/Migrations/2026_10_04_110100_create_odoo_outbox.php",
+      "migration": "2026_10_04_110100_create_odoo_outbox",
+      "sha256": "922ef313c3536d03bd89f656308010a203fc80b3c272a3965b4f2520a856f423",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PaymentModule/Database/Migrations/2023_08_06_152659_create_offline_payments_table.php",
+      "migration": "2023_08_06_152659_create_offline_payments_table",
+      "sha256": "22f58d5635519974cc40b55c7af1e41791ec4d0ea89c24d72aba6a49bffec8f4",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PaymentModule/Database/Migrations/2023_08_08_094402_create_bonuses_table.php",
+      "migration": "2023_08_08_094402_create_bonuses_table",
+      "sha256": "11d6a296b4be3fdfe327703e773e12466c148849fc99dcb795fe7adaefe9629a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PaymentModule/Database/Migrations/2026_10_04_110000_create_gateway_workflows.php",
+      "migration": "2026_10_04_110000_create_gateway_workflows",
+      "sha256": "6a4e7cc601d63a4f77c388c1afd70ecfca780e3a4aaf4bd2dca6c335800f6f24",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PaymentModule/Database/Migrations/2026_10_06_235000_create_secure_payment_sessions.php",
+      "migration": "2026_10_06_235000_create_secure_payment_sessions",
+      "sha256": "de2eb5e11154460bc1b64039ea4a0f82389518bc52d8d6a12e58bedbe0076ffe",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_03_06_091813_create_discounts_table.php",
+      "migration": "2022_03_06_091813_create_discounts_table",
+      "sha256": "3081309c1ae920266a99e8de92ba07f2f0d5787acb95602bef55b4b487112420",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_03_07_063157_create_discount_types_table.php",
+      "migration": "2022_03_07_063157_create_discount_types_table",
+      "sha256": "485fb6ef31a4ccbb536df094411491fe75e78c6e04220f3d8abdbfaabdbc88f6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_03_07_090055_create_coupons_table.php",
+      "migration": "2022_03_07_090055_create_coupons_table",
+      "sha256": "579050fea012414dc692c7c58cec1c6a600aa418a36c6cdc2fbed148a3b6f0f8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_03_07_110744_create_campaigns_table.php",
+      "migration": "2022_03_07_110744_create_campaigns_table",
+      "sha256": "a664b151a0d5765cb28e9e7167dc0d6356e90b50a900fbdd8ed8fee139044503",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_03_08_052530_create_banners_table.php",
+      "migration": "2022_03_08_052530_create_banners_table",
+      "sha256": "9d8e59e5d9603253f13a9a44e2cbac82cec045549b6ecb70e805e35e3d897d75",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_05_18_041330_discount_table_col_modify.php",
+      "migration": "2022_05_18_041330_discount_table_col_modify",
+      "sha256": "88ecc40819d85ab930320582e30b1df717c965eb6c5e5b724e3a3fda806574f5",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_05_21_035041_add_coupon_type.php",
+      "migration": "2022_05_21_035041_add_coupon_type",
+      "sha256": "81abf73ad349703fd9889723dbac1571f63b173638f89a6d1a8146366c12082a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_05_22_120123_add_banner_redirection_link.php",
+      "migration": "2022_05_22_120123_add_banner_redirection_link",
+      "sha256": "43e46f056a77d26bd6758cadd057ebf22dd761a26d1236aea7222ee2cecf800d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2022_07_03_095424_create_push_notifications_table.php",
+      "migration": "2022_07_03_095424_create_push_notifications_table",
+      "sha256": "1e49c224af13754670701f353c1df9ef0053793ae6c4456e107f55666dbfcf97",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2023_05_16_231127_create_coupon_customers_table.php",
+      "migration": "2023_05_16_231127_create_coupon_customers_table",
+      "sha256": "ea9939853224d1d10c10e173600cd5ce2756fb61d3f4f09553dd6362cacbb2f7",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2024_04_02_102509_create_push_notification_users_table.php",
+      "migration": "2024_04_02_102509_create_push_notification_users_table",
+      "sha256": "b511058df40574173ad520db48a5025c5d0002431b4b02f7e77a882b8a7cba3f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2024_04_22_132349_create_advertisements_table.php",
+      "migration": "2024_04_22_132349_create_advertisements_table",
+      "sha256": "cf0e1247dec0244849b2f9c1c8666b8cfdb14b12c58851d928f35920efb84c8f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2024_04_22_134754_create_advertisement_attachments_table.php",
+      "migration": "2024_04_22_134754_create_advertisement_attachments_table",
+      "sha256": "487cb9e0fad3dae8db339729ff9cc2055f029a192846c0c63107b7d57ebd100f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2024_04_22_181536_create_advertisement_notes_table.php",
+      "migration": "2024_04_22_181536_create_advertisement_notes_table",
+      "sha256": "249b8c41dc017decfcf6f135e683fe2640662e398914337afb3327d80f499998",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2024_04_25_160923_create_advertisement_settings_table.php",
+      "migration": "2024_04_25_160923_create_advertisement_settings_table",
+      "sha256": "ce498c27642b0e076a5034cf4f43feccd512c1ccebf3d7f457920453d28d37fa",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/PromotionManagement/Database/Migrations/2024_05_13_112445_add_is_updated_to_advertisements_table.php",
+      "migration": "2024_05_13_112445_add_is_updated_to_advertisements_table",
+      "sha256": "2aae2c90639196f2177e94820b79edaeb18e641f348c940ce27cc7447fe049dc",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_03_07_064337_create_providers_table.php",
+      "migration": "2022_03_07_064337_create_providers_table",
+      "sha256": "5a73f519d988eb2d61b129b9fb12e15fe690e885d0b1edc684fc97045951e550",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_03_07_065305_create_provider_sub_category_table.php",
+      "migration": "2022_03_07_065305_create_provider_sub_category_table",
+      "sha256": "88cf1bf68d8226c3bceb308420c12ce89c460f1f47d40ba51737315cdec7f236",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_06_13_120346_add_column_is_approved_to_provider_table.php",
+      "migration": "2022_06_13_120346_add_column_is_approved_to_provider_table",
+      "sha256": "f54eed6e6ca7b88fe9724820ab69668a0d5f1c962d42c2934b539aed51f0f19d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_06_14_104816_create_bank_details_table.php",
+      "migration": "2022_06_14_104816_create_bank_details_table",
+      "sha256": "1d3127b1407e0182fea32852ab0d02e5c3a744f7a6653b463d163b8d806c9373",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_06_15_043227_create_subscribed_services_table.php",
+      "migration": "2022_06_15_043227_create_subscribed_services_table",
+      "sha256": "ea6050715b23ff260c1b4b8c223c0c6b74b140a818f3603127fb817d9d3a1e76",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_06_18_095222_create_withdraw_requests_table.php",
+      "migration": "2022_06_18_095222_create_withdraw_requests_table",
+      "sha256": "c65d394a97ed7a2ebea906d5ea827b5eb61c1f9e2dae5b392fcdfdfca0528c4f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_06_22_090257_column_add_to_withdraw_request_table.php",
+      "migration": "2022_06_22_090257_column_add_to_withdraw_request_table",
+      "sha256": "84efb07b770b6d150961f072acd86a4eda336760ab486e995d768b064a80ba52",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_07_03_065118_add_zone_id_in_providers.php",
+      "migration": "2022_07_03_065118_add_zone_id_in_providers",
+      "sha256": "8fd4b58c432e4b14d7923ad4f689bfcde5097bc1654f33fba12c97bdc24dc40c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_09_17_185044_add_col_to_bank_destails.php",
+      "migration": "2022_09_17_185044_add_col_to_bank_destails",
+      "sha256": "472cef4fd3c19ed3f7d7a51b5d0be85f5004bcf26379e09f7b9f559a08bb69cb",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2022_09_21_235326_col_add_to_withdraw_requests_table.php",
+      "migration": "2022_09_21_235326_col_add_to_withdraw_requests_table",
+      "sha256": "52185e1a2372fb8720815ad7c204575d902cba76291a840efa64679c71db2347",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2023_05_16_130004_add_col_to_providers_table.php",
+      "migration": "2023_05_16_130004_add_col_to_providers_table",
+      "sha256": "bb92ebe53c562b39d141693a17d1ac31a184feee322afe2bab5e367117c20baa",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2023_08_24_132317_create_provider_settings_table.php",
+      "migration": "2023_08_24_132317_create_provider_settings_table",
+      "sha256": "51c2e8b9b2e2fc1ef053b52d0d8242b14dadcf8804ac46f86a21280045bf093d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2023_11_19_112426_add_is_suspended_col_to_providers_table.php",
+      "migration": "2023_11_19_112426_add_is_suspended_col_to_providers_table",
+      "sha256": "f903b9963897a4abfde16bc28d4d0879aa26d406d5033fa8162226db9ffdca67",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2023_11_19_155434_add_soft_deletes_to_providers_table.php",
+      "migration": "2023_11_19_155434_add_soft_deletes_to_providers_table",
+      "sha256": "14189cee09721da0b50c5aeec8f35e13287fb137fc39f54a548b28985931221c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2023_12_20_135725_add_service_availability_to_providers_table.php",
+      "migration": "2023_12_20_135725_add_service_availability_to_providers_table",
+      "sha256": "4dda6e7fb63c0a89d12a9eb4ad939609c76d45fbb937485ca9fb5f42e82d1437",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2024_03_20_053908_create_favorite_providers_table.php",
+      "migration": "2024_03_20_053908_create_favorite_providers_table",
+      "sha256": "6af38893903ce14c886abcfd3ac7289ddfccc31b09940c4ded0e035c3d1a1da9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2025_07_15_153339_create_providers_withdraw_methods_data_table.php",
+      "migration": "2025_07_15_153339_create_providers_withdraw_methods_data_table",
+      "sha256": "3ed6112a9f0a1fc9ad0303d71eb01ccc25c0270bbfb955454771b8de78229431",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2025_07_22_145850_add_cover_image_in_providers_table.php",
+      "migration": "2025_07_22_145850_add_cover_image_in_providers_table",
+      "sha256": "ad0c6306417ef4c121630d6d5577c6cc60c91a1bb93fa331636aea1735b03683",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2026_06_04_000001_add_verification_columns_to_providers_table.php",
+      "migration": "2026_06_04_000001_add_verification_columns_to_providers_table",
+      "sha256": "5c8b2b85f7dcc6471cd4fc0bdd521e262710e727029f652fb55fc411e901f614",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2026_06_04_000002_add_verification_notified_to_providers_table.php",
+      "migration": "2026_06_04_000002_add_verification_notified_to_providers_table",
+      "sha256": "95534945887e6809f24891591ad2a423ead7ac204cf6a11a3fcc7ad119ca2f80",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2026_10_01_000001_add_branch_operational_fields_to_providers_table.php",
+      "migration": "2026_10_01_000001_add_branch_operational_fields_to_providers_table",
+      "sha256": "c986d7c937d1a27fedeb33236cb5d05feb7beda53d0a45531fc9808c1343dcbd",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ProviderManagement/Database/Migrations/2026_10_01_100000_create_branch_service_areas_table.php",
+      "migration": "2026_10_01_100000_create_branch_service_areas_table",
+      "sha256": "c606a12c6c7b5bc0bf00e980c5ba69d63976e3f95a10040a18166cfb67566ac8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ReviewModule/Database/Migrations/2022_06_18_052537_create_reviews_table.php",
+      "migration": "2022_06_18_052537_create_reviews_table",
+      "sha256": "1d5b87a6a931fb7dcaecf6336e90846a6cd4da60f1e937a5f183e206c58b0042",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ReviewModule/Database/Migrations/2022_07_24_051517_add_cus_col_in_review.php",
+      "migration": "2022_07_24_051517_add_cus_col_in_review",
+      "sha256": "119e9ea6642cefefcdbcf116d38f0059628e1a61b53d7cab66fdbed516a4e97c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ReviewModule/Database/Migrations/2024_09_02_131527_create_review_replies_table.php",
+      "migration": "2024_09_02_131527_create_review_replies_table",
+      "sha256": "2baf20cc85b79c0ef0868592ef9df75d39f145a6b51a68f52390381cf20d8afd",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ReviewModule/Database/Migrations/2024_09_02_132320_add_to_col_readable_id_in_review_table.php",
+      "migration": "2024_09_02_132320_add_to_col_readable_id_in_review_table",
+      "sha256": "4c8f3a4be3cf85622b6a1d1c6316fc0c0db21531f20052161d7fa29f76a7f511",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_03_06_092202_create_services_table.php",
+      "migration": "2022_03_06_092202_create_services_table",
+      "sha256": "6f04db9f41197849589cfa02e943492a2de3d6f843bca8f8f9d085c0d4276474",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_03_06_094413_create_variations_table.php",
+      "migration": "2022_03_06_094413_create_variations_table",
+      "sha256": "8818629bd091b2e53fde32faa6a11be1c89b666eeda5478c686ddd63004059b8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_05_09_122054_add_variant_key_in_variation.php",
+      "migration": "2022_05_09_122054_add_variant_key_in_variation",
+      "sha256": "f9311264eb1113b6bb7c1d2dbe6216bc012aca401c74fffc879bbe7fc7b62984",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_05_12_100348_create_faqs_table.php",
+      "migration": "2022_05_12_100348_create_faqs_table",
+      "sha256": "171c71e78358b4424b938553de511cffad76a4d9b37ad30fc3eecc932699a733",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_12_05_184417_col_add_to_services_table.php",
+      "migration": "2022_12_05_184417_col_add_to_services_table",
+      "sha256": "412ecc9ca33ddd2ae5b5c0d34cdd8cf3530604f6601e85743e4624e505822074",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_12_06_002432_create_recent_views_table.php",
+      "migration": "2022_12_06_002432_create_recent_views_table",
+      "sha256": "425247da859aa84c6c386b61d552efbd963bceb3955122430b1a712dffc5129e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2022_12_08_201359_create_recent_searches_table.php",
+      "migration": "2022_12_08_201359_create_recent_searches_table",
+      "sha256": "cfa6926d0cd925ddd5984bd345776dbf68b8b8e00286a993a1d06a0bb04798c7",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2023_01_29_011739_create_tags_table.php",
+      "migration": "2023_01_29_011739_create_tags_table",
+      "sha256": "047bd250bff478687f2afdf29f658352000969bd0624d8e1eeb5c73830a01656",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2023_01_29_162753_create_table_service_tag.php",
+      "migration": "2023_01_29_162753_create_table_service_tag",
+      "sha256": "885cdced6d8e62fa2912ff50a89f8f5d72eef8dc6e711c529a2f2a0775711582",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2023_02_02_231012_create_service_requests_table.php",
+      "migration": "2023_02_02_231012_create_service_requests_table",
+      "sha256": "ec4ec474c0f797e1dd4358f6002490c473efb9694435ee91aab6a4c2a580bbad",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2023_02_05_214409_create_visited_services_table.php",
+      "migration": "2023_02_05_214409_create_visited_services_table",
+      "sha256": "5267d6a5b7264ee2394b38d5c6da89337932ce64ccdb20b2993e04e404e42365",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2023_05_08_161525_add_col_to_services_table.php",
+      "migration": "2023_05_08_161525_add_col_to_services_table",
+      "sha256": "875821ec75f55f06887739a9c6f45ba9ef8c4409cfa912520c4749262fdf18f5",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2024_02_15_143856_make_col_nullable_to_service_requests_table.php",
+      "migration": "2024_02_15_143856_make_col_nullable_to_service_requests_table",
+      "sha256": "e9be4340f16e5d06a75ade5d318d209cf748380da11b8b724624d1386682265a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2024_03_20_134756_create_favorite_services_table.php",
+      "migration": "2024_03_20_134756_create_favorite_services_table",
+      "sha256": "c53b2e719862eed2363be5dad4fabd51589d6970bf55d18bf384eff5ce624bb3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2026_01_14_161318_add_slug_col_to_services_table.php",
+      "migration": "2026_01_14_161318_add_slug_col_to_services_table",
+      "sha256": "fc1a0817e698be9c06db12e76562a1956857b819f022231642b4308cbe58ab4b",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2026_10_01_110000_create_service_pricing_foundation.php",
+      "migration": "2026_10_01_110000_create_service_pricing_foundation",
+      "sha256": "9faa85b000e314425b4261fb39711b75fc5c96b7e9628b37e69a9d159f6a9178",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServiceManagement/Database/Migrations/2026_10_07_000002_add_service_gallery_images.php",
+      "migration": "2026_10_07_000002_add_service_gallery_images",
+      "sha256": "7b74a25da6c178a6adb846b0b9f01191b2250d5392fcf9771d28759b2e9352e1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ServicemanModule/Database/Migrations/2026_10_01_100100_create_dispatch_workforce_tables.php",
+      "migration": "2026_10_01_100100_create_dispatch_workforce_tables",
+      "sha256": "14f0be3b058f9f4bd65f0a4fc3fb0575f92aae9dcfeb579b24df7a92b3c39902",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2022_06_16_060054_tnx_add.php",
+      "migration": "2022_06_16_060054_tnx_add",
+      "sha256": "0145bcaab858f5653e9af5d89c8298c085095357fa05d35ac0a9373c17661bce",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2022_06_16_060137_acc_add.php",
+      "migration": "2022_06_16_060137_acc_add",
+      "sha256": "cf3755847ef4a052e731317646700f1969eea60f27e26797fdedf5d1248f420a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2022_08_23_060744_col_add_to_tnx_table.php",
+      "migration": "2022_08_23_060744_col_add_to_tnx_table",
+      "sha256": "33f74d340d0a3352c4cb816a17e9778918bf54d773ea009a49339b9de32ce099",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2022_11_21_175412_add_col_to_withdraw_requests_table.php",
+      "migration": "2022_11_21_175412_add_col_to_withdraw_requests_table",
+      "sha256": "6f674df93c015f48bfe55ae2fd3d141a665111a62ebe4684f9674f1759b7dad9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2022_11_21_230747_create_withdrawal_methods_table.php",
+      "migration": "2022_11_21_230747_create_withdrawal_methods_table",
+      "sha256": "772748bd8e9d29ba6b523a5d1f23171b070a585e3b4bcd4f89fa1ecd4ef89d18",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2022_12_26_115139_add_col_to_accounts_table.php",
+      "migration": "2022_12_26_115139_add_col_to_accounts_table",
+      "sha256": "382b3a911b9aad02d1ce1d872cbae770fd4578af6366a5d85a9d828d80cdf3c2",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2023_01_25_195038_add_col_to_transactions_table.php",
+      "migration": "2023_01_25_195038_add_col_to_transactions_table",
+      "sha256": "2df886cc68a886717e79666084e62319dc2dd5f5dbb0eee788a31f89888f43b8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2023_01_26_174101_Create_loyalty_point_transactions_table.php",
+      "migration": "2023_01_26_174101_Create_loyalty_point_transactions_table",
+      "sha256": "c9cafc62ae1afc7d99c3acac4fcdde233cb607938b2bd8c9943629dc271fb927",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2023_07_13_094305_add_is_guest_column_to_transactions_table.php",
+      "migration": "2023_07_13_094305_add_is_guest_column_to_transactions_table",
+      "sha256": "42cbee9fd56871933316d214d1c43b56dd15121be23621cb2c74d483604bf3d1",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2024_11_10_113216_add_to_col_transactions_table.php",
+      "migration": "2024_11_10_113216_add_to_col_transactions_table",
+      "sha256": "2a1cde89d89a294412795a9d87ae6a04b5d4819982be6bd6d301eea371324560",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/TransactionModule/Database/Migrations/2026_04_09_210000_add_short_code_to_transactions_table.php",
+      "migration": "2026_04_09_210000_add_short_code_to_transactions_table",
+      "sha256": "173b75a46aaa9ae093e96c2bf009933ec620e9a38c7e5734b9dd001e624976ae",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2014_10_12_100000_create_password_resets_table.php",
+      "migration": "2014_10_12_100000_create_password_resets_table",
+      "sha256": "4523ad86b515b1d37c4e182e12973247b793e50511f1065d8ef9d57fac71c45d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2019_12_14_000001_create_personal_access_tokens_table.php",
+      "migration": "2019_12_14_000001_create_personal_access_tokens_table",
+      "sha256": "be34fc2b6d751cf72f23befbd4195e9bfed690784a5573b7f9188de8f74221c6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_02_28_094005_create_users_table.php",
+      "migration": "2022_02_28_094005_create_users_table",
+      "sha256": "cedf737199ff3d2ed1491df12826c702af1b05d80c886baa81d2bf6f87763c17",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_02_28_094802_create_roles_table.php",
+      "migration": "2022_02_28_094802_create_roles_table",
+      "sha256": "d30a56de861808879c0af2f1bffc4d4936c6bbe022011b5796d28976f618fd0e",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_02_28_094823_create_user_roles_table.php",
+      "migration": "2022_02_28_094823_create_user_roles_table",
+      "sha256": "8a31824d5e461d39f5f881c250eeb4b731bc9914d47b74b811b815bb3abd7ad9",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_03_01_093500_create_role_modules_table.php",
+      "migration": "2022_03_01_093500_create_role_modules_table",
+      "sha256": "28c0b53fe3e9b9402bb69ede2c1d1b025fc31fccb388fcb2518c842b696b2713",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_05_24_043332_remove_and_reformat_urder_table_col.php",
+      "migration": "2022_05_24_043332_remove_and_reformat_urder_table_col",
+      "sha256": "131f2ee96b7bef728b987e41470bd791290c99f7ce894a0849bfe5b65c6e2ad8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_06_08_070555_add_status_col_toRole.php",
+      "migration": "2022_06_08_070555_add_status_col_toRole",
+      "sha256": "3f073d5ee223e9be2761ac2655aea7510981c24d6f4a460fd7df1c2716f15240",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_06_11_110610_create_user_zones_table.php",
+      "migration": "2022_06_11_110610_create_user_zones_table",
+      "sha256": "8d730a69143b0f016d096e7df1f0e5175b5155df1c3d77feddf99fdf36d3e208",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_06_12_034552_create_user_addresses_table.php",
+      "migration": "2022_06_12_034552_create_user_addresses_table",
+      "sha256": "d931c7d654566799afc020ce02e7d7d28b7b95d8b005eaaff33ce89376809550",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_06_15_025832_role_table_customization.php",
+      "migration": "2022_06_15_025832_role_table_customization",
+      "sha256": "b6c8d26ca15475168bb7c71b6508fb9088233519105041b61d2a8fcb0ff6d59f",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_06_16_094936_create_servicemen_table.php",
+      "migration": "2022_06_16_094936_create_servicemen_table",
+      "sha256": "385d928b0a0d6267dd46befc8b2dd740ad169c4559931a5764e334dd9e468d6d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_06_20_085647_add_col_to_serviceman.php",
+      "migration": "2022_06_20_085647_add_col_to_serviceman",
+      "sha256": "1d912c0108b6d3786b843dd8263d638974342cc7aaa8d7802bdfaf747a8440b8",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_07_21_050907_pass_reset_table_col_add.php",
+      "migration": "2022_07_21_050907_pass_reset_table_col_add",
+      "sha256": "c7894604cb1e80c5bef8a6c7bb9b90928fcef69ded7035c379fc0bed1a845bcf",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_07_21_054008_pass_reset_table_col_add1.php",
+      "migration": "2022_07_21_054008_pass_reset_table_col_add1",
+      "sha256": "f1fcb6317b4f0f068a8ccd655d67f5a7c530f25ec6288befa4ea27123d317c30",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_08_06_045001_remove_col_from_user.php",
+      "migration": "2022_08_06_045001_remove_col_from_user",
+      "sha256": "b63f515a2b74d6213be52a9fa3272025e4ecfe0d9b5c9c24b94fccdb45b25172",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_09_01_135800_create_user_verifications_table.php",
+      "migration": "2022_09_01_135800_create_user_verifications_table",
+      "sha256": "bbf39137bc758cdc3a9fab9910e9a8bf8d0bdeb5abf929d9f6649b01583e4d3c",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2022_10_03_175305_add_zone_id_in_address.php",
+      "migration": "2022_10_03_175305_add_zone_id_in_address",
+      "sha256": "321ec9ae3cf9fd43eb572e5b417a331e50d9869d199318a79fe3354eb11aa470",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_01_24_230519_add_col_to_users_table.php",
+      "migration": "2023_01_24_230519_add_col_to_users_table",
+      "sha256": "d111ec3aeb192eab4e825f85c364a934b5641cf248f37a77ef18c5265baf5972",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_05_21_095745_add_col_to_users_table.php",
+      "migration": "2023_05_21_095745_add_col_to_users_table",
+      "sha256": "45d721dd6519e2d5b25da2988c7e698ee57d6621a79260fc293889382af61764",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_05_21_101102_add_col_to_user_verifications_table.php",
+      "migration": "2023_05_21_101102_add_col_to_user_verifications_table",
+      "sha256": "edf33c6426c5e999835db80d376f2a32300478f747fb0ea535d22a08af4d0ffa",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_07_13_105419_create_guests_table.php",
+      "migration": "2023_07_13_105419_create_guests_table",
+      "sha256": "f826d9f2689222fc8dfbb80c73bd0ef8b46ff3d8ba48d019459770062a3f9fd3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_07_13_180332_add_is_guest_column_to_added_to_user_addresses_table.php",
+      "migration": "2023_07_13_180332_add_is_guest_column_to_added_to_user_addresses_table",
+      "sha256": "f8fe1abbb33d2737386fcafbc86dfdfd31a8134ec0bff24ba899222eaf7ead1a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_11_08_174249_add_current_language_to_users_table.php",
+      "migration": "2023_11_08_174249_add_current_language_to_users_table",
+      "sha256": "b8f1d8fa76715e1f08366a1ea6ce8951cdd29e59a058fd0aeb265adfc8c66efd",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2023_11_08_174418_add_current_language_to_guests_table.php",
+      "migration": "2023_11_08_174418_add_current_language_to_guests_table",
+      "sha256": "467d589fda3045e400ff57bc7e630bd1fe62f9a8427f5650afe7f668d887a0fa",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_04_29_133239_create_role_accesses_table.php",
+      "migration": "2024_04_29_133239_create_role_accesses_table",
+      "sha256": "2ab8562055e545ac9c9a28de29fab8d87ecdd9814d8bb69674add19d10f2c31a",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_04_29_135809_create_role_sections_table.php",
+      "migration": "2024_04_29_135809_create_role_sections_table",
+      "sha256": "11da9043c1a7a9772b1b5160c35f18a449f6433346d71e7c1d411a2d4b4edabf",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_02_114745_create_employee_role_sections_table.php",
+      "migration": "2024_05_02_114745_create_employee_role_sections_table",
+      "sha256": "361149467a6ca6f6daec1020c78501c98c044651fc65548135e1bba212ddacb5",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_02_114900_create_employee_role_accesses_table.php",
+      "migration": "2024_05_02_114900_create_employee_role_accesses_table",
+      "sha256": "7470da4267375d2655987f4ba3582a530849e0240dde9921c78b87703ceb05ee",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_09_141125_drop_col_form_roles_tabel.php",
+      "migration": "2024_05_09_141125_drop_col_form_roles_tabel",
+      "sha256": "5b828f1dcca1a9ac0d9cfe7d55104b3fa56a02e62650f1b22690a67f0a778172",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_09_142158_drop_col_form_employee_role_section_tabel.php",
+      "migration": "2024_05_09_142158_drop_col_form_employee_role_section_tabel",
+      "sha256": "0efa53d23589d7751c3ebb0b1c357b5501625d62f3ce872dde15b29e1cfa23a3",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_09_142555_drop_role_modules_tabel.php",
+      "migration": "2024_05_09_142555_drop_role_modules_tabel",
+      "sha256": "e05f3a8dc61324fe8015a406787e0cae7af055059057ce35cd6343b766204449",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_09_142749_drop_user_roles_tabel.php",
+      "migration": "2024_05_09_142749_drop_user_roles_tabel",
+      "sha256": "6144e0ea5ce6375ae7fc3340a65b9bd27033b087c65fa118e7cc1d7a29d4a948",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_09_143102_drop_role_section_tabel.php",
+      "migration": "2024_05_09_143102_drop_role_section_tabel",
+      "sha256": "ffcdb481889c488582f1a5e2a1cdbf4fe95cee9de19f51d48f5fe493f2be51bd",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_13_155906_add_to_col_role_accesses_tabel.php",
+      "migration": "2024_05_13_155906_add_to_col_role_accesses_tabel",
+      "sha256": "4fb9aae80a48c865ec29e066d0b79ac8a3b0162ca20671f286584713e8d77cb6",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2024_05_13_162125_add_to_col_employee_role_accesses_tabel.php",
+      "migration": "2024_05_13_162125_add_to_col_employee_role_accesses_tabel",
+      "sha256": "1bb02fa7574bd1121a2de35bd0309cd505444daa00a0464c0bc9973ec9d56e5d",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2025_03_08_135235_change_column_type_in_user_verifications_table.php",
+      "migration": "2025_03_08_135235_change_column_type_in_user_verifications_table",
+      "sha256": "f551a03cbe2a6a6bc43c516beaa4a8f90981de2409c3a6397b6fb6bb58a53efc",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/UserManagement/Database/Migrations/2026_06_08_120000_create_user_additional_infos_table.php",
+      "migration": "2026_06_08_120000_create_user_additional_infos_table",
+      "sha256": "ff4371dad464e7c8c03b21aa2a23fea39a26f5d8317a5b06f6a1923ae28ef8f0",
+      "runtime_status": "not_checked"
+    },
+    {
+      "file": "Modules/ZoneManagement/Database/Migrations/2022_03_05_085155_create_zones_table.php",
+      "migration": "2022_03_05_085155_create_zones_table",
+      "sha256": "33a1df1caed860b0d49f68be3ef1cc62ff35af1abaace467bb6879c223e5ee27",
+      "runtime_status": "not_checked"
+    }
+  ],
+  "backend_release_commit": "8b7f21607520709f5459577d8088f14c7a164489"
+}

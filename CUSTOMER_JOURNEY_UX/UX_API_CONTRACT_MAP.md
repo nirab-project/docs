@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | فتح خدمة | GET customer/service/detail/{slug} | slug فقط من الرابط | Service.pricing_type, active_fields, variations, FAQ, HTML, gallery_image_urls | ServiceActionHelper يقرر quote/fixed؛ CreatePostScreen يعيد تحميل الخدمة بعد الدخول |
 | العودة من الدخول | RouteHelper.getSignInRoute + redirect parser | مسار محلي يتضمن service وaction=quote، أو checkout | نفس المسار بعد نجاح الدخول بما فيه social login | URI encoding، رفض scheme/authority ومسارات auth؛ يقبل الشكل المحلي وJSON القديم؛ Guest Checkout محفوظ |
-| إنشاء عرض | POST customer/quote-requests؛ POST customer/post يتوافق في وضع الفروع | service_id، description، service_address_id أو service_address، requested_window_start/end اختياريان، field_values، additional_instructions، attachments | Post submitted + branch_id؛ CreatePostController ثم قائمة الطلبات | خدمة quote نشطة غير محذوفة، عنوان مملوك وإحداثيات ومنطقة Spatial، حقول الخدمة والملفات، اختيار فرع intakeOnly بلا حجز سعة |
+| إنشاء عرض | POST customer/quote-requests؛ POST customer/post القديم يرفض بـ410 في وضع الفروع | service_id، description، service_address_id أو service_address، requested_window_start/end اختياريان، field_values، additional_instructions، attachments | Post submitted + branch_id؛ CreatePostController ثم قائمة الطلبات | خدمة quote نشطة غير محذوفة، عنوان مملوك وإحداثيات ومنطقة Spatial، حقول الخدمة والملفات، اختيار فرع intakeOnly بلا حجز سعة |
 | قائمة الطلبات | GET customer/quote-requests?page&limit | حساب مصادق عليه | data/current_page/last_page/total؛ service, active_quotation, inspections, booking, quote_status | ملكية customer_user_id؛ تصحيح bool is_booked في العميل؛ لا بيانات Controller قديمة لازمة للرابط |
 | تفاصيل الطلب | GET customer/quote-requests/{id} | post_id في رابط quote-request | quotations[].customer_actions.can_accept/can_reject, payable_amount, currency، المعاينات، booking_id | قراءة مملوكة؛ حالة العرض بعد انتهاء الصلاحية؛ خدمة الطلب لا تختفي بسبب انتقال منطقة التصفح الحالية؛ لا قبول مستنتج من UI |
 | ملخص قبول العرض | GET customer/post/details/{id}?post_bid_id={quoteId} | معرفا الطلب والعرض | post_details، quotation_can_checkout، quotation_offered_amount، quotation_inspection_deduction، quotation_payable_amount | Flutter يعرض هذه المبالغ دون حساب ضريبة/خصم مستقل ودون مبلغ الرابط؛ المبلغ هو إجمالي عقد العرض الحالي؛ غياب العقد يعطّل الدفع بأمان |
@@ -16,6 +16,8 @@
 | تحويل العرض | POST customer/quote-requests/quotations/{id}/accept، ومسارات post القديمة المتوافقة | service_schedule صريح، payment_method، quotation_payable_amount كقيمة متوقعة فقط؛ is_partial/بيانات offline وفق المسار الموجود | Booking.id والربط post.booking_id/quote.booking_id | العرض والطلب مقفولان، إعادة الطلب تعيد الحجز؛ الخدمة والسعة والفرع والموعد والسعر يعاد فحصها؛ التوقيت الاختياري الأولي لا يستخدم كبديل |
 
 قواعد معاينة العرض من QuoteInspection الحالية: مجانية أو مدفوعة، scheduled_at وstatus؛ خصم المعاينة يأتي من paid_at/amount وغير المخصوم على الخادم. تطبيق العميل يعرضها ولا ينشئ سياسة رسوم أو موعد معاينة تلقائياً. provider_note وterms من العرض الحالي، لا محتوى ثابت لخدمة.
+
+بعد `RELEASE-HOTFIX-01` يرد `PUT customer/post/update-info` أيضًا بـ410 في وضع الفروع. الرسالة تطلب تحديث التطبيق واستخدام شاشة طلب عرض السعر، دون إنشاء أو تعديل سجل. قراءة `post/details` وقبول ورفض العرض محفوظة. في الوضع الآخر تبقى الكتابة مشروطة بنوع customer وملكية الطلب والعنوان؛ التعديل يقفل الطلب والعنوان ويرفض المحجوز أو ذا عرض أو سياق رحلة الفروع بـ409. التفاصيل في [تقرير الإصلاح](RELEASE_HOTFIX_01_REPORT.md).
 
 ## الإتاحة والحجز المباشر والدفع
 
