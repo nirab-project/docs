@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-06",
+  "repositories": [
+    {
+      "repository": "Admin Panel",
+      "branch": "main",
+      "sha": "3ef8528c6cf01e82ebb2ab4d9ebf30b73cf02846",
+      "status_before": ""
+    },
+    {
+      "repository": "User app and web",
+      "branch": "main",
+      "sha": "1fe0d15bc33e9e511dfabf45c3263aa1705f21f9",
+      "status_before": ""
+    },
+    {
+      "repository": "Provider app",
+      "branch": "main",
+      "sha": "fa6c9a03c81dc960440589041caa70c5d5139917",
+      "status_before": ""
+    },
+    {
+      "repository": "Service man app",
+      "branch": "main",
+      "sha": "574754ed5b2bf0acf0e2a69fa98a60a2dfd4bb37",
+      "status_before": ""
+    },
+    {
+      "repository": "Docs",
+      "branch": "main",
+      "sha": "611a32242c520a87aa8cad39b16c183c8e4b1fb2",
+      "status_before": ""
+    }
+  ],
+  "scope": "UX-01 through UX-06; source/static only; no runtime, integrations, migrations, package installs or deployment"
+}
