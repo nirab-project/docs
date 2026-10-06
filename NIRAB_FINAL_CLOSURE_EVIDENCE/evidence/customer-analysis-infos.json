@@ -1,0 +1,231 @@
+[
+  {
+    "file": "lib/common/widgets/cookies_view.dart",
+    "line": 2,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/common/widgets/custom_text_field.dart",
+    "line": 2,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/common/widgets/footer_view.dart",
+    "line": 3,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/common/widgets/quantity_button.dart",
+    "line": 2,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/common/widgets/service_widget_vertical.dart",
+    "line": 1,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/feature/auth/controller/auth_controller.dart",
+    "line": 1230,
+    "diagnostic": "avoid_function_literals_in_foreach_calls",
+    "message": "Function literals shouldn't be passed to 'forEach'",
+    "source_line_present_in": [
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/auth/widgets/file_upload_field_widget.dart",
+    "line": 39,
+    "diagnostic": "avoid_function_literals_in_foreach_calls",
+    "message": "Function literals shouldn't be passed to 'forEach'",
+    "source_line_present_in": [
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/auth/widgets/file_upload_field_widget.dart",
+    "line": 106,
+    "diagnostic": "unnecessary_underscores",
+    "message": "Unnecessary use of multiple underscores",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/booking/controller/service_booking_controller.dart",
+    "line": 3,
+    "diagnostic": "library_prefixes",
+    "message": "The prefix 'reBook' isn't a lower_case_with_underscores identifier",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/bottomNav/view/bottom_nav_screen.dart",
+    "line": 1,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'dart:async' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/feature/checkout/view/payment_screen.dart",
+    "line": 200,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/checkout/view/payment_screen.dart",
+    "line": 290,
+    "diagnostic": "empty_catches",
+    "message": "Empty catch block",
+    "source_line_present_in": [
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/create_post/controller/create_post_controller.dart",
+    "line": 354,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/create_post/widget/dynamic_service_fields.dart",
+    "line": 54,
+    "diagnostic": "deprecated_member_use",
+    "message": "'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/create_post/widget/dynamic_service_fields.dart",
+    "line": 80,
+    "diagnostic": "deprecated_member_use",
+    "message": "'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/create_post/widget/dynamic_service_fields.dart",
+    "line": 81,
+    "diagnostic": "deprecated_member_use",
+    "message": "'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/create_post/widget/dynamic_service_fields.dart",
+    "line": 178,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/create_post/widget/dynamic_service_fields.dart",
+    "line": 190,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/profile/widget/update_additional_files_widget.dart",
+    "line": 41,
+    "diagnostic": "avoid_function_literals_in_foreach_calls",
+    "message": "Function literals shouldn't be passed to 'forEach'",
+    "source_line_present_in": [
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/profile/widget/update_additional_files_widget.dart",
+    "line": 192,
+    "diagnostic": "unnecessary_underscores",
+    "message": "Unnecessary use of multiple underscores",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/provider/view/become_a_provider.dart",
+    "line": 2,
+    "diagnostic": "unnecessary_import",
+    "message": "The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart'",
+    "source_line_present_in": [
+      "main_baseline"
+    ]
+  },
+  {
+    "file": "lib/feature/quality/view/quality_center_screen.dart",
+    "line": 102,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/quality/view/quality_center_screen.dart",
+    "line": 154,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  },
+  {
+    "file": "lib/feature/quality/view/quality_center_screen.dart",
+    "line": 354,
+    "diagnostic": "curly_braces_in_flow_control_structures",
+    "message": "Statements in an if should be enclosed in a block",
+    "source_line_present_in": [
+      "main_baseline",
+      "staging_source"
+    ]
+  }
+]

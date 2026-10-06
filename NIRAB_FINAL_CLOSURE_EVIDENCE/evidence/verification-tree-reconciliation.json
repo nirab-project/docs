@@ -1,0 +1,13 @@
+{
+  "command_start_tree": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+  "final_tree": "7536c371e46705b89adb68cdd4225acdb53746bb",
+  "changed_files": [
+    "Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php",
+    "Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php",
+    "Modules/BookingModule/Services/BranchCheckoutService.php",
+    "Modules/ProviderManagement/Services/BranchAssignmentService.php"
+  ],
+  "composer_manifests_and_psr_declarations_unchanged": true,
+  "changed_php_lint": "PASS",
+  "log": "logs/backend-final-recheck.log"
+}

@@ -1,0 +1,5 @@
+Resolving dependencies...
+Because demandium_serviceman depends on flutter_switch any which doesn't exist (could not find package flutter_switch in cache), version solving failed.
+
+Try again without --offline!
+Failed to update packages.

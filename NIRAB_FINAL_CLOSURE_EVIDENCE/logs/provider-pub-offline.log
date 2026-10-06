@@ -1,0 +1,5 @@
+Resolving dependencies...
+Because demandium_provider depends on loading_animation_widget any which doesn't exist (could not find package loading_animation_widget in cache), version solving failed.
+
+Try again without --offline!
+Failed to update packages.

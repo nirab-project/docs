@@ -1,0 +1,28 @@
+Analyzing User app and web...
+
+   info - The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\common\widgets\cookies_view.dart:2:8 - unnecessary_import
+   info - The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\common\widgets\custom_text_field.dart:2:8 - unnecessary_import
+   info - The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\common\widgets\footer_view.dart:3:8 - unnecessary_import
+   info - The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\common\widgets\quantity_button.dart:2:8 - unnecessary_import
+   info - The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\common\widgets\service_widget_vertical.dart:1:8 - unnecessary_import
+   info - Function literals shouldn't be passed to 'forEach' - lib\feature\auth\controller\auth_controller.dart:1230:12 - avoid_function_literals_in_foreach_calls
+   info - Function literals shouldn't be passed to 'forEach' - lib\feature\auth\widgets\file_upload_field_widget.dart:39:25 - avoid_function_literals_in_foreach_calls
+   info - Unnecessary use of multiple underscores - lib\feature\auth\widgets\file_upload_field_widget.dart:106:37 - unnecessary_underscores
+   info - The prefix 'reBook' isn't a lower_case_with_underscores identifier - lib\feature\booking\controller\service_booking_controller.dart:3:8 - library_prefixes
+   info - The import of 'dart:async' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\feature\bottomNav\view\bottom_nav_screen.dart:1:8 - unnecessary_import
+   info - Statements in an if should be enclosed in a block - lib\feature\checkout\view\payment_screen.dart:200:11 - curly_braces_in_flow_control_structures
+   info - Empty catch block - lib\feature\checkout\view\payment_screen.dart:290:23 - empty_catches
+   info - Statements in an if should be enclosed in a block - lib\feature\create_post\controller\create_post_controller.dart:354:9 - curly_braces_in_flow_control_structures
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\feature\create_post\widget\dynamic_service_fields.dart:54:9 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\feature\create_post\widget\dynamic_service_fields.dart:80:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\feature\create_post\widget\dynamic_service_fields.dart:81:15 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\feature\create_post\widget\dynamic_service_fields.dart:178:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\create_post\widget\dynamic_service_fields.dart:190:7 - curly_braces_in_flow_control_structures
+   info - Function literals shouldn't be passed to 'forEach' - lib\feature\profile\widget\update_additional_files_widget.dart:41:25 - avoid_function_literals_in_foreach_calls
+   info - Unnecessary use of multiple underscores - lib\feature\profile\widget\update_additional_files_widget.dart:192:39 - unnecessary_underscores
+   info - The import of 'package:demandium/theme/brand_tokens.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium/util/core_export.dart' - lib\feature\provider\view\become_a_provider.dart:2:8 - unnecessary_import
+   info - Statements in an if should be enclosed in a block - lib\feature\quality\view\quality_center_screen.dart:102:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\quality\view\quality_center_screen.dart:154:23 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\quality\view\quality_center_screen.dart:354:29 - curly_braces_in_flow_control_structures
+
+24 issues found. (ran in 14.6s)

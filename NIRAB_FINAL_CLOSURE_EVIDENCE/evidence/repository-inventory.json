@@ -1,0 +1,112 @@
+[
+  {
+    "component": "Admin Panel",
+    "root": "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\Admin Panel",
+    "initial_status": "",
+    "main_baseline_sha": "55da3ab139939c6412f15fc702bd09dde9610827",
+    "local_refs_before": "55da3ab139939c6412f15fc702bd09dde9610827 refs/heads/main\n55da3ab139939c6412f15fc702bd09dde9610827 refs/remotes/origin/main",
+    "worktrees": "worktree C:/Users/PC/Desktop/Projects/nirab-project/Admin Panel\nHEAD 55da3ab139939c6412f15fc702bd09dde9610827\nbranch refs/heads/main",
+    "history": "55da3ab (HEAD -> main, origin/main) feat: add dispatch, quotation, tracking, and booking service modules and controllers\n92d3c19 feat: add comprehensive service operations, pricing, and dispatch management modules\n42d1a4f feat: initialize admin panel project structure and core modules\nda36636 feat: add quality, communication, and subscription modules with enhanced booking analytics\n67e3b9b feat: integrate Odoo ERP and payment gateways with new accounting, outbox, and transport modules\n182b1e5 feat: implement booking execution, cash operations, and audit tracking modules\n6c44d74 feat: add service pricing, bidding workflow, cart, and coupon management modules with related database migrations\n7770887 feat: implement booking dispatch engine, workforce management modules, and service execution parameters\n87b32cf feat: add branch management features, provider operations, and financial services\n82b5cc6 feat: add admin master layout view and configuration controller\n4ab7f25 feat: add webp support to PHP GD extension in Dockerfile\n64af8b5 feat: add language localization files, provider management routes, and serviceman views\n5166c4a feat: add Norsal font assets and layout templates across modules\nb6da24b feat: add Arabic language translation file\n1c8c6c3 update lang\n4401d7b feat: add migration to create failed_jobs table\n6447567 feat: add startup script for docker container initialization\n9bde372 feat: add ConfigurationController to handle admin notification and email settings\ne8ffc9e feat: add docker container initialization and startup script\n9367b5d chore: enable opcache timestamp validation and set revalidate frequency\n1ccd27e feat: add docker startup script to configure environment and state management\nc5310a1 feat: add Apache virtual host configuration for Docker\n289933e feat: add Docker support with Apache vhost configuration, container startup script, and optimized Dockerfile\n01dcadd feat: add Docker startup script for Laravel environment and persistent storage management\n6049696 feat: add Dockerfile, Apache vhost configuration, and startup script for containerization\n6ece3e1 first commit",
+    "hooks_path": "",
+    "fetch": {
+      "exit_code": 0,
+      "output": ""
+    },
+    "refs_after_fetch": "55da3ab139939c6412f15fc702bd09dde9610827 refs/heads/main\n55da3ab139939c6412f15fc702bd09dde9610827 refs/remotes/origin/HEAD\n55da3ab139939c6412f15fc702bd09dde9610827 refs/remotes/origin/main",
+    "repository_identifier_without_secrets": "git@github.com:nirab-project/admin-panel.git",
+    "restore_main_ref": "backup/final-closure-20261006-184742-main",
+    "local_staging_sha": null,
+    "remote_staging_sha": null,
+    "staging_source_sha": null,
+    "restore_staging_ref": null,
+    "merge_base_sha": null
+  },
+  {
+    "component": "User app and web",
+    "root": "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\User app and web",
+    "initial_status": "",
+    "main_baseline_sha": "35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b",
+    "local_refs_before": "35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/heads/main\n107f5c48ffa682e21a648032c6a6be0532839621 refs/heads/staging\n35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/remotes/origin/HEAD\n35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/remotes/origin/feat/nirab-user-identity\n35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/remotes/origin/main\n107f5c48ffa682e21a648032c6a6be0532839621 refs/remotes/origin/staging\n3aa4d0995b7a3d6020aa4ecb7aea4ca6093046bf refs/stash",
+    "worktrees": "worktree C:/Users/PC/Desktop/Projects/nirab-project/User app and web\nHEAD 35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b\nbranch refs/heads/main",
+    "history": "35e9e49 (HEAD -> main, origin/main, origin/feat/nirab-user-identity, origin/HEAD) feat(ui): modernize chat channels, message composer, notifications, and social login buttons for Nirab Clean\n013991e feat(ui): modernize service details, checkout, search, profile, and address screens for Nirab Clean\ndc7974d feat(ui): modernize Cart, Menu, Bookings, and Offers screens for Nirab Clean identity\n52ba92c feat(home): modernize home screen sections, provider cards, campaigns and services for Nirab Clean\nc7eb247 feat(navigation): redesign bottom navigation bar with luxury floating island for Nirab Clean\n409d14a fix(home): resolve SliverGeometry layoutExtent assertion in HomeSearchWidget\n97a56be feat(ui): elevate Home Screen, BottomNavigationBar, and cards to modern premium design\n2231aac fix(brand): safely resolve locale and directionality in BrandLogo without throwing\n39ff403 feat(i18n): restrict application languages to Arabic and English only\ne00a62a chore: update app description in pubspec.yaml\nbadfbc4 feat(brand): update application name to نيراب كلين across Android, iOS, and Web\n8e8d754 feat(brand): adopt identity/ايقونة.png as official app launcher icon for Android and iOS\n69437e8 fix(area): safely parse dynamic list and geojson coordinates in ZoneModel and Coordinates\n51a94d5 Merge branch 'main' of https://github.com/nirab-project/user-app-web into feat/nirab-user-identity\n68e2776 feat(brand): implement nirab user identity, theme tokens, and typography\n347600e feat: add booking details model and related screens, widgets, and language localization assets\nb4b6196 feat: add invoice panel, repeat booking details, and payment screen with localization files\n6bbcf88 feat: implement booking summary widget and related UI components for booking details screen\n0f2e59b feat: implement custom post creation feature with new screens, controllers, and API endpoints\n1c06453 feat: add booking scheduling, checkout features, and multi-language support\n115d593 feat: add invoice controller for PDF generation and localization files for Bengali, Hindi, and Arabic\n5d5a886 feat: add index.html with SEO metadata and initialization scripts for Flutter web\nbe3d495 feat: add app constants and Google services configuration\n686ca50 feat: add English and Arabic language translation files\nb66e09c feat: add menu screen and button widget\ne45d6da add maps\n6dc4390 feat: add internet permission to debug and profile Android manifests\n6304573 Pin html package for flutter_html compatibility\nfa9798f Fix Flutter web bootstrap and Firebase configuration\n914605c chore: upgrade Flutter SDK to 3.44.0 and optimize Docker build steps",
+    "hooks_path": "",
+    "fetch": {
+      "exit_code": 0,
+      "output": ""
+    },
+    "refs_after_fetch": "35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/heads/main\n107f5c48ffa682e21a648032c6a6be0532839621 refs/heads/staging\n35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/remotes/origin/HEAD\n35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/remotes/origin/feat/nirab-user-identity\n35e9e49e7d9a3b2b73bcf0cd5c79afeaf5260c8b refs/remotes/origin/main\n107f5c48ffa682e21a648032c6a6be0532839621 refs/remotes/origin/staging\n3aa4d0995b7a3d6020aa4ecb7aea4ca6093046bf refs/stash",
+    "repository_identifier_without_secrets": "git@github.com:nirab-project/user-app-web.git",
+    "restore_main_ref": "backup/final-closure-20261006-184742-main",
+    "local_staging_sha": "107f5c48ffa682e21a648032c6a6be0532839621",
+    "remote_staging_sha": "107f5c48ffa682e21a648032c6a6be0532839621",
+    "staging_source_sha": "107f5c48ffa682e21a648032c6a6be0532839621",
+    "restore_staging_ref": "backup/final-closure-20261006-184742-staging",
+    "merge_base_sha": "347600e8155bb32f070e90a4e113ee8c8c63af83"
+  },
+  {
+    "component": "Provider app",
+    "root": "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\Provider app",
+    "initial_status": "",
+    "main_baseline_sha": "d1fd060586d3048aa90250535d6c693cc503bd85",
+    "local_refs_before": "d1fd060586d3048aa90250535d6c693cc503bd85 refs/heads/main\nd1fd060586d3048aa90250535d6c693cc503bd85 refs/remotes/origin/main",
+    "worktrees": "worktree C:/Users/PC/Desktop/Projects/nirab-project/Provider app\nHEAD d1fd060586d3048aa90250535d6c693cc503bd85\nbranch refs/heads/main",
+    "history": "d1fd060 (HEAD -> main, origin/main) feat: add booking details feature with models, widgets, and language support\nbad670a feat: add workforce operations, branch management, and booking assignment features\nd4315ec feat: initialize provider app structure with core features and notification helper\n0c4872d feat: add core API client, multi-language support, and initial app features and helpers\n05e8689 feat: add branch cash operations screen, string parser helper, and localization files\n125b539 feat: add localization files, booking details widgets, and dashboard screens\nc845a5c feat: add custom post feature with quotation management and related screens\n2245ddc feat: add booking details, serviceman management, and multi-language assets\nf6abff0 feat: implement dashboard, reporting, and subscription features with localized language assets\n25e717f feat: add google-services.json configuration file for Android app\n50e33cc feat: add English and Arabic language localization files\n95d3e15 add maps\ndd7d1ab feat: add Android configuration files, app constants, and macOS plugin registrant\nb450dcc feat: initialize Android platform and main entry point for provider app\n591f5c1 first commit",
+    "hooks_path": "",
+    "fetch": {
+      "exit_code": 0,
+      "output": ""
+    },
+    "refs_after_fetch": "d1fd060586d3048aa90250535d6c693cc503bd85 refs/heads/main\nd1fd060586d3048aa90250535d6c693cc503bd85 refs/remotes/origin/HEAD\nd1fd060586d3048aa90250535d6c693cc503bd85 refs/remotes/origin/main",
+    "repository_identifier_without_secrets": "git@github.com:nirab-project/provider-app.git",
+    "restore_main_ref": "backup/final-closure-20261006-184742-main",
+    "local_staging_sha": null,
+    "remote_staging_sha": null,
+    "staging_source_sha": null,
+    "restore_staging_ref": null,
+    "merge_base_sha": null
+  },
+  {
+    "component": "Service man app",
+    "root": "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\Service man app",
+    "initial_status": "",
+    "main_baseline_sha": "886bded47a8f8955908c845f237dd314c6ba7111",
+    "local_refs_before": "886bded47a8f8955908c845f237dd314c6ba7111 refs/heads/main\n886bded47a8f8955908c845f237dd314c6ba7111 refs/remotes/origin/main",
+    "worktrees": "worktree C:/Users/PC/Desktop/Projects/nirab-project/Service man app\nHEAD 886bded47a8f8955908c845f237dd314c6ba7111\nbranch refs/heads/main",
+    "history": "886bded (HEAD -> main, origin/main) feat: add booking details feature with custom theme colors and localization assets\nab0cf4c feat: add booking details widget, validation helpers, notification helper, auth repository, and invoice controller\nc82c2e9 feat: add authentication repository, notification screens, localization assets, and API client\nf7090bb feat: add booking details controller, widgets, and language json files\n3ccf40c feat: implement booking details feature with app constants and localization assets\n65b2cce feat: add PDF invoice generation controller and language localization files\n3a041e1 feat: add google-services.json configuration file for Android\n2f8010e feat: add English and Arabic localization files\nea44b61 feat: add Android build configuration files and application constants\ncb5b274 feat: initialize Android configuration, Firebase setup, and main application entry point\n085ca8f first commit",
+    "hooks_path": "",
+    "fetch": {
+      "exit_code": 0,
+      "output": ""
+    },
+    "refs_after_fetch": "886bded47a8f8955908c845f237dd314c6ba7111 refs/heads/main\n886bded47a8f8955908c845f237dd314c6ba7111 refs/remotes/origin/HEAD\n886bded47a8f8955908c845f237dd314c6ba7111 refs/remotes/origin/main",
+    "repository_identifier_without_secrets": "git@github.com:nirab-project/service-man-app.git",
+    "restore_main_ref": "backup/final-closure-20261006-184742-main",
+    "local_staging_sha": null,
+    "remote_staging_sha": null,
+    "staging_source_sha": null,
+    "restore_staging_ref": null,
+    "merge_base_sha": null
+  },
+  {
+    "component": "Docs",
+    "root": "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\Docs",
+    "initial_status": "",
+    "main_baseline_sha": "42d8cbcf02d843747f8904805c4981d90073e0d4",
+    "local_refs_before": "42d8cbcf02d843747f8904805c4981d90073e0d4 refs/heads/main\n42d8cbcf02d843747f8904805c4981d90073e0d4 refs/remotes/origin/main",
+    "worktrees": "worktree C:/Users/PC/Desktop/Projects/nirab-project/Docs\nHEAD 42d8cbcf02d843747f8904805c4981d90073e0d4\nbranch refs/heads/main",
+    "history": "42d8cbc (HEAD -> main, origin/main) chore: add phase 09 verification logs and customer workflow code freeze report\n9c07dc2 docs: add implementation report for NIRAB agent phase 8\n1de9505 docs: add security legacy cleanup report for NIRAB agent phase 7\nf7e7c89 docs: add documentation for final agent development phases 7 through 9\na71752f docs: add implementation summary for Phase 5 of Nirab Agent\n799c80d docs: add implementation summary for Phase 4 of Nirab Agent\nc611fb2 docs: add NIRAB agent implementation phases and Saudi payments integration specifications\n82a4c42 second commit\n3e71909 first commit",
+    "hooks_path": "",
+    "fetch": {
+      "exit_code": 0,
+      "output": ""
+    },
+    "refs_after_fetch": "42d8cbcf02d843747f8904805c4981d90073e0d4 refs/heads/main\n42d8cbcf02d843747f8904805c4981d90073e0d4 refs/remotes/origin/HEAD\n42d8cbcf02d843747f8904805c4981d90073e0d4 refs/remotes/origin/main",
+    "repository_identifier_without_secrets": "git@github.com:nirab-project/docs.git",
+    "restore_main_ref": "backup/final-closure-20261006-184742-main",
+    "local_staging_sha": null,
+    "remote_staging_sha": null,
+    "staging_source_sha": null,
+    "restore_staging_ref": null,
+    "merge_base_sha": null
+  }
+]

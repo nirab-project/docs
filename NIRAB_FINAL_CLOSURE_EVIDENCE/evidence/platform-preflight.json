@@ -1,0 +1,47 @@
+[
+  {
+    "component": "User app and web",
+    "source_tree_sha": "ca8c97b00f9f9bc67e50c787f615d12f0ae237bc",
+    "android_sdk": "C:\\Users\\PC\\AppData\\Local\\Android\\Sdk",
+    "platforms": [],
+    "build_tools": [],
+    "required_gradle": "8.14.3-all",
+    "gradle_cached": false,
+    "package_config": true,
+    "lockfile_tracked": true,
+    "android_status": "BLOCKED_MISSING_TOOLCHAIN",
+    "ios_status": "NOT_APPLICABLE",
+    "reason": "Windows; Android SDK platforms/build-tools missing. No download/build attempted.",
+    "source_commit_sha": "c2c95c17298dfc9915eacfc59dc24de24fe475e1"
+  },
+  {
+    "component": "Provider app",
+    "source_tree_sha": "86e66535f9da0a190828eb42e884c9079fa6f09d",
+    "android_sdk": "C:\\Users\\PC\\AppData\\Local\\Android\\Sdk",
+    "platforms": [],
+    "build_tools": [],
+    "required_gradle": "8.14.3-all",
+    "gradle_cached": false,
+    "package_config": false,
+    "lockfile_tracked": false,
+    "android_status": "BLOCKED_MISSING_TOOLCHAIN",
+    "ios_status": "NOT_APPLICABLE",
+    "reason": "Windows; Android SDK platforms/build-tools missing. No download/build attempted.",
+    "source_commit_sha": "d1fd060586d3048aa90250535d6c693cc503bd85"
+  },
+  {
+    "component": "Service man app",
+    "source_tree_sha": "f1186b7a536c5f6d4471156dfcc13689c93d8909",
+    "android_sdk": "C:\\Users\\PC\\AppData\\Local\\Android\\Sdk",
+    "platforms": [],
+    "build_tools": [],
+    "required_gradle": "8.14.3-all",
+    "gradle_cached": false,
+    "package_config": false,
+    "lockfile_tracked": false,
+    "android_status": "BLOCKED_MISSING_TOOLCHAIN",
+    "ios_status": "NOT_APPLICABLE",
+    "reason": "Windows; Android SDK platforms/build-tools missing. No download/build attempted.",
+    "source_commit_sha": "886bded47a8f8955908c845f237dd314c6ba7111"
+  }
+]

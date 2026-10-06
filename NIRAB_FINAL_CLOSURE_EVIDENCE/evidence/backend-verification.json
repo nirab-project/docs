@@ -1,0 +1,146 @@
+[
+  {
+    "target": "php-version",
+    "command": [
+      "php",
+      "-v"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/php-version.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "composer-version",
+    "command": [
+      "composer",
+      "--version"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/composer-version.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "composer-validate",
+    "command": [
+      "composer",
+      "--no-plugins",
+      "--no-scripts",
+      "validate",
+      "--no-check-publish"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/composer-validate.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "composer-autoload",
+    "command": [
+      "composer",
+      "--no-plugins",
+      "--no-scripts",
+      "dump-autoload",
+      "--optimize"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/composer-autoload.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "php-lint",
+    "command": "php -l <every tracked non-Blade PHP source, excluding vendor/storage/cache>",
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "count": 1111,
+    "failed": [],
+    "log": "logs/backend-php-lint.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "nirab-operations-syntax",
+    "command": [
+      "node",
+      "--check",
+      "public/assets/admin-module/js/nirab-operations.js"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/nirab-operations-syntax.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "nirab-workforce-syntax",
+    "command": [
+      "node",
+      "--check",
+      "public/assets/admin-module/js/nirab-workforce.js"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/nirab-workforce-syntax.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "blade-compile",
+    "command": [
+      "php",
+      "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\NIRAB-FINAL-CLOSURE\\scripts\\compile_blade.php",
+      "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\Admin Panel",
+      "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\NIRAB-FINAL-CLOSURE\\evidence\\compiled-blade"
+    ],
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "logs/blade-compile.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  },
+  {
+    "target": "blade-php-lint",
+    "command": "php -l <standalone compiled Blade templates>",
+    "source_tree_sha": "7536c371e46705b89adb68cdd4225acdb53746bb",
+    "exit_code": 0,
+    "status": "PASS",
+    "count": 112,
+    "log": "logs/blade-php-lint.log",
+    "command_start_tree_sha": "e453b5c0c21b3d1c393bb96d979819523b24f007",
+    "source_commit_sha": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
+    "final_tree_binding": "evidence/verification-tree-reconciliation.json",
+    "unique_templates": 56,
+    "note": "112 compiled files represent 56 templates compiled under two path spellings; all syntax checks passed.",
+    "tool_version": "PHP 8.4.24; Composer 2.10.1; Node v26.7.0"
+  }
+]

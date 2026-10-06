@@ -1,0 +1,28 @@
+{
+  "source_commit_sha": "c2c95c17298dfc9915eacfc59dc24de24fe475e1",
+  "source_tree_sha": "ca8c97b00f9f9bc67e50c787f615d12f0ae237bc",
+  "output_directory": "C:\\Users\\PC\\Desktop\\Projects\\nirab-project\\User app and web\\build\\web",
+  "files": {
+    "main.dart.js": {
+      "bytes": 6718542,
+      "sha256": "45aeaf754a3bc1e3cfd4cda8e1f82262c7d8f773bd6da7490b1450abb575e573"
+    },
+    "index.html": {
+      "bytes": 17615,
+      "sha256": "791733d5ac35a950c68bff56c3438af9116e6490bbe950508291a9aa8e5df413"
+    },
+    "flutter.js": {
+      "bytes": 9553,
+      "sha256": "a483fd28f51ed2fadd0da3fade5b672eba56310d549d736ce62eabf624a6a578"
+    },
+    "flutter_bootstrap.js": {
+      "bytes": 10000,
+      "sha256": "8c48b982e10ae738db9337930b4794a1892ffd4b2ac10f742bce9f847c38b007"
+    },
+    "version.json": {
+      "bytes": 88,
+      "sha256": "afe5c639b6449b13216211b131eaa250546a156e57b04facd65c1ff4acbbdd4a"
+    }
+  },
+  "delivered_as_deployment_artifact": false
+}
