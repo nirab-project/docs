@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-07",
+  "scope": "Source/static only; no application, database or integration execution",
+  "tools": {
+    "PHP": "8.4.24",
+    "Dart": "3.11.1",
+    "Git": "2.53.0.windows.2",
+    "Python": "3.14.3"
+  },
+  "repositories": [
+    {
+      "repository": "Admin Panel",
+      "branch": "main",
+      "baseline": "3ef8528c6cf01e82ebb2ab4d9ebf30b73cf02846",
+      "head_before_closure_commit": "4b64cda7a094151ad950618eac2654017649d15e",
+      "changed_files": 22,
+      "protected_paths_changed": [],
+      "utf8_files_checked": 22,
+      "private_key_or_token_pattern_hits": [],
+      "diff_check": {
+        "exit_code": 0,
+        "output": ""
+      },
+      "php_files_linted": 19,
+      "blade_templates_reviewed_textually": 3,
+      "journey_php_language_key_difference": [],
+      "quality_php_language_key_difference": [],
+      "final_source_commit": "2c878a7b350b5f65d4e69f6529b294929670b6ab",
+      "final_source_status": ""
+    },
+    {
+      "repository": "User app and web",
+      "branch": "main",
+      "baseline": "1fe0d15bc33e9e511dfabf45c3263aa1705f21f9",
+      "head_before_closure_commit": "a3f1ebbfaefe788594a4141fdc43a746ec17a3e5",
+      "changed_files": 40,
+      "protected_paths_changed": [],
+      "utf8_files_checked": 40,
+      "private_key_or_token_pattern_hits": [],
+      "diff_check": {
+        "exit_code": 0,
+        "output": ""
+      },
+      "missing_added_literal_translation_keys": {
+        "ar": [],
+        "en": []
+      },
+      "missing_ux_translation_keys": {
+        "ar": [],
+        "en": []
+      },
+      "dart_files_analyzed": 38,
+      "final_source_commit": "caa7985d3c71c96327087fa15c6e353c6bc0e338",
+      "final_source_status": "",
+      "dynamic_package_state_keys_checked": true
+    },
+    {
+      "repository": "Provider app",
+      "branch": "main",
+      "baseline": "fa6c9a03c81dc960440589041caa70c5d5139917",
+      "head_before_closure_commit": "58eed996a84bebb814871b0cae90b461ec79f52b",
+      "changed_files": 4,
+      "protected_paths_changed": [],
+      "utf8_files_checked": 4,
+      "private_key_or_token_pattern_hits": [],
+      "diff_check": {
+        "exit_code": 0,
+        "output": ""
+      },
+      "missing_added_literal_translation_keys": {
+        "ar": [],
+        "en": []
+      },
+      "missing_ux_translation_keys": {
+        "ar": [],
+        "en": []
+      },
+      "dart_files_analyzed": 2,
+      "final_source_commit": "692b970103089f5f836c30653c2d5972b3afc053",
+      "final_source_status": "",
+      "dynamic_package_state_keys_checked": true
+    },
+    {
+      "repository": "Service man app",
+      "branch": "main",
+      "baseline": "574754ed5b2bf0acf0e2a69fa98a60a2dfd4bb37",
+      "head_before_closure_commit": "0055f37aeb982d1af2ab821af839eb9a14df55b8",
+      "changed_files": 4,
+      "protected_paths_changed": [],
+      "utf8_files_checked": 4,
+      "private_key_or_token_pattern_hits": [],
+      "diff_check": {
+        "exit_code": 0,
+        "output": ""
+      },
+      "missing_added_literal_translation_keys": {
+        "ar": [],
+        "en": []
+      },
+      "missing_ux_translation_keys": {
+        "ar": [],
+        "en": []
+      },
+      "dart_files_analyzed": 2,
+      "final_source_commit": "e818379412c29d47c0ff53741b08ac3ae5884c6f",
+      "final_source_status": "",
+      "dynamic_package_state_keys_checked": true
+    }
+  ]
+}

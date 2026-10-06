@@ -1,0 +1,352 @@
+[
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/BidModule/Http/Controllers/APi/V1/Customer/PostController.php",
+    "sha256": "fae121b4c7ddc726f35fcb41ecf462f556c0e1c615ee11b726e1a5cd3bc6c6ea"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php",
+    "sha256": "f622c7af381ca82b4b3dab7e80e4317e788505cce54c643a2de8531d8f305f3e"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/BookingModule/Database/Migrations/2026_10_07_000001_create_visit_booking_requests.php",
+    "sha256": "8305c0d3227c5a6b5d3887a8a677ec778976fc2d3e703b7a9fdffbf735deef69"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/BookingModule/Http/Traits/BookingTrait.php",
+    "sha256": "e4c875b4757b4f094ce42211e718f135042a1d09becf7154c92d8aa22ae22580"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/BookingModule/Routes/api/v1/quality.php",
+    "sha256": "06b37ede89ba51acb23c047cafccd37e8c33953db7bac16d3ca84229ada9148d"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/BookingModule/Services/BookingWorkflowService.php",
+    "sha256": "d5a9cb3e0302005e22d3f93175681b4851a7e4801941c5cd4f34b7dc6920789b"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/CustomerSubscriptionModule/Http/Controllers/VisitPackageController.php",
+    "sha256": "4eb2d8806f58df25785922d25e28a4d227b2ff3cd3c8c5e3a7cc425fde069f01"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/CustomerSubscriptionModule/Services/VisitPackageService.php",
+    "sha256": "051e214450a6c2801577bce9b65cf0997895ef78685bb5e08d0ff6ec4709b771"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ProviderManagement/Services/BranchAssignmentService.php",
+    "sha256": "d23335e26a26e42b91e763a515520bd065596697b46bf8f17b7ce89822b81b76"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/SMSModule/Http/Controllers/CommunicationController.php",
+    "sha256": "63417205a8968f58b03c344a9d4fbb241a4badf6a8e63f45bb46c944474e8925"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Database/Migrations/2026_10_07_000002_add_service_gallery_images.php",
+    "sha256": "7b74a25da6c178a6adb846b0b9f01191b2250d5392fcf9771d28759b2e9352e1"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Entities/Service.php",
+    "sha256": "5cfef0ca55225de8d2ba30338d8048063f72f2c0f657ea8421fa00fc0195b47f"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Http/Controllers/Web/Admin/ServiceController.php",
+    "sha256": "2c95a32c410f0918d3a0f2ee88bb20ca4df84ad73abc44812b179e84d9f77dc7"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Resources/views/admin/create.blade.php",
+    "sha256": "3f5278f2b19b9ae20c5d2883217f63ed48934d03d0635f10c382de33a6b15962"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Resources/views/admin/edit.blade.php",
+    "sha256": "dd3d6a41fd68b80e00160c57d8222f753c1a984c54234fa98b87c5f8e4cd572c"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Resources/views/admin/partials/_gallery.blade.php",
+    "sha256": "b66bd41d84a795e18fd2ed5bc1831f63e5c8a10da79c87d204b41e340522f7d1"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "Modules/ServiceManagement/Services/ServiceGalleryService.php",
+    "sha256": "48ea4b17d211159b6203ec7a2921e4192e4b0f234536280f77299b13e281b8bd"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "app/Observers/QualityCommunicationObserver.php",
+    "sha256": "9abc0acd9c1221f900609fec9b75792313cc7096e35609fe47b024dce5d2ddec"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "resources/lang/ar/journey.php",
+    "sha256": "cfacae0a398e4255786e34ee5145e369d88521c919c1efdf6f917e46d5255497"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "resources/lang/ar/quality.php",
+    "sha256": "d117a48af54dce42d73da5cefbe6efd20240e243adaa8b42db0d569c7969fa52"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "resources/lang/en/journey.php",
+    "sha256": "fccb1a04313a1d5159638fecc7386d3d2c27318d1fef3dac8d00cd397e455c55"
+  },
+  {
+    "repository": "Admin Panel",
+    "path": "resources/lang/en/quality.php",
+    "sha256": "ce05d2d62ef17adc6aa83b86425580c07465abb4cbf611d1d97d0a0fad135c24"
+  },
+  {
+    "repository": "User app and web",
+    "path": "assets/language/ar.json",
+    "sha256": "dc24754232ecb8e779290e531fc158a16d9d61d492b12e9faf048d6d7b7b0504"
+  },
+  {
+    "repository": "User app and web",
+    "path": "assets/language/en.json",
+    "sha256": "acf9c1d47daeffface4d7f0587e42aa733669c984c2d34c7f1c139ec5793330a"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/common/widgets/menu_drawer.dart",
+    "sha256": "33fdbff76355490b44caa859a4d135d9bc4f54f78a0f273817bd577af6b1c4e7"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/common/widgets/service_center_dialog.dart",
+    "sha256": "2c92b3c8cb9abb4bae6f5adbc67e0a9f4920d7f7d35b9cd0b0e747f6e1716065"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/common/widgets/service_widget_vertical.dart",
+    "sha256": "8ead99608321c4e3d578272a8fd8939fe9a60594aa298ba1fe0e1e2464f26f32"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/auth/widgets/social_login_button.dart",
+    "sha256": "00bededb1e439a19c89a8ae95850fa38882caad495fb100910e0c337ab0b8af7"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/booking/widget/booking_invoices_panel.dart",
+    "sha256": "197bf60c4097ec8ea9a28869c6cbc06fc098290a908344cdda449be0510f6726"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/booking/widget/booking_workflow_panel.dart",
+    "sha256": "2e428a7bf515f22201e3c77a4f70bc6034c65ac6116adebf33ab6f90bbe0acfc"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/cart/controller/cart_controller.dart",
+    "sha256": "ad4210c5e5193104aa4192f302fb3b578d7136a244eae05c170bdf533a6999de"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/controller/checkout_controller.dart",
+    "sha256": "87165171652ad131a6d9949db3f029a79d1a45e6952a80474dc0c8f7b8c49fb9"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/controller/schedule_controller.dart",
+    "sha256": "d86291249daadab25f0cb96f065b3bc41b11e2fb8fcf7f0efb4087c6b241e27e"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/model/post_details_model.dart",
+    "sha256": "c032b07a9f21e61492d62d6718e9e3190f2ea0534fa41af02c0baeda7fea167c"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/repo/checkout_repo.dart",
+    "sha256": "4caf4c1da9eeeded6847e34ba183ce168de697ca3b45336a36a18b7c6635cd8e"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/view/custom_post_checkout_screen.dart",
+    "sha256": "42de29caf8dfb395bb40d1c5172c7f95cb7cead77b43b5c751a2fcd5508d684e"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/widget/custom_post/cart_summary.dart",
+    "sha256": "347e44eeae980906764c8f037c743ba6848dbaaabf5b0893e490162c59041f45"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/checkout/widget/order_details_section/available_slot_picker.dart",
+    "sha256": "e3b91ac2f73cb54281b1cb6f38d868b47a775baca999fc900af7623d27fcd1e0"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/create_post/controller/create_post_controller.dart",
+    "sha256": "6439b03050c86dbfe58b87e411e046dbbeb6f5e362d3d17f234de71ce36dfd43"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/create_post/model/create_post_body.dart",
+    "sha256": "785fcb2ae168e04d5230bf8ebd2503a52c5c648131e5096c310b6be9b73ee64f"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/create_post/model/my_post_model.dart",
+    "sha256": "5849cf6da1c3701aaf008eb96a6e24467ad581011c748dddc3d31e09d396f152"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/create_post/view/create_post_screen.dart",
+    "sha256": "3215f66dd104f4e11f57088f045f7e3af45f8eea92c16c9eb9aaeb930b658a28"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/create_post/widget/subcategory_service_view.dart",
+    "sha256": "7a458a3dbe5ca511fc635d8415f6d4eeade778822a34e64387ae8df583b89a38"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/favorite/widget/favorite_service_item_view.dart",
+    "sha256": "92069427df7745caa5ed9128e9c6f754b18dfc7ed5f9ad573571c1a82d27f86c"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/home/home_screen.dart",
+    "sha256": "7fd1ae9a7346a1bdc75189778305c168d1014d5397dc29ac40d7156f8684c3f9"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/home/web_home_screen.dart",
+    "sha256": "80919b84fb6bfdb90e8f8a8bdb6c4ba6a48a79a419d1ad7973dcb8b2b6f0d8da"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/location/controller/location_controller.dart",
+    "sha256": "ff7bffa08faa2d71722acde3481fb4c8ab74f51ef44803f413bfa3bdd8d13cfc"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/my_post/view/all_post_screen.dart",
+    "sha256": "d3d1366a57597d4d1077d04b37e8aba87c71647cb9cb33b5ae9ff8cad8e6a67e"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/my_post/view/quote_request_details_screen.dart",
+    "sha256": "2c318f9f2ac4bb0eef0e055e091539bfce8d02b5067e12190b69aaa283497614"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/my_post/widgets/my_post_view.dart",
+    "sha256": "96ef9cf50c487a31c0cba943c97ec301c74baa24202845e00694c9b2a738c708"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/profile/view/profile_screen.dart",
+    "sha256": "ae744810d25a480401ddee0b0cfc02b28d47ed86ea479c4a67879994a6f363ad"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/quality/view/operational_notifications_screen.dart",
+    "sha256": "ed64d6d63c412a2412282e432868f552f3c01b8e37ff45f381fb9ee59bb19396"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/quality/view/quality_center_screen.dart",
+    "sha256": "19bd0609a6728522ec2a103cb35e81c569c862c99d9fb867a4e5c28327bdc56b"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/service/model/service_model.dart",
+    "sha256": "0aa620a29f086ca8bfb1ded91bbad063fbbea144c9236016a1f8c35ef55221a1"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/service/view/service_details_screen.dart",
+    "sha256": "52a06fb2f672d4dee0bc8d704b9aec93b6e2b9af9365c81ff1e24d5d7e916324"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/service/widget/service_gallery.dart",
+    "sha256": "8b45dcf2506d1dfa26384ff0e873a8a641d6c9fa2dde7b79c08513933bfb233d"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/service/widget/service_info_card.dart",
+    "sha256": "2929f8a54eab281ed286f77d2dfafce65b5e959ee41dea689c639a3f8ca70429"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/service/widget/service_overview.dart",
+    "sha256": "7c282af6f118cdb3ddd56ba2629c020f723342966f6f59b43c1320bd41da85b7"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/visit_package/view/package_visit_screen.dart",
+    "sha256": "bc1b50259304e9ccec9c5f9e06d51358c77c24841f63c7b055dcc2ad697edbcb"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/feature/visit_package/view/visit_packages_screen.dart",
+    "sha256": "09aef3dc4810daa79a829a0d9355cd2c467d71c936db639185fd3eafe3b47aa2"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/helper/route_helper.dart",
+    "sha256": "67bb28b654703791fa7372e155bdf13a29dc4a1f2c69679d0102404ed79d4201"
+  },
+  {
+    "repository": "User app and web",
+    "path": "lib/helper/service_action_helper.dart",
+    "sha256": "cd34099af4b2419524e574d77fa103ffe6c96ea334a861ca0a8950ddddbc50ce"
+  },
+  {
+    "repository": "Provider app",
+    "path": "assets/language/ar.json",
+    "sha256": "fdacee91ea0ca4fff72cbba6a5a6b101c1b2ac6b9f88bffeb0fb77b20f0c3fca"
+  },
+  {
+    "repository": "Provider app",
+    "path": "assets/language/en.json",
+    "sha256": "415559081163ded1003faa79ef980b5dda013991b6a54043832c59d9988a10d4"
+  },
+  {
+    "repository": "Provider app",
+    "path": "lib/feature/booking_details/widget/booking_workflow_panel.dart",
+    "sha256": "506d2dd2e8745488985e3907f27e36373688d33572ea2db6aa58ba7d3476c52c"
+  },
+  {
+    "repository": "Provider app",
+    "path": "lib/feature/booking_details/widget/regular_booking/booking_details.dart",
+    "sha256": "220d31f0c6fb9ded9cc60cef9240598627d7f1d03f882241fa03c1a344f1b4eb"
+  },
+  {
+    "repository": "Service man app",
+    "path": "assets/language/ar.json",
+    "sha256": "3d68b3fa9f8232870cc5636ba26cdd1908c53d109b54841521a2d308e69bd185"
+  },
+  {
+    "repository": "Service man app",
+    "path": "assets/language/en.json",
+    "sha256": "8c2a2c58ddf9118fa9c1109d1a753e9543fe8c4f582efae35f6e6b9c006a65fd"
+  },
+  {
+    "repository": "Service man app",
+    "path": "lib/feature/booking_details/widget/booking_details_widget.dart",
+    "sha256": "76c46b4343a72b0c346a71409161c41c15e59c97597158a90fe5dcbd95bb3cd0"
+  },
+  {
+    "repository": "Service man app",
+    "path": "lib/feature/booking_details/widget/service_execution_panel.dart",
+    "sha256": "490722af0d7500d900047e817a0e9e4d496f10c1afaad8a55b96ad9f6964802b"
+  }
+]

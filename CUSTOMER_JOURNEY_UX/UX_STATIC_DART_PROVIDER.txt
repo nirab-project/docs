@@ -1,0 +1,5 @@
+Analyzing booking_workflow_panel.dart, booking_details.dart...
+
+   info - lib\feature\booking_details\widget\booking_workflow_panel.dart:3:8 - The import of 'package:url_launcher/url_launcher.dart' is unnecessary because all of the used elements are also provided by the import of 'package:demandium_provider/util/core_export.dart'. Try removing the import directive. - unnecessary_import
+
+1 issue found.

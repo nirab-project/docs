@@ -1,0 +1,111 @@
+[
+  {
+    "repository": "Admin Panel",
+    "commits": [
+      {
+        "sha": "089773a06d4b901ccfb6eac03babbd62252ae847",
+        "subject": "UX-01 separate quote intake from execution availability"
+      },
+      {
+        "sha": "1d59bcf29be319b36f948c7f44948abf04da0c34",
+        "subject": "UX-02 require an explicit execution slot for quotation checkout"
+      },
+      {
+        "sha": "eddb460e3631a3015d342eb55011dacb89863d4f",
+        "subject": "UX-03 atomically book covered package visits with idempotent reservation"
+      },
+      {
+        "sha": "f7b59e9bbad7f9da7b97ab9ef099f6a6e516bbad",
+        "subject": "UX-04 add ordered service gallery using existing storage and administration"
+      },
+      {
+        "sha": "4b64cda7a094151ad950618eac2654017649d15e",
+        "subject": "UX-05 connect quote lifecycle and customer notifications"
+      },
+      {
+        "sha": "2c878a7b350b5f65d4e69f6529b294929670b6ab",
+        "subject": "UX-06 guard covered visit edits and audit address contexts"
+      }
+    ]
+  },
+  {
+    "repository": "User app and web",
+    "commits": [
+      {
+        "sha": "196d92df14f8e95b56eaff1c3345f99297b3cae0",
+        "subject": "UX-01 unify service actions and preserve quote context through login"
+      },
+      {
+        "sha": "ea041c914b9e7bad03543825ce598b3d21a81105",
+        "subject": "UX-02 invalidate changed checkout contexts and preserve safe confirmation retries"
+      },
+      {
+        "sha": "b03b87e9a721379bf996a3f5cb9d356ec33137d8",
+        "subject": "UX-03 add standalone packages and covered visit booking journey"
+      },
+      {
+        "sha": "7d048d67248715b82ef7a3d8d713fd989c7e9506",
+        "subject": "UX-04 clarify service discovery and details with persistent booking action"
+      },
+      {
+        "sha": "a3f1ebbfaefe788594a4141fdc43a746ec17a3e5",
+        "subject": "UX-05 complete quote follow-up and authoritative checkout"
+      },
+      {
+        "sha": "caa7985d3c71c96327087fa15c6e353c6bc0e338",
+        "subject": "UX-06 clarify safe retries and isolate quote availability"
+      }
+    ]
+  },
+  {
+    "repository": "Provider app",
+    "commits": [
+      {
+        "sha": "58eed996a84bebb814871b0cae90b461ec79f52b",
+        "subject": "UX-03 show package coverage in branch booking workflow"
+      },
+      {
+        "sha": "692b970103089f5f836c30653c2d5972b3afc053",
+        "subject": "UX-06 hide unsupported covered visit editing"
+      }
+    ]
+  },
+  {
+    "repository": "Service man app",
+    "commits": [
+      {
+        "sha": "0055f37aeb982d1af2ab821af839eb9a14df55b8",
+        "subject": "UX-03 show package coverage during service execution"
+      },
+      {
+        "sha": "e818379412c29d47c0ff53741b08ac3ae5884c6f",
+        "subject": "UX-06 respect covered visit edit capability"
+      }
+    ]
+  },
+  {
+    "repository": "Docs",
+    "commits": [
+      {
+        "sha": "a8baf1996f8f58e4a7cde26644f47a5f7442fabc",
+        "subject": "Document UX baseline and UX-01 implementation"
+      },
+      {
+        "sha": "349e14396f8cdbbb8ddc340557a2df44fcf3c1ff",
+        "subject": "Document UX-02 contracts and static checks"
+      },
+      {
+        "sha": "2f9c0c465e648acf276ef9d0ffd0db892f62b951",
+        "subject": "Document UX-03 transaction guarantees and migration order"
+      },
+      {
+        "sha": "38cd4799a8ca7f2857d7a0444af50c4d923e6379",
+        "subject": "Document UX-04 content ownership and gallery migration"
+      },
+      {
+        "sha": "091ffe3d05f44dbb7580755b9ab9f63bcaa0e072",
+        "subject": "UX-05 document request follow-up and payment contract"
+      }
+    ]
+  }
+]

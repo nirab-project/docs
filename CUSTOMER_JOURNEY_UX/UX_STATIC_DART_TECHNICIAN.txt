@@ -1,0 +1,12 @@
+Analyzing booking_details_widget.dart, service_execution_panel.dart...
+
+   info - lib\feature\booking_details\widget\booking_details_widget.dart:3:8 - The import of 'dart:async' is unnecessary because all of the used elements are also provided by the import of 'package:demandium_serviceman/utils/core_export.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\feature\booking_details\widget\booking_details_widget.dart:209:59 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\feature\booking_details\widget\service_execution_panel.dart:92:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\feature\booking_details\widget\service_execution_panel.dart:95:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\feature\booking_details\widget\service_execution_panel.dart:98:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\feature\booking_details\widget\service_execution_panel.dart:111:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\feature\booking_details\widget\service_execution_panel.dart:231:7 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - lib\feature\booking_details\widget\service_execution_panel.dart:464:29 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+
+8 issues found.
