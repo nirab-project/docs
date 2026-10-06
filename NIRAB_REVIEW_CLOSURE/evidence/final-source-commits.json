@@ -4,8 +4,8 @@
     "main_before_review_fixes": "0a4f22f79e3d67cc78900bfeda8f8b524b6237fd",
     "main_before_original_merge": "55da3ab139939c6412f15fc702bd09dde9610827",
     "staging_source_sha": null,
-    "main_final_sha": "d44c397e8b15a5a9ab0fc1300fe36e81a2965225",
-    "source_tree_sha": "ed9385b0f9cd6898e5ec3fc7bea08a6fa9076222",
+    "main_final_sha": "3ef8528c6cf01e82ebb2ab4d9ebf30b73cf02846",
+    "source_tree_sha": "89974d306ae441cd8eb83d79e44a645e5cf1d6ec",
     "backup_ref": "backup/review-closure-20261006-main",
     "main_before_review_is_ancestor": true,
     "staging_source_is_ancestor": null,
@@ -49,9 +49,9 @@
       "tests/Unit/PaymentClosureTest.php"
     ],
     "archive": {
-      "file": "NIRAB-main-20261006-backend-d44c397e8b15-source.zip",
-      "sha256": "7c2ea074144723cc7ca5a737e8d2355eef7a401272b1203e5a7adf7ad876aa94",
-      "bytes": 35393198,
+      "file": "NIRAB-main-20261006-backend-3ef8528c6cf0-source.zip",
+      "sha256": "e221dd651d3a01743812bb3f8800a39ace74d8c00374b1846b21c3702e79774a",
+      "bytes": 35393616,
       "files": 3019,
       "required_files": [
         "public/assets/admin-module/js/nirab-operations.js",
@@ -130,7 +130,7 @@
     ],
     "archive": {
       "file": "NIRAB-main-20261006-customer-1fe0d15bc33e-source.zip",
-      "sha256": "0b86f8936731df949017f4f4c3ec6ac5563bb2041857813c2784d88db6dda083",
+      "sha256": "b55fe0fb4158279224b11d67a22f8953debb2ee1116b74fb7678fb490974877e",
       "bytes": 5857942,
       "files": 968,
       "required_files": [
@@ -163,7 +163,7 @@
     ],
     "archive": {
       "file": "NIRAB-main-20261006-provider-fa6c9a03c81d-source.zip",
-      "sha256": "cef3573bef30189b8df7f9a0639f1b83670be0e742ab22effbefa4fe40a7ad8e",
+      "sha256": "dfdc1d2f2edeb92da4a6b86fa1fa0b6cdcba95b16c528abfa6eacdcd0e0948f1",
       "bytes": 3375784,
       "files": 928,
       "required_files": [
@@ -283,7 +283,7 @@
     ],
     "archive": {
       "file": "NIRAB-main-20261006-technician-574754ed5b2b-source.zip",
-      "sha256": "81d57101d334aa75550a6d58cc8749e866c6a0c28ec629d6c5afe7cf4630cb3b",
+      "sha256": "ff283c9b1ca94d3ed89eea8de26b4f6379831349756f0bc84e84e598c2af6db1",
       "bytes": 2283773,
       "files": 490,
       "required_files": [

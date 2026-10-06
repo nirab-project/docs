@@ -1,6 +1,7 @@
 {
   "rechecked_files": [
-    "Modules/PaymentModule/Services/PaymentPrincipal.php"
+    "Modules/PaymentModule/Http/Controllers/GatewayController.php",
+    "tests/Unit/PaymentClosureTest.php"
   ],
   "all_final_file_hashes_match": true,
   "php_lint_count": 1119,
