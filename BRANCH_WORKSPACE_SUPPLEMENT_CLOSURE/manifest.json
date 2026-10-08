@@ -1,0 +1,263 @@
+{
+  "title": "NIRAB branch workspace supplement closure",
+  "closed_findings": [
+    "BWC-R01",
+    "BWC-R02",
+    "BWC-R03",
+    "BWC-R04",
+    "S-01",
+    "S-02"
+  ],
+  "created_at_utc": "2026-10-08T19:17:27.595121+00:00",
+  "branch": "main",
+  "backend_base_commit": "91f23d91f7b76c4c9e956c4d0bd69c593d3ba973",
+  "backend_final_commit": "71f4ca68a811b1a2ec71851d6fd1a2e91757e845",
+  "documentation_base_commit": "eee03dd7a08862e9c1d99785a5d24c1831bd2c96",
+  "backend_changed_file_count": 34,
+  "checks": {
+    "phpunit_tests": 39,
+    "assertions": 461,
+    "branch_tests": 25,
+    "new_branch_regression_tests": 6,
+    "javascript_tests": 12,
+    "php_files": 11,
+    "blade_templates": 35,
+    "javascript_syntax": "passed",
+    "staged_diff_check": "passed",
+    "reverse_patch_check": "passed"
+  },
+  "migrations_added": false,
+  "scope": "Source closure with isolated SQLite, real link fragments and DOM/fetch simulations; staging browser and full HTTP acceptance remains required.",
+  "files": [
+    {
+      "path": "Admin Panel/Modules/AdminModule/Resources/views/quality/index.blade.php",
+      "bytes": 31142,
+      "sha256": "a964082d01eaf0e2e22e9deb9d12a4a7de58ddc2625a0bef55820a80a1d93760"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php",
+      "bytes": 134584,
+      "sha256": "61141642f117250ccdc52314c777fa3a586e67d8e5e6fafa0460dbcf37f54b1a"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php",
+      "bytes": 104369,
+      "sha256": "694453c1f2756b52caca5283a4caac3b585e59a39b0d44435544e46a01c5c99e"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/details.blade.php",
+      "bytes": 123230,
+      "sha256": "0de3ebbed6fc7b5662e31015a4ea2ccfafc78d07286daabd7de3a747ac50fd47"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php",
+      "bytes": 127601,
+      "sha256": "8c3128ae1a80dd8d557f3ab3643603dba923b111f1f7b8fbde5e93fb39be821f"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php",
+      "bytes": 119833,
+      "sha256": "29e2fe05eb49800f5c179e0e9d5d4f9b35f28dca0394b87df94cbeabc50c9b79"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php",
+      "bytes": 90725,
+      "sha256": "fbdb82b8ebe97a5928a1cedcc369ba216a4eeeb9ab15b239d053366b05c5b36c"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php",
+      "bytes": 83759,
+      "sha256": "938a75f27a0b0de09744c2aed2eae403ca2d3a897ab0f778faae886c32b49243"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/status.blade.php",
+      "bytes": 84112,
+      "sha256": "250f1dd6c8a2c00552d2b25c86a9963e3a9b60ffd46942af84c02c50515295e0"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/details.blade.php",
+      "bytes": 105182,
+      "sha256": "60d17db0af653d82b4d48b32f4d2d1e213e9d9e98323ef27922506dfaea844c5"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/list.blade.php",
+      "bytes": 36228,
+      "sha256": "dadfb40452cefd65429b6973da4d7190d36ca40efd9bb0a0627919f489f9e47f"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php",
+      "bytes": 101773,
+      "sha256": "fa37076e8f3b3f166032b28a3829608bd11657476e07333d5cc0dfce98b5ed19"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php",
+      "bytes": 90984,
+      "sha256": "c1816f6d860c1bcc55803887e2d452dace6e79359d977ee252aee9f11b00143f"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php",
+      "bytes": 59496,
+      "sha256": "54424d291b58fe2fd4c8baaac5ff2d28079242b21f5678b092107a48268d85d8"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php",
+      "bytes": 47303,
+      "sha256": "d4771d71c4b60d8c7c44efa39b3c4e361b88cb8e6fdc091762876ab9cdaf607d"
+    },
+    {
+      "path": "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/status.blade.php",
+      "bytes": 37259,
+      "sha256": "ba2a901f7a3c8c9d4db0fe40ad6a8686ccc58ea35cf347729b8c144d37c180e4"
+    },
+    {
+      "path": "Admin Panel/Modules/ProviderManagement/Resources/views/layouts/master.blade.php",
+      "bytes": 30707,
+      "sha256": "9c2da5342936b02dd45ddcd77673cc0e0985e1781155c06408ef18151644daab"
+    },
+    {
+      "path": "Admin Panel/Modules/ProviderManagement/Resources/views/layouts/new-master.blade.php",
+      "bytes": 31793,
+      "sha256": "89ad029a36005b69e4f569fc609115c4fb22e447fdb16b102d78e070a17649a8"
+    },
+    {
+      "path": "Admin Panel/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php",
+      "bytes": 24273,
+      "sha256": "7cc0c41cc3f489549ee2b481cc6803348c0b83a9b34363b8fba9a93bc7eb9c34"
+    },
+    {
+      "path": "Admin Panel/Modules/ProviderManagement/Resources/views/layouts/partials/_header.blade.php",
+      "bytes": 12385,
+      "sha256": "caf26d9cb1bffe9f1db783d435c4f0c6ebb829dc26a14dacba7981b8c8514d22"
+    },
+    {
+      "path": "Admin Panel/Modules/UserManagement/Entities/User.php",
+      "bytes": 9472,
+      "sha256": "05246e619844167ff9f895c2a956c2b0df2b98533e7994d30c4fc57aa188249e"
+    },
+    {
+      "path": "Admin Panel/app/Http/Controllers/BranchWorkspaceController.php",
+      "bytes": 15968,
+      "sha256": "bf17871c90e0f44d4ddd781e946e3082628d535c4caa77c08dba210a09f47562"
+    },
+    {
+      "path": "Admin Panel/app/Services/BranchWorkspaceNavigation.php",
+      "bytes": 1897,
+      "sha256": "7a04921e69b133c8f0f2a777affcc75834fe238a7af2528da9d5c5ac6d0e071c"
+    },
+    {
+      "path": "Admin Panel/app/Services/NirabFinanceAccess.php",
+      "bytes": 3218,
+      "sha256": "6a78aede0ae4a941878ba57087c2de0ac8d595674c44c73339d81908d9796796"
+    },
+    {
+      "path": "Admin Panel/app/Services/OperationalAccess.php",
+      "bytes": 3416,
+      "sha256": "1459327ee51b34b10f495691cff8fa7a0b4d35827fc1a527fed5961d05737b4d"
+    },
+    {
+      "path": "Admin Panel/public/assets/common/js/nirab-branch.js",
+      "bytes": 8612,
+      "sha256": "e066e0c509d2f300996d3fe19b131376cec62b967f15c21d10282e7a494a77d9"
+    },
+    {
+      "path": "Admin Panel/resources/lang/ar/branch.php",
+      "bytes": 9494,
+      "sha256": "50948f2afaca309f157701b858f4ed59c8013b866d3baac5b4f0cc44601e3822"
+    },
+    {
+      "path": "Admin Panel/resources/lang/en/branch.php",
+      "bytes": 7224,
+      "sha256": "56e9521961bdcd52de707d4db92bf512ba610e37ade447fedcbc708ee7f8accb"
+    },
+    {
+      "path": "Admin Panel/resources/views/branch/bookings.blade.php",
+      "bytes": 2702,
+      "sha256": "e37b80e8fe7e9693b3275410586ecc5335aee96709d05d469ca55783a4daf881"
+    },
+    {
+      "path": "Admin Panel/resources/views/branch/finance.blade.php",
+      "bytes": 6739,
+      "sha256": "f778d6a8362604559759f251502c741d3f49fd681cd837588330207c69912e63"
+    },
+    {
+      "path": "Admin Panel/resources/views/branch/return.blade.php",
+      "bytes": 272,
+      "sha256": "8932d6a42b87f0bc3665b10f111f5849e26cb2d717833a87fc15baa43b388a41"
+    },
+    {
+      "path": "Admin Panel/tests/Unit/BranchWorkspaceTest.php",
+      "bytes": 32189,
+      "sha256": "ad4ec91f2da56ef6756c600dc23e879524090b1256c37d523e30312d0eaafd2a"
+    },
+    {
+      "path": "Admin Panel/tests/branch-workspace-js.test.cjs",
+      "bytes": 7321,
+      "sha256": "47dfdb9f11d177ee2e4d1aa1f70bd4882664c5fabbe83d4621bca8f92efc07ce"
+    },
+    {
+      "path": "Admin Panel/tests/compile-branch-views.php",
+      "bytes": 3489,
+      "sha256": "e91d2ea0e6d837d88738fd1c04545f85c638e692a82155a535f4b1a79ef16ad2"
+    },
+    {
+      "path": "Docs/README.md",
+      "bytes": 1182,
+      "sha256": "b1724008f3e164a650e155935123166c36e89b42850ab600d09040c935ac7661"
+    },
+    {
+      "path": "Docs/NIRAB_BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE_2026-10-08.md",
+      "bytes": 9298,
+      "sha256": "0f9ef76ce8aef878935d221a27f509ebe0f08b92dfcfe8df8c1af8948e34f8fb"
+    },
+    {
+      "path": "Docs/NIRAB_BRANCH_WORKSPACE_CLOSURE_2026-10-08.md",
+      "bytes": 19680,
+      "sha256": "3a2c9dec2796d36a66117649023a1e754900242c918e0b92b6c2fc485590b1c0"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/backend.patch",
+      "bytes": 128741,
+      "sha256": "467f5ee4c49e35e6b8900cb1af8665a50d36d237915a9811b8111e125eaa6bc5"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/blade-check.txt",
+      "bytes": 41,
+      "sha256": "20dce019f79cf9e9694757b928cb3a0c8e45d06b2fa86bb5b3191dcd7165b01c"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/diff-check.txt",
+      "bytes": 31,
+      "sha256": "2c01f924cd8310d82559ca783e6e0abe88f8939edcf2d4c43b3e16bb28525299"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/javascript-syntax.txt",
+      "bytes": 34,
+      "sha256": "874bc2d2cfcc2011db2c071c53a0fbb3777d22853c52508e4b8216e575bdf798"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/javascript-tests.txt",
+      "bytes": 1069,
+      "sha256": "db0e95e4e9710b11080c3456f9873fda5c8343699ae855e45e016fd5c78059ef"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/patch-check.txt",
+      "bytes": 47,
+      "sha256": "48bdf11774d7e3b4295e7dfdc0dbc4a7251d8eb69836e7693488bc3b2d520080"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/php-lint.txt",
+      "bytes": 829,
+      "sha256": "6e40fe12083dd7efc49328478d67f2143f5bdb9ed223d4313afe89066409c2d0"
+    },
+    {
+      "path": "Docs/BRANCH_WORKSPACE_SUPPLEMENT_CLOSURE/unit-tests.txt",
+      "bytes": 231,
+      "sha256": "04a7f569ca4adb74cb2c322a0ab0c10402d59a1da879e028352b5c93fe0882a1"
+    },
+    {
+      "path": "References/NIRAB_BRANCH_WORKSPACE_SUPPLEMENT_REVIEW_2026-10-08.md",
+      "bytes": 17001,
+      "sha256": "b5151f25a8c247c6fa13d7eb45af0538f26e07d102ff8917b9d73785a18c799b"
+    }
+  ]
+}

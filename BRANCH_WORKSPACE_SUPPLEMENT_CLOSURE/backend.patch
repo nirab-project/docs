@@ -1,0 +1,1613 @@
+From 71f4ca68a811b1a2ec71851d6fd1a2e91757e845 Mon Sep 17 00:00:00 2001
+From: Muhammed Murad <eng.mohd.murad@gmail.com>
+Date: Thu, 8 Oct 2026 22:17:24 +0300
+Subject: [PATCH] Fix branch visit navigation, employee context, and save error
+ handling
+
+---
+ .../Resources/views/quality/index.blade.php   |  15 +-
+ .../Web/Admin/BookingController.php           |   9 +-
+ .../Web/Provider/BookingController.php        |  91 ++++++------
+ .../views/admin/booking/details.blade.php     |   6 +-
+ .../admin/booking/rebooking-ongoing.blade.php |   5 +-
+ .../booking/repeat-booking-details.blade.php  |  10 +-
+ .../admin/booking/repeat-status.blade.php     |   5 +-
+ .../views/admin/booking/service-log.blade.php |   9 +-
+ .../views/admin/booking/status.blade.php      |   5 +-
+ .../views/provider/booking/details.blade.php  |   8 +-
+ .../views/provider/booking/list.blade.php     |   4 +-
+ .../booking/rebooking-ongoing.blade.php       |   7 +-
+ .../booking/repeat-booking-details.blade.php  |  12 +-
+ .../provider/booking/repeat-status.blade.php  |   5 +-
+ .../provider/booking/service-log.blade.php    |   9 +-
+ .../views/provider/booking/status.blade.php   |   5 +-
+ .../Resources/views/layouts/master.blade.php  |  16 +--
+ .../views/layouts/new-master.blade.php        |  16 +--
+ .../views/layouts/partials/_aside.blade.php   |  28 ++--
+ .../views/layouts/partials/_header.blade.php  |   6 +-
+ Modules/UserManagement/Entities/User.php      |   6 +
+ .../Controllers/BranchWorkspaceController.php |   1 +
+ app/Services/BranchWorkspaceNavigation.php    |  41 ++++++
+ app/Services/NirabFinanceAccess.php           |   4 +-
+ app/Services/OperationalAccess.php            |   9 ++
+ public/assets/common/js/nirab-branch.js       |  25 +++-
+ resources/lang/ar/branch.php                  |   1 +
+ resources/lang/en/branch.php                  |   1 +
+ resources/views/branch/bookings.blade.php     |   2 +-
+ resources/views/branch/finance.blade.php      |   2 +-
+ resources/views/branch/return.blade.php       |   3 +
+ tests/Unit/BranchWorkspaceTest.php            | 135 ++++++++++++++++++
+ tests/branch-workspace-js.test.cjs            |  93 ++++++++++++
+ tests/compile-branch-views.php                |  12 ++
+ 34 files changed, 462 insertions(+), 144 deletions(-)
+ create mode 100644 app/Services/BranchWorkspaceNavigation.php
+ create mode 100644 resources/views/branch/return.blade.php
+ create mode 100644 tests/branch-workspace-js.test.cjs
+
+diff --git a/Modules/AdminModule/Resources/views/quality/index.blade.php b/Modules/AdminModule/Resources/views/quality/index.blade.php
+index c1e3490..ee12e49 100644
+--- a/Modules/AdminModule/Resources/views/quality/index.blade.php
++++ b/Modules/AdminModule/Resources/views/quality/index.blade.php
+@@ -101,13 +101,20 @@
+     @php($qualityTableLabels = ['readable_id' => __('operations.booking_reference'), 'booking_status' => __('quality.status'), 'service_schedule' => __('operations.starts_at'), 'total_booking_amount' => translate('Total_Amount')])
+     const tableLabels = @json($qualityTableLabels);
+     const adminPresentation = document.body.classList.contains('nirab-admin-ui');
+-    const presentationLabels = @json(['actions' => __('operations.actions'), 'inactive' => __('operations.inactive'), 'completion_rate' => __('branch.completion_rate')]);
+-    const collectionLabels = @json(\Illuminate\Support\Arr::only(__('bookingmodule::execution'), ['submitted_by_technician', 'branch_verified', 'branch_rejected', 'accountant_rejected', 'ready_for_accounting_sync']));
++    @php($qualityPresentationLabels = ['actions' => __('operations.actions'), 'inactive' => __('operations.inactive'), 'completion_rate' => __('branch.completion_rate')])
++    const presentationLabels = @json($qualityPresentationLabels);
++    @php($qualityCollectionLabels = \Illuminate\Support\Arr::only(__('bookingmodule::execution'), ['submitted_by_technician', 'branch_verified', 'branch_rejected', 'accountant_rejected', 'ready_for_accounting_sync']))
++    const collectionLabels = @json($qualityCollectionLabels);
+     const permissions = @json($permissions);
+     let complaintPage = 1, complaintLast = 1, requestPage = 1, planPage = 1;
+     const notice = text => document.getElementById('quality-message').textContent = text;
++    function endpointUrl(path) {
++        const endpoint = new URL(base + path, window.location.origin);
++        if (branchId) { endpoint.searchParams.set('branch_id', branchId); for (const [key, value] of Object.entries(workspaceDates)) if (!endpoint.searchParams.has(key)) endpoint.searchParams.set(key, value); }
++        return endpoint;
++    }
+     async function api(path, data, method = 'GET') {
+-        const endpoint = new URL(base + path, window.location.origin); if (branchId) { endpoint.searchParams.set('branch_id', branchId); for (const [key, value] of Object.entries(workspaceDates)) if (!endpoint.searchParams.has(key)) endpoint.searchParams.set(key, value); }
++        const endpoint = endpointUrl(path);
+         const response = await fetch(endpoint, {method, headers: {'Accept':'application/json','Content-Type':'application/json','X-CSRF-TOKEN': token}, ...(data ? {body:JSON.stringify(data)} : {})});
+         const body = await response.json();
+         if (!response.ok) throw new Error(body.message || labels.failed);
+@@ -238,7 +245,7 @@ function drawMap(map) {
+             const data=await api('/complaints/'+ticket.id);
+             const dialog=document.createElement('dialog');dialog.className='nirab-dialog';dialog.setAttribute('aria-label',labels.complaints);const content=document.createElement('div');content.className='nirab-dialog-content';
+             const description=document.createElement('p');description.textContent=data.description;content.append(description);
+-            for(const attachment of data.attachments){const link=document.createElement('a');link.textContent=attachment.name;link.href=base+'/complaints/'+data.id+'/attachments/'+attachment.index;link.target='_blank';link.rel='noopener';content.append(link,document.createElement('br'));}
++            for(const attachment of data.attachments){const link=document.createElement('a');link.textContent=attachment.name;link.href=endpointUrl('/complaints/'+data.id+'/attachments/'+attachment.index).href;link.target='_blank';link.rel='noopener';content.append(link,document.createElement('br'));}
+             if(data.notes) {
+                 const notesHost=document.createElement('div');notesHost.className='nirab-note-list';content.append(notesHost);
+                 function renderNotes(notes) {
+diff --git a/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php b/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
+index aba5323..536cc21 100644
+--- a/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
+@@ -795,10 +795,7 @@ public function repeatSingleDetails($id, Request $request): Renderable|RedirectR
+         }
+ 
+         $this->authorize('booking_view');
+-        Validator::make($request->all(), [
+-            'web_page' => 'required|in:details,status',
+-        ]);
+-        $webPage = $request->has('web_page') ? $request['web_page'] : 'business_setup';
++        $webPage = \App\Services\BranchWorkspaceNavigation::detailPage($request);
+ 
+         $booking = $this->bookingRepeat->with(['booking.category', 'booking.subCategory', 'detail.service' => function ($query) {
+             $query->withTrashed();
+@@ -872,10 +869,10 @@ public function repeatSingleDetails($id, Request $request): Renderable|RedirectR
+ 
+             $area = json_decode($zoneCenter->coordinates[0]->toJson(), true);
+         }
+-        if ($request->web_page == 'details') {
++        if ($webPage == 'details') {
+             return view('bookingmodule::admin.booking.rebooking-ongoing', compact('zoneCenter', 'currentZone', 'centerLat', 'centerLng', 'area', 'booking', 'servicemen', 'webPage', 'customerAddress', 'services', 'zones', 'category', 'subCategory', 'providers', 'sort_by'));
+ 
+-        }elseif ($request->web_page == 'status') {
++        }elseif ($webPage == 'status') {
+             return view('bookingmodule::admin.booking.repeat-status', compact('booking', 'webPage', 'servicemen', 'customerAddress', 'category', 'subCategory', 'services', 'providers', 'zones', 'sort_by'));
+         }
+     }
+diff --git a/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php b/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
+index 1497e98..c664ebe 100644
+--- a/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
+@@ -87,12 +87,10 @@ public function __construct(Booking $booking, BookingRepeat $bookingRepeat, Book
+         $this->bookingRepeatDetail = $bookingRepeatDetail;
+         $this->bookingRepeatHistory = $bookingRepeatHistory;
+ 
+-        try {
+-            $this->subscribed_sub_categories = $subscribedService->where(['provider_id' => auth('api')->user()->provider->id])
+-                ->where(['is_subscribed' => 1])->pluck('sub_category_id')->toArray();
+-        } catch (\Exception $exception) {
+-            $this->subscribed_sub_categories = $subscribedService->pluck('sub_category_id')->toArray();
+-        }
++        $actor = auth('api')->user() ?? auth()->user();
++        $branchId = $actor ? app(\App\Services\OperationalAccess::class)->branch($actor) : null;
++        $this->subscribed_sub_categories = $branchId ? $subscribedService->where('provider_id', $branchId)
++            ->where('is_subscribed', 1)->pluck('sub_category_id')->toArray() : [];
+     }
+ 
+     /**
+@@ -119,7 +117,7 @@ public function index(Request $request): Renderable
+         }
+ 
+         $maxBookingAmount = business_config('max_booking_amount', 'booking_setup')->live_values;
+-        $providerId = $request->user()?->provider?->id;
++        $providerId = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+         $packageSubscriber = PackageSubscriber::where('provider_id', $providerId)->first();
+         $endDate = optional($packageSubscriber)->package_end_date;
+         $canceled = optional($packageSubscriber)->is_canceled;
+@@ -145,12 +143,12 @@ public function index(Request $request): Renderable
+                             });
+                     })
+                     ->when($request['booking_status'] == 'accepted', function ($query) use ($request, $maxBookingAmount) {
+-                        $query->providerAcceptedBookings($request->user()->provider->id, $maxBookingAmount);
++                        $query->providerAcceptedBookings(app(\App\Services\OperationalAccess::class)->provider($request->user())->id, $maxBookingAmount);
+                     });
+             })
+             ->when($request['booking_status'] == 'pending', function ($query) use ($packageSubscriber, $canceled, $scheduleBookingEligibility, $isPackageEnded, $request, $maxBookingAmount, $serviceAtProviderPlace, $serviceLocations) {
+                 if (nirab_branch_mode()) {
+-                    $query->providerPendingBookings($request->user()->provider, $maxBookingAmount)
++                    $query->providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider($request->user()), $maxBookingAmount)
+                         ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+                             $query->whereIn('service_location', $serviceLocations);
+                         });
+@@ -160,7 +158,7 @@ public function index(Request $request): Renderable
+ 
+                 if ($packageSubscriber) {
+                     if ($isPackageEnded > 0 && $scheduleBookingEligibility && !$canceled) {
+-                        $query->providerPendingBookings($request->user()->provider, $maxBookingAmount)
++                        $query->providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider($request->user()), $maxBookingAmount)
+                             ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+                                 $query->whereIn('service_location', $serviceLocations);
+                             });
+@@ -168,7 +166,7 @@ public function index(Request $request): Renderable
+                         $query->whereRaw('1 = 0');
+                     }
+                 } else {
+-                    $query->providerPendingBookings($request->user()->provider, $maxBookingAmount)
++                    $query->providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider($request->user()), $maxBookingAmount)
+                         ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+                             $query->whereIn('service_location', $serviceLocations);
+                         });
+@@ -205,7 +203,7 @@ public function index(Request $request): Renderable
+         if ($bookingStatus == 'pending') {
+             $this->booking
+                 ->whereIn('sub_category_id', $this->subscribed_sub_categories)
+-                ->where('zone_id', $request->user()->provider->zone_id)
++                ->where('zone_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->zone_id)
+                 ->where('is_checked', 0)
+                 ->update(['is_checked' => 1]);
+         }
+@@ -236,15 +234,11 @@ public function checkBooking($id): void
+      */
+     public function details($id, Request $request)
+     {
+-        Validator::make($request->all(), [
+-            'web_page' => 'required|in:details,status',
+-        ]);
+-
+-        $webPage = $request->has('web_page') ? $request['web_page'] : 'details';
+-        $booking = $this->booking->with(['detail.service' => fn($query) => $query->withTrashed(), 'detail.service.category', 'detail.service.subCategory', 'detail.variation', 'customer', 'provider', 'serviceman', 'status_histories.user'])->find($id);
++        $webPage = \App\Services\BranchWorkspaceNavigation::detailPage($request);
++        $booking = $this->booking->with(['detail.service' => fn($query) => $query->withTrashed(), 'detail.service.category', 'detail.service.subCategory', 'detail.variation', 'customer', 'provider', 'serviceman', 'status_histories.user'])->findOrFail($id);
+         $booking->service_address = $booking->service_address_location != null ? json_decode($booking->service_address_location) : $booking->service_address;
+ 
+-        if ($booking['booking_status'] != 'pending' && $booking['provider_id'] != $request->user()->provider->id) {
++        if ($booking['booking_status'] != 'pending' && $booking['provider_id'] != app(\App\Services\OperationalAccess::class)->provider($request->user())->id) {
+             Toastr::error(translate(ACCESS_DENIED['key']));
+             return redirect(route('provider.booking.list', ['booking_status' => 'accepted']));
+         }
+@@ -255,7 +249,7 @@ public function details($id, Request $request)
+                 ->whereHas('user', function ($q) {
+                     $q->ofStatus(1);
+                 })
+-                ->where('provider_id', $this->provider->where('user_id', $request->user()->id)->first()->id)
++                ->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)
+                 ->latest()
+                 ->get();
+ 
+@@ -276,7 +270,7 @@ public function details($id, Request $request)
+                 ->whereHas('user', function ($q) {
+                     $q->ofStatus(1);
+                 })
+-                ->where('provider_id', $this->provider->where('user_id', $request->user()->id)->first()->id)
++                ->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)
+                 ->latest()
+                 ->get();
+             $customerAddresses = $this->userAddress->where(['user_id' => $booking?->customer?->id])->get();
+@@ -309,7 +303,7 @@ public function repeatDetails($id, Request $request): Renderable|RedirectRespons
+         $booking = $this->booking->with(['repeat.detail.service','repeat.scheduleHistories','repeat.repeatHistories', 'detail.service' => function ($query) {
+             $query->withTrashed();
+         }, 'detail.service.category', 'detail.service.subCategory', 'detail.variation', 'customer', 'provider',
+-             'serviceman', 'status_histories.user'])->find($id);
++             'serviceman', 'status_histories.user'])->findOrFail($id);
+ 
+         $booking->service_address = $booking->service_address_location != null ? json_decode($booking->service_address_location) : $booking->service_address;
+ 
+@@ -426,15 +420,12 @@ public function repeatDetails($id, Request $request): Renderable|RedirectRespons
+      */
+     public function repeatSingleDetails($id, Request $request): Renderable|RedirectResponse
+     {
+-        Validator::make($request->all(), [
+-            'web_page' => 'required|in:details,status',
+-        ]);
+-        $webPage = $request->has('web_page') ? $request['web_page'] : 'details';
++        $webPage = \App\Services\BranchWorkspaceNavigation::detailPage($request);
+ 
+ 
+         $booking = $this->bookingRepeat->with(['booking.category', 'detail.service' => function ($query) {
+             $query->withTrashed();
+-        }, 'detail.service', 'scheduleHistories.user', 'statusHistories.user', 'booking.service_address', 'booking.customer', 'booking.provider', 'serviceman.user', 'booking.subCategory'])->find($id);
++        }, 'detail.service', 'scheduleHistories.user', 'statusHistories.user', 'booking.service_address', 'booking.customer', 'booking.provider', 'serviceman.user', 'booking.subCategory'])->findOrFail($id);
+ 
+         $booking->service_address = $booking->service_address_location != null ? json_decode($booking->service_address_location) : $booking?->booking?->service_address;
+         unset($booking->service_address_location);
+@@ -474,7 +465,7 @@ public function requestAccept(Request $request, string $bookingId): RedirectResp
+ 
+         if (isset($booking)) {
+ 
+-            $provider = $request->user()->provider;
++            $provider = app(\App\Services\OperationalAccess::class)->provider($request->user());
+ 
+             if (!nirab_branch_mode() && $provider?->is_suspended == 1 && business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values) {
+                 Toastr::error(translate(DEFAULT_SUSPEND_200['key']));
+@@ -492,7 +483,7 @@ public function requestAccept(Request $request, string $bookingId): RedirectResp
+                 return back();
+             }
+ 
+-            $booking->provider_id = $request->user()->provider->id;
++            $booking->provider_id = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+             $booking->booking_status = 'accepted';
+ 
+             $bookingStatusHistory = $this->bookingStatusHistory;
+@@ -506,7 +497,7 @@ public function requestAccept(Request $request, string $bookingId): RedirectResp
+ 
+                 if ($booking->repeat->isNotEmpty()){
+                     foreach ($booking->repeat as $repeat) {
+-                        $repeat->provider_id = $request->user()->provider->id;
++                        $repeat->provider_id = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+                         $repeat->booking_status = 'accepted';
+                         $repeat->save();
+ 
+@@ -535,7 +526,7 @@ public function requestAccept(Request $request, string $bookingId): RedirectResp
+      */
+     public function requestIgnore(Request $request, string $bookingId): RedirectResponse
+     {
+-        $providerId = $request->user()->provider->id;
++        $providerId = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+         $booking = $this->booking->where('id', $bookingId)->first();
+         $repeatBookings = $this->bookingRepeat->where('booking_id', $bookingId)->get();
+ 
+@@ -602,12 +593,12 @@ public function statusUpdate($bookingId, Request $request): JsonResponse
+         }
+ 
+         $booking = $this->booking->where('id', $bookingId)->where(function ($query) use ($request) {
+-            return $query->where('provider_id', $request->user()->provider->id)->orWhereNull('provider_id');
++            return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->orWhereNull('provider_id');
+         })->first();
+ 
+-        $repeatBooking = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', $request->user()->provider->id)->first();
++        $repeatBooking = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->first();
+ 
+-        $provider = $request->user()->provider;
++        $provider = app(\App\Services\OperationalAccess::class)->provider($request->user());
+ 
+         if (isset($booking)) {
+ 
+@@ -632,7 +623,7 @@ public function statusUpdate($bookingId, Request $request): JsonResponse
+                     return response()->json(DEFAULT_SUSPEND_200, 200);
+                 }
+ 
+-                $nextBookingEligibility = nextBookingEligibility($request->user()->provider->id);
++                $nextBookingEligibility = nextBookingEligibility(app(\App\Services\OperationalAccess::class)->provider($request->user())->id);
+                 if (!$nextBookingEligibility){
+                     return response()->json(BOOKING_LIMIT_END, 200);
+                 }
+@@ -655,7 +646,7 @@ public function statusUpdate($bookingId, Request $request): JsonResponse
+             }
+ 
+             $booking->booking_status = $request['booking_status'];
+-            $booking->provider_id = $request->user()->provider->id;
++            $booking->provider_id = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+ 
+             $bookingStatusHistory = $this->bookingStatusHistory;
+             $bookingStatusHistory->booking_id = $bookingId;
+@@ -788,11 +779,11 @@ public function evidencePhotosUpload($bookingId, Request $request): JsonResponse
+         ]);
+ 
+         $booking = $this->booking->where('id', $bookingId)->where(function ($query) use ($request) {
+-            return $query->where('provider_id', $request->user()->provider->id)->orWhereNull('provider_id');
++            return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->orWhereNull('provider_id');
+         })->first();
+ 
+         $repeat = $this->bookingRepeat->where('id', $bookingId)->where(function ($query) use ($request) {
+-            return $query->where('provider_id', $request->user()->provider->id)->orWhereNull('provider_id');
++            return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->orWhereNull('provider_id');
+         })->first();
+         if (isset($booking)) {
+ 
+@@ -872,14 +863,14 @@ public function resendOtp(Request $request): JsonResponse
+             ->with(['customer'])
+             ->where('id', $request['booking_id'])
+             ->where(function ($query) use ($request) {
+-                return $query->where('provider_id', $request->user()->provider->id);
++                return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id);
+             })
+             ->first();
+ 
+         if (!isset($booking)) {
+ 
+             $repeat = $this->bookingRepeat->where('id', $request['booking_id'])->where(function ($query) use ($request) {
+-                return $query->where('provider_id', $request->user()->provider->id)->orWhereNull('provider_id');
++                return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->orWhereNull('provider_id');
+             })->first();
+ 
+             if ($repeat){
+@@ -923,10 +914,10 @@ public function paymentUpdate($bookingId, Request $request): JsonResponse
+         ]);
+ 
+         $booking = $this->booking->where('id', $bookingId)->where(function ($query) use ($request) {
+-            return $query->where('provider_id', $request->user()->provider->id)->orWhereNull('provider_id');
++            return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->orWhereNull('provider_id');
+         })->first();
+ 
+-        $repeatBooking = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', $request->user()->provider->id)->first();
++        $repeatBooking = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->first();
+ 
+         if (isset($booking)) {
+             $booking->is_paid = $request->paymentStatus == '1' ? 1 : 0;
+@@ -963,10 +954,10 @@ public function scheduleUpdate($bookingId, Request $request): JsonResponse
+         ]);
+ 
+         $booking = $this->booking->where('id', $bookingId)->where(function ($query) use ($request) {
+-            return $query->where('provider_id', $request->user()->provider->id)->orWhereNull('provider_id');
++            return $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->orWhereNull('provider_id');
+         })->first();
+ 
+-        $bookingRepeat = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', $request->user()->provider->id)->first();
++        $bookingRepeat = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->first();
+ 
+         if (isset($booking)) {
+             $booking->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
+@@ -1244,7 +1235,7 @@ public function download(Request $request): string|StreamedResponse
+         }
+ 
+         $maxBookingAmount = business_config('max_booking_amount', 'booking_setup')->live_values;
+-        $providerId = $request->user()?->provider?->id;
++        $providerId = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+         $packageSubscriber = PackageSubscriber::where('provider_id', $providerId)->first();
+         $endDate = optional($packageSubscriber)->package_end_date;
+         $canceled = optional($packageSubscriber)->is_canceled;
+@@ -1270,12 +1261,12 @@ public function download(Request $request): string|StreamedResponse
+                             });
+                     })
+                     ->when($request['booking_status'] == 'accepted', function ($query) use ($request, $maxBookingAmount) {
+-                        $query->providerAcceptedBookings($request->user()->provider->id, $maxBookingAmount);
++                        $query->providerAcceptedBookings(app(\App\Services\OperationalAccess::class)->provider($request->user())->id, $maxBookingAmount);
+                     });
+             })
+             ->when($request['booking_status'] == 'pending', function ($query) use ($packageSubscriber, $canceled, $scheduleBookingEligibility, $isPackageEnded, $request, $maxBookingAmount, $serviceAtProviderPlace, $serviceLocations) {
+                 if (nirab_branch_mode()) {
+-                    $query->providerPendingBookings($request->user()->provider, $maxBookingAmount)
++                    $query->providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider($request->user()), $maxBookingAmount)
+                         ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+                             $query->whereIn('service_location', $serviceLocations);
+                         });
+@@ -1285,7 +1276,7 @@ public function download(Request $request): string|StreamedResponse
+ 
+                 if ($packageSubscriber) {
+                     if ($isPackageEnded > 0 && $scheduleBookingEligibility && !$canceled) {
+-                        $query->providerPendingBookings($request->user()->provider, $maxBookingAmount)
++                        $query->providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider($request->user()), $maxBookingAmount)
+                             ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+                                 $query->whereIn('service_location', $serviceLocations);
+                             });
+@@ -1293,7 +1284,7 @@ public function download(Request $request): string|StreamedResponse
+                         $query->whereRaw('1 = 0');
+                     }
+                 } else {
+-                    $query->providerPendingBookings($request->user()->provider, $maxBookingAmount)
++                    $query->providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider($request->user()), $maxBookingAmount)
+                         ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+                             $query->whereIn('service_location', $serviceLocations);
+                         });
+@@ -1953,7 +1944,7 @@ public function calendarView(Request $request): Renderable
+ 
+     public function calendarEvents(Request $request)
+     {
+-        $providerId = $request->user()?->provider?->id;
++        $providerId = app(\App\Services\OperationalAccess::class)->provider($request->user())->id;
+         if (!$providerId) {
+             return response()->json([]);
+         }
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/details.blade.php b/Modules/BookingModule/Resources/views/admin/booking/details.blade.php
+index 639dcc0..224fd2e 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/details.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/details.blade.php
+@@ -7,7 +7,7 @@
+ @endpush
+ 
+ @section('content')
+-@if(nirab_branch_mode() && request('branch_id'))<div class="px-4 pt-3"><a class="btn btn-outline-primary" href="{{ route('admin.branch.index', ['branch_id' => request('branch_id'), 'tab' => 'bookings', 'from' => request('workspace_from'), 'to' => request('workspace_to')]) }}">{{ __('branch.return') }}</a></div>@endif
++@include('branch.return', ['workspacePanel' => 'admin'])
+ <div class="main-content nirab-operational-page nirab-booking-detail">
+     <div class="container-fluid">
+         <div class="page-title-wrap mb-3">
+@@ -185,11 +185,11 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+             <ul class="nav nav--tabs nav--tabs__style2">
+                 <li class="nav-item">
+                     <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                        href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                        href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                 </li>
+                 <li class="nav-item">
+                     <a class="nav-link {{ $webPage == 'status' ? 'active' : '' }}"
+-                        href="{{ url()->current() }}?web_page=status">{{ translate('status') }}</a>
++                        href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{ translate('status') }}</a>
+                 </li>
+             </ul>
+             @php($max_booking_amount = business_config('max_booking_amount', 'booking_setup')->live_values ?? 0)
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php b/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php
+index f6612b9..e6f382e 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php
+@@ -7,6 +7,7 @@
+ @endpush
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'admin'])
+     <div class="main-content nirab-operational-page nirab-booking-detail">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -176,11 +177,11 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'status' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=status">{{ translate('status') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{ translate('status') }}</a>
+                     </li>
+                 </ul>
+                 @php($max_booking_amount = business_config('max_booking_amount', 'booking_setup')->live_values ?? 0)
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php b/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php
+index bec863d..774b998 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php
+@@ -7,7 +7,7 @@
+ @endpush
+ 
+ @section('content')
+-@if(nirab_branch_mode() && request('branch_id'))<div class="px-4 pt-3"><a class="btn btn-outline-primary" href="{{ route('admin.branch.index', ['branch_id' => request('branch_id'), 'tab' => 'bookings', 'from' => request('workspace_from'), 'to' => request('workspace_to')]) }}">{{ __('branch.return') }}</a></div>@endif
++@include('branch.return', ['workspacePanel' => 'admin'])
+     <div class="main-content nirab-operational-page nirab-booking-detail">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -178,11 +178,11 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'service_log' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=service_log">{{ translate('service_log') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'service_log']) }}">{{ translate('service_log') }}</a>
+                     </li>
+                 </ul>
+                 @php($max_booking_amount = business_config('max_booking_amount', 'booking_setup')->live_values ?? 0)
+@@ -227,7 +227,7 @@ class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-
+                                     {{ ucwords($booking->nextService['booking_status']) }}
+                                 </div>
+ 
+-                                <a href="{{ route('admin.booking.repeat_single_details', [$booking->nextService['id'], 'web_page' => 'details'])}}" class="btn btn--secondary-two text-capitalize fw-semibold fz-14">
++                                <a href="{{ route('admin.booking.repeat_single_details', \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $booking->nextService['id']))}}" class="btn btn--secondary-two text-capitalize fw-semibold fz-14">
+                                     {{ translate('view_details') }}
+                                 </a>
+                             </div>
+@@ -273,7 +273,7 @@ class="btn btn--light border-dashed text-capitalize title-color d-flex flex-wrap
+                         <div class="card-header shadow-none border-bottom">
+                             <div class="d-flex justify-content-between flex-wrap gap-3">
+                                 <h3>{{ translate('All_Booking_Summary') }}</h3>
+-                                <a href="{{ url()->current() }}?web_page=service_log" class="btn-link text-primary fw-semibold">{{translate('View All Booking')}}</a>
++                                <a href="{{ request()->fullUrlWithQuery(['web_page' => 'service_log']) }}" class="btn-link text-primary fw-semibold">{{translate('View All Booking')}}</a>
+                             </div>
+                         </div>
+                         <div class="card-body pb-5">
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php b/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php
+index b86127e..b6eb5f0 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php
+@@ -3,6 +3,7 @@
+ @section('title', translate('Booking_Status'))
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'admin'])
+     <div class="main-content nirab-operational-page nirab-booking-detail">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -100,11 +101,11 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'status' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=status">{{ translate('status') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{ translate('status') }}</a>
+                     </li>
+                 </ul>
+ 
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php b/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php
+index 1879052..5fae2a4 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php
+@@ -3,6 +3,7 @@
+ @section('title', translate('Booking_Service_log'))
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'admin'])
+     <div class="main-content nirab-operational-page nirab-booking-detail">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -180,11 +181,11 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'service_log' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=service_log">{{ translate('service_log') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'service_log']) }}">{{ translate('service_log') }}</a>
+                     </li>
+                 </ul>
+ 
+@@ -241,7 +242,7 @@ class="action-btn btn--light-primary text-primary fw-medium text-capitalize fz-1
+                                                         style="--size: 30px">
+                                                         <span class="material-icons">description</span>
+                                                     </a>
+-                                                    <a href="{{ route('admin.booking.repeat_single_details', [$booking->nextService['id'], 'web_page' => 'details'])}}" type="button"
++                                                    <a href="{{ route('admin.booking.repeat_single_details', \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $booking->nextService['id']))}}" type="button"
+                                                         class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                         style="--size: 30px">
+                                                         <span class="material-icons">visibility</span>
+@@ -274,7 +275,7 @@ class="action-btn btn--light-primary text-primary fw-medium text-capitalize fz-1
+                                                            style="--size: 30px">
+                                                             <span class="material-icons">description</span>
+                                                         </a>
+-                                                        <a href="{{ route('admin.booking.repeat_single_details', [$data['id'], 'web_page' => 'details'])}}" type="button"
++                                                        <a href="{{ route('admin.booking.repeat_single_details', \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $data['id']))}}" type="button"
+                                                            class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                            style="--size: 30px">
+                                                             <span class="material-icons">visibility</span>
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/status.blade.php b/Modules/BookingModule/Resources/views/admin/booking/status.blade.php
+index 1d0b9dd..88b2449 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/status.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/status.blade.php
+@@ -3,6 +3,7 @@
+ @section('title', translate('Booking_Status'))
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'admin'])
+     <div class="main-content nirab-operational-page nirab-booking-detail">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -168,11 +169,11 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'status' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=status">{{ translate('status') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{ translate('status') }}</a>
+                     </li>
+                 </ul>
+ 
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/details.blade.php b/Modules/BookingModule/Resources/views/provider/booking/details.blade.php
+index fdcb3b6..dee0a88 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/details.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/details.blade.php
+@@ -11,7 +11,7 @@
+ @endpush
+ 
+ @section('content')
+-@if(nirab_branch_mode() && request('branch_id'))<div class="px-4 pt-3"><a class="btn btn-outline-primary" href="{{ route('provider.branch.index', ['branch_id' => request('branch_id'), 'tab' => 'bookings', 'from' => request('workspace_from'), 'to' => request('workspace_to')]) }}">{{ __('branch.return') }}</a></div>@endif
++@include('branch.return', ['workspacePanel' => 'provider'])
+     <div class="main-content">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-4">
+@@ -63,11 +63,11 @@ class="btn btn-primary" target="_blank">
+                 <ul class="nav nav--tabs nav--tabs__style2 mb-4">
+                     <li class="nav-item">
+                         <a class="nav-link {{$webPage=='details'?'active':''}}"
+-                           href="{{url()->current()}}?web_page=details">{{translate('details')}}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{translate('details')}}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{$webPage=='status'?'active':''}}"
+-                           href="{{url()->current()}}?web_page=status">{{translate('status')}}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{translate('status')}}</a>
+                     </li>
+                 </ul>
+             </div>
+@@ -563,7 +563,7 @@ class="border-bottom d-flex align-items-center justify-content-between gap-2 py-
+                                         </h4>
+                                         @if($serviceAtProviderPlace == 1 && $booking->booking_status != 'pending' && $booking->booking_status != 'completed'  && $booking->booking_status != 'canceled')
+ 
+-                                            @php($serviceLocation = getProviderSettings(providerId: auth()->user()->provider->id, key: 'service_location', type: 'provider_config'))
++                                            @php($serviceLocation = getProviderSettings(providerId: app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, key: 'service_location', type: 'provider_config'))
+                                             @if(in_array('customer', $serviceLocation) && in_array('provider', $serviceLocation))
+                                                 <div class="btn-group">
+                                                     <div data-bs-toggle="modal"
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/list.blade.php b/Modules/BookingModule/Resources/views/provider/booking/list.blade.php
+index ae0c5b6..917a222 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/list.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/list.blade.php
+@@ -29,7 +29,7 @@
+ @endpush
+ 
+ @section('content')
+-    @if(!nirab_branch_mode() && business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values && Request()->user()->provider->is_suspended == 1)
++    @if(!nirab_branch_mode() && business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values && app(\App\Services\OperationalAccess::class)->provider(request()->user())->is_suspended == 1)
+         <div class="alert alert-danger">
+             <div class="media gap-3 align-items-center">
+                 <div class="alert-close-btn">
+@@ -44,7 +44,7 @@
+             </div>
+         </div>
+     @endif
+-    @if(!request()->user()->provider->service_availability && $queryParams['booking_status'] == 'pending')
++    @if(!app(\App\Services\OperationalAccess::class)->provider(request()->user())->service_availability && $queryParams['booking_status'] == 'pending')
+         <div class="alert alert-primary availability-alert">
+             <div class="media gap-3 align-items-center">
+                 <div class="alert-close-btn">
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php b/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php
+index 6af35d9..370c86e 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php
+@@ -23,6 +23,7 @@
+ @endpush
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'provider'])
+     <div class="main-content">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -69,11 +70,11 @@
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'status' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=status">{{ translate('status') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{ translate('status') }}</a>
+                     </li>
+                 </ul>
+                 @php($max_booking_amount = business_config('max_booking_amount', 'booking_setup')->live_values ?? 0)
+@@ -544,7 +545,7 @@ class="btn btn--primary otp-submit-button" disabled>{{translate('Submit')}}</but
+                                             {{ translate('Service_location') }}
+                                         </h4>
+                                         @if($serviceAtProviderPlace == 1 && $booking->booking_status != 'pending' && $booking->booking_status != 'completed'  && $booking->booking_status != 'canceled')
+-                                            @php($serviceLocation = getProviderSettings(providerId: auth()->user()->provider->id, key: 'service_location', type: 'provider_config'))
++                                            @php($serviceLocation = getProviderSettings(providerId: app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, key: 'service_location', type: 'provider_config'))
+                                             @if(in_array('customer', $serviceLocation) && in_array('provider', $serviceLocation))
+                                                 <div class="btn-group">
+                                                     <div data-bs-toggle="modal"
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php b/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php
+index cd7dabe..f9eaf6a 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php
+@@ -24,7 +24,7 @@
+ @endpush
+ 
+ @section('content')
+-@if(nirab_branch_mode() && request('branch_id'))<div class="px-4 pt-3"><a class="btn btn-outline-primary" href="{{ route('provider.branch.index', ['branch_id' => request('branch_id'), 'tab' => 'bookings', 'from' => request('workspace_from'), 'to' => request('workspace_to')]) }}">{{ __('branch.return') }}</a></div>@endif
++@include('branch.return', ['workspacePanel' => 'provider'])
+     <div class="main-content">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -72,11 +72,11 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'service_log' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=service_log">{{ translate('service_log') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'service_log']) }}">{{ translate('service_log') }}</a>
+                     </li>
+                 </ul>
+                 @php($max_booking_amount = business_config('max_booking_amount', 'booking_setup')->live_values ?? 0)
+@@ -122,7 +122,7 @@ class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-
+                                     </span>
+                                 </div>
+ 
+-                                <a href="{{ route('provider.booking.repeat_single_details', [$booking->nextService['id'], 'web_page' => 'details'])}}" class="btn btn--secondary-two text-capitalize fw-semibold fz-14">
++                                <a href="{{ route('provider.booking.repeat_single_details', \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $booking->nextService['id']))}}" class="btn btn--secondary-two text-capitalize fw-semibold fz-14">
+                                     {{ translate('view_details') }}
+                                 </a>
+                             </div>
+@@ -168,7 +168,7 @@ class="btn btn--light border-dashed text-capitalize title-color d-flex flex-wrap
+                         <div class="card-header shadow-none border-bottom">
+                             <div class="d-flex justify-content-between flex-wrap gap-3">
+                                 <h3>{{ translate('All_Booking_Summary') }}</h3>
+-                                <a href="{{ url()->current() }}?web_page=service_log" class="btn-link text-primary fw-semibold">{{translate('View All Booking')}}</a>
++                                <a href="{{ request()->fullUrlWithQuery(['web_page' => 'service_log']) }}" class="btn-link text-primary fw-semibold">{{translate('View All Booking')}}</a>
+                             </div>
+                         </div>
+                         <div class="card-body pb-5">
+@@ -538,7 +538,7 @@ class="btn btn--light-primary g-2 max-w120 flex-grow-1 form-alert"
+                                             {{ translate('Service_location') }}
+                                         </h4>
+                                         @if($serviceAtProviderPlace == 1 && $booking->booking_status != 'pending' && $booking->booking_status != 'completed'  && $booking->booking_status != 'canceled')
+-                                            @php($serviceLocation = getProviderSettings(providerId: auth()->user()->provider->id, key: 'service_location', type: 'provider_config'))
++                                            @php($serviceLocation = getProviderSettings(providerId: app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, key: 'service_location', type: 'provider_config'))
+                                             @if(in_array('customer', $serviceLocation) && in_array('provider', $serviceLocation))
+                                                 <div class="btn-group">
+                                                     <div data-bs-toggle="modal"
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php b/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php
+index 38afc78..4c7bc1d 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php
+@@ -10,6 +10,7 @@
+     </style>
+ @endpush
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'provider'])
+     <div class="main-content">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -52,11 +53,11 @@
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'status' ? 'active' : '' }}"
+-                            href="{{ url()->current() }}?web_page=status">{{ translate('status') }}</a>
++                            href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{ translate('status') }}</a>
+                     </li>
+                 </ul>
+ 
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php b/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php
+index 23044a5..de80c5f 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php
+@@ -3,6 +3,7 @@
+ @section('title', translate('Booking_Service_log'))
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'provider'])
+     <div class="main-content">
+         <div class="container-fluid">
+             <div class="page-title-wrap mb-3">
+@@ -50,11 +51,11 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                 <ul class="nav nav--tabs nav--tabs__style2">
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'details' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=details">{{ translate('details') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{ translate('details') }}</a>
+                     </li>
+                     <li class="nav-item">
+                         <a class="nav-link {{ $webPage == 'service_log' ? 'active' : '' }}"
+-                           href="{{ url()->current() }}?web_page=service_log">{{ translate('service_log') }}</a>
++                           href="{{ request()->fullUrlWithQuery(['web_page' => 'service_log']) }}">{{ translate('service_log') }}</a>
+                     </li>
+                 </ul>
+             </div>
+@@ -81,7 +82,7 @@ class="action-btn btn--light-primary text-primary fw-medium text-capitalize fz-1
+                                                     style="--size: 30px">
+                                                     <span class="material-icons">description</span>
+                                                 </a>
+-                                                <a href="{{ route('provider.booking.repeat_single_details', [$booking->nextService['id'], 'web_page' => 'details'])}}" type="button"
++                                                <a href="{{ route('provider.booking.repeat_single_details', \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $booking->nextService['id']))}}" type="button"
+                                                     class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                     style="--size: 30px">
+                                                     <span class="material-icons">visibility</span>
+@@ -114,7 +115,7 @@ class="action-btn btn--light-primary text-primary fw-medium text-capitalize fz-1
+                                                            style="--size: 30px">
+                                                             <span class="material-icons">description</span>
+                                                         </a>
+-                                                        <a href="{{ route('provider.booking.repeat_single_details', [$data['id'], 'web_page' => 'details'])}}" type="button"
++                                                        <a href="{{ route('provider.booking.repeat_single_details', \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $data['id']))}}" type="button"
+                                                            class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                            style="--size: 30px">
+                                                             <span class="material-icons">visibility</span>
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/status.blade.php b/Modules/BookingModule/Resources/views/provider/booking/status.blade.php
+index 1df98ec..aa9248c 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/status.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/status.blade.php
+@@ -12,6 +12,7 @@
+ @endpush
+ 
+ @section('content')
++@include('branch.return', ['workspacePanel' => 'provider'])
+     <div class="main-content">
+         <div class="container-fluid">
+ 
+@@ -60,11 +61,11 @@ class="btn btn-primary" target="_blank">
+             <ul class="nav nav--tabs nav--tabs__style2 mb-4">
+                 <li class="nav-item">
+                     <a class="nav-link {{$webPage=='details'?'active':''}}"
+-                        href="{{url()->current()}}?web_page=details">{{translate('details')}}</a>
++                        href="{{ request()->fullUrlWithQuery(['web_page' => 'details']) }}">{{translate('details')}}</a>
+                 </li>
+                 <li class="nav-item">
+                     <a class="nav-link {{$webPage=='status'?'active':''}}"
+-                        href="{{url()->current()}}?web_page=status">{{translate('status')}}</a>
++                        href="{{ request()->fullUrlWithQuery(['web_page' => 'status']) }}">{{translate('status')}}</a>
+                 </li>
+             </ul>
+ 
+diff --git a/Modules/ProviderManagement/Resources/views/layouts/master.blade.php b/Modules/ProviderManagement/Resources/views/layouts/master.blade.php
+index 9a43912..18c6837 100644
+--- a/Modules/ProviderManagement/Resources/views/layouts/master.blade.php
++++ b/Modules/ProviderManagement/Resources/views/layouts/master.blade.php
+@@ -117,7 +117,7 @@
+ 
+ <?php
+ $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+-$serviceLocations = getProviderSettings(providerId: auth()->user()->provider->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
++$serviceLocations = getProviderSettings(providerId: app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
+ ?>
+ 
+ 
+@@ -208,7 +208,7 @@ function demo_mode() {
+     });
+ 
+ 
+-    @if(!request()->is('provider/profile-update') && is_null(auth()->user()->provider->coordinates))
++    @if(!request()->is('provider/profile-update') && is_null(app(\App\Services\OperationalAccess::class)->provider(auth()->user())->coordinates))
+     Swal.fire({
+         title: "{{translate('Update Location')}}",
+         text: "{{translate('You must update your location first')}}",
+@@ -516,7 +516,7 @@ function playAudio(status) {
+ 
+         @if($admin_order_notification_type == 'manual')
+ 
+-            @if(nirab_branch_mode() || !auth()->user()?->provider?->is_suspended || !business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values)
++            @if(nirab_branch_mode() || !app(\App\Services\OperationalAccess::class)->provider(auth()->user())?->is_suspended || !business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values)
+                 setInterval(function () {
+                     $.get({
+                         url: '{{ route('provider.get_updated_data') }}',
+@@ -545,7 +545,7 @@ function playAudio(status) {
+                             document.getElementById("message_count").innerHTML = data.message;
+                             document.getElementById("notification_count").innerHTML = parseInt(count) < 0 ? 0 : parseInt(count);
+                             document.getElementById("show-notification-list").innerHTML = data.notification_template;
+-                            var availableStatus = "{{auth()->user()?->provider?->service_availability}}";
++                            var availableStatus = "{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())?->service_availability}}";
+ 
+                             if (data.booking !== parseInt(booking_count) && data.booking > 0 && availableStatus == 1) {
+                                 playAudio(true);
+@@ -605,16 +605,16 @@ function startFCM() {
+                                 return messaging.getToken();
+                             })
+                             .then(function(token) {
+-                                subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_{{ auth()->user()->provider->id }}_booking_message');
++                                subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_{{ app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id }}_booking_message');
+                                 @if($serviceAtProviderPlace)
+                                     @if(in_array('customer', $serviceLocations))
+-                                        subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_customer_booking_message');
++                                        subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_customer_booking_message');
+                                    @endif
+                                    @if(in_array('provider', $serviceLocations))
+-                                        subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_provider_booking_message');
++                                        subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_provider_booking_message');
+                                    @endif
+                                 @else
+-                                   subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_booking_message');
++                                   subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_booking_message');
+                                 @endif
+                             }).catch(function(error) {
+                             console.error('Error getting permission or token:', error);
+diff --git a/Modules/ProviderManagement/Resources/views/layouts/new-master.blade.php b/Modules/ProviderManagement/Resources/views/layouts/new-master.blade.php
+index db9535c..f1b51f6 100644
+--- a/Modules/ProviderManagement/Resources/views/layouts/new-master.blade.php
++++ b/Modules/ProviderManagement/Resources/views/layouts/new-master.blade.php
+@@ -110,7 +110,7 @@
+ 
+ <?php
+ $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+-$serviceLocations = getProviderSettings(providerId: auth()->user()->provider->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
++$serviceLocations = getProviderSettings(providerId: app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
+ ?>
+ 
+ 
+@@ -193,7 +193,7 @@ function update_notification() {
+     }
+ 
+ 
+-    @if(!request()->is('provider/profile-update') && is_null(auth()->user()->provider->coordinates))
++    @if(!request()->is('provider/profile-update') && is_null(app(\App\Services\OperationalAccess::class)->provider(auth()->user())->coordinates))
+     Swal.fire({
+         title: "{{translate('Update Location')}}",
+         text: "{{translate('You must update your location first')}}",
+@@ -546,7 +546,7 @@ function playAudio(status) {
+ 
+         @if($admin_order_notification_type == 'manual')
+ 
+-            @if(nirab_branch_mode() || !auth()->user()?->provider?->is_suspended || !business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values)
++            @if(nirab_branch_mode() || !app(\App\Services\OperationalAccess::class)->provider(auth()->user())?->is_suspended || !business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values)
+                 setInterval(function () {
+                     $.get({
+                         url: '{{ route('provider.get_updated_data') }}',
+@@ -575,7 +575,7 @@ function playAudio(status) {
+                             document.getElementById("message_count").innerHTML = data.message;
+                             document.getElementById("notification_count").innerHTML = parseInt(count) < 0 ? 0 : parseInt(count);
+                             document.getElementById("show-notification-list").innerHTML = data.notification_template;
+-                            var availableStatus = "{{auth()->user()?->provider?->service_availability}}";
++                            var availableStatus = "{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())?->service_availability}}";
+ 
+                             if (data.booking !== parseInt(booking_count) && data.booking > 0 && availableStatus == 1) {
+                                 playAudio(true);
+@@ -635,16 +635,16 @@ function startFCM() {
+                                 return messaging.getToken();
+                             })
+                             .then(function(token) {
+-                                subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_{{ auth()->user()->provider->id }}_booking_message');
++                                subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_{{ app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id }}_booking_message');
+                                 @if($serviceAtProviderPlace)
+                                     @if(in_array('customer', $serviceLocations))
+-                                        subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_customer_booking_message');
++                                        subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_customer_booking_message');
+                                    @endif
+                                    @if(in_array('provider', $serviceLocations))
+-                                        subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_provider_booking_message');
++                                        subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_provider_booking_message');
+                                    @endif
+                                 @else
+-                                   subscribeTokenToBackend(token, 'demandium_provider_{{auth()->user()->provider->zone_id}}_booking_message');
++                                   subscribeTokenToBackend(token, 'demandium_provider_{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id}}_booking_message');
+                                 @endif
+                             }).catch(function(error) {
+                             console.error('Error getting permission or token:', error);
+diff --git a/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php b/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php
+index bb19c39..c4031f5 100644
+--- a/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php
++++ b/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php
+@@ -1,26 +1,26 @@
+ <?php
+-$booking = \Modules\BookingModule\Entities\Booking::where('provider_id', auth()->user()->provider->id)
++$booking = \Modules\BookingModule\Entities\Booking::where('provider_id', app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id)
+     ->whereDoesntHave('ignores', function ($query) {
+-        $query->where('provider_id', auth()->user()->provider->id);
++        $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id);
+     })
+     ->get();
+ $maxBookingAmount = (business_config('max_booking_amount', 'booking_setup'))->live_values;
+-$subscribed_sub_category_ids = \Modules\ProviderManagement\Entities\SubscribedService::where(['provider_id' => auth()->user()->provider->id])->ofSubscription(1)->pluck('sub_category_id')->toArray();
++$subscribed_sub_category_ids = \Modules\ProviderManagement\Entities\SubscribedService::where(['provider_id' => app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id])->ofSubscription(1)->pluck('sub_category_id')->toArray();
+ $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+-$serviceLocations = getProviderSettings(providerId: auth()->user()->provider->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
++$serviceLocations = getProviderSettings(providerId: app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, key: 'service_location', type: 'provider_config') ?? ['customer'];
+ 
+-$pending_booking_count = \Modules\BookingModule\Entities\Booking::providerPendingBookings(auth()->user()->provider, $maxBookingAmount)
++$pending_booking_count = \Modules\BookingModule\Entities\Booking::providerPendingBookings(app(\App\Services\OperationalAccess::class)->provider(auth()->user()), $maxBookingAmount)
+     ->when($serviceAtProviderPlace == 1, function ($query) use ($serviceLocations) {
+         $query->whereIn('service_location', $serviceLocations);
+     })->whereDoesntHave('ignores', function ($query)  {
+-        $query->where('provider_id', auth()->user()->provider->id);
++        $query->where('provider_id', app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id);
+     })
+ 
+     ->count();
+-$accepted_booking_count = \Modules\BookingModule\Entities\Booking::providerAcceptedBookings(auth()->user()->provider->id, $maxBookingAmount)->count();
++$accepted_booking_count = \Modules\BookingModule\Entities\Booking::providerAcceptedBookings(app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id, $maxBookingAmount)->count();
+ 
+ if (nirab_branch_mode() && app(\App\Services\OperationalAccess::class)->allows(auth()->user(), 'analytics.read')) {
+-    $sidebarFilters = \App\Services\BranchPeriod::dates('this_month') + ['branch_id' => auth()->user()->provider->id];
++    $sidebarFilters = \App\Services\BranchPeriod::dates('this_month') + ['branch_id' => app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id];
+     $branchReports = app(\App\Services\BranchReportService::class);
+     $pending_booking_count = $branchReports->subjects(auth()->user(), $sidebarFilters + ['status' => 'pending'])->count();
+     $accepted_booking_count = $branchReports->subjects(auth()->user(), $sidebarFilters + ['status' => 'accepted'])->count();
+@@ -28,7 +28,7 @@
+ $logo = getBusinessSettingsImageFullPath(key: 'business_logo', settingType: 'business_information', path: 'business/',  defaultPath : 'public/assets/admin-module/img/placeholder.png');
+ ?>
+ 
+-@php($provider = auth()->user()->provider)
++@php($provider = app(\App\Services\OperationalAccess::class)->provider(auth()->user()))
+ <style>
+     body.aside-folded:not(.open-aside-folded) .aside .user-profile .avatar {
+         inline-size: 1.375rem;
+@@ -91,16 +91,16 @@ class="{{request()->is('provider/dashboard')?'active-menu':''}}">
+                     @php($bidding_status = (int)((business_config('bidding_status', 'bidding_system'))->live_values ?? 0))
+                     @if($bidding_status)
+                             <?php
+-                            $ignored_posts = \Modules\BidModule\Entities\IgnoredPost::where('provider_id', auth()->user()->provider->id)->pluck('post_id')->toArray();
++                            $ignored_posts = \Modules\BidModule\Entities\IgnoredPost::where('provider_id', app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id)->pluck('post_id')->toArray();
+                             $bidding_post_validity = (int)(business_config('bidding_post_validity', 'bidding_system'))->live_values;
+                             $posts = \Modules\BidModule\Entities\Post::where('is_booked', 0)
+                                 ->whereNotIn('id', $ignored_posts)
+                                 ->whereIn('sub_category_id', $subscribed_sub_category_ids)
+-                                ->where('zone_id', auth()->user()->provider->zone_id)
++                                ->where('zone_id', app(\App\Services\OperationalAccess::class)->provider(auth()->user())->zone_id)
+                                 ->whereBetween('created_at', [Carbon\Carbon::now()->subDays($bidding_post_validity), Carbon\Carbon::now()])
+-                                ->when(!request()->user()?->provider?->service_availability || (!nirab_branch_mode() && auth()->user()->provider->is_suspended && business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values), function ($query) {
++                                ->when(!app(\App\Services\OperationalAccess::class)->provider(auth()->user())?->service_availability || (!nirab_branch_mode() && app(\App\Services\OperationalAccess::class)->provider(auth()->user())->is_suspended && business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values), function ($query) {
+                                     $query->whereHas('bids', function ($query) {
+-                                        $query->where('status', 'pending')->where('provider_id', auth()->user()->provider->id);
++                                        $query->where('status', 'pending')->where('provider_id', app(\App\Services\OperationalAccess::class)->provider(auth()->user())->id);
+                                     });
+                                 })
+                                 ->get();
+@@ -128,7 +128,7 @@ class="{{request()->is('provider/booking/post') || request()->is('provider/booki
+                         <a href="{{(nirab_branch_mode() ? route('provider.branch.index', ['tab'=>'bookings', 'status'=>'pending']) : route('provider.booking.list', ['booking_status'=>'pending','service_type'=>'all']))}}"
+                            class="{{request()->is('provider/booking/list') && request()->query('booking_status')=='pending'?'active-menu':''}}">
+                             <span class="link-title">{{translate('Booking_Requests')}}
+-                                <span class="count">{{nirab_branch_mode() || \Illuminate\Support\Facades\Request::user()?->provider?->is_suspended == 0 || !business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values ? $pending_booking_count : 0}}</span>
++                                <span class="count">{{nirab_branch_mode() || app(\App\Services\OperationalAccess::class)->provider(auth()->user())?->is_suspended == 0 || !business_config('suspend_on_exceed_cash_limit_provider', 'provider_config')->live_values ? $pending_booking_count : 0}}</span>
+                             </span>
+                         </a>
+                     </li>
+diff --git a/Modules/ProviderManagement/Resources/views/layouts/partials/_header.blade.php b/Modules/ProviderManagement/Resources/views/layouts/partials/_header.blade.php
+index ddc57a6..5763bcd 100644
+--- a/Modules/ProviderManagement/Resources/views/layouts/partials/_header.blade.php
++++ b/Modules/ProviderManagement/Resources/views/layouts/partials/_header.blade.php
+@@ -111,7 +111,7 @@
+                             <div class="user mt-n1">
+                                 <a href="#" class="header-icon user-icon" data-bs-toggle="dropdown">
+                                     <div>
+-                                        <img width="30" height="30" src="{{auth()->user()->provider->logo_full_path}}"
++                                        <img width="30" height="30" src="{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->logo_full_path}}"
+                                             class="rounded-circle aspect-square object-fit-cover" alt="{{ translate('logo') }}">
+                                     </div>
+                                 </a>
+@@ -119,11 +119,11 @@ class="rounded-circle aspect-square object-fit-cover" alt="{{ translate('logo')
+                                     <a href="{{route('provider.profile_update')}}"
+                                        class="dropdown-item-text media gap-3 align-items-center">
+                                         <div class="avatar">
+-                                            <img class="avatar-img rounded-circle aspect-square object-fit-cover" width="50" height="50" src="{{auth()->user()->provider->logo_full_path}}"
++                                            <img class="avatar-img rounded-circle aspect-square object-fit-cover" width="50" height="50" src="{{app(\App\Services\OperationalAccess::class)->provider(auth()->user())->logo_full_path}}"
+                                                  alt="{{ translate('logo') }}">
+                                         </div>
+                                         <div class="media-body ">
+-                                            <h5 class="card-title">{{ Str::limit(auth()->user()->provider->company_name, 15) }}</h5>
++                                            <h5 class="card-title">{{ Str::limit(app(\App\Services\OperationalAccess::class)->provider(auth()->user())->company_name, 15) }}</h5>
+                                             <span class="card-text">{{ Str::limit(auth()->user()->email, 20) }}</span>
+                                         </div>
+                                     </a>
+diff --git a/Modules/UserManagement/Entities/User.php b/Modules/UserManagement/Entities/User.php
+index 7ffa400..dd1bb6b 100644
+--- a/Modules/UserManagement/Entities/User.php
++++ b/Modules/UserManagement/Entities/User.php
+@@ -105,6 +105,12 @@ public function provider(): \Illuminate\Database\Eloquent\Relations\HasOne
+         return $this->hasOne(Provider::class);
+     }
+ 
++    /** Assigned branch of a non-owner employee; keep the owner relation separate. */
++    public function branchProvider(): \Illuminate\Database\Eloquent\Relations\BelongsTo
++    {
++        return $this->belongsTo(Provider::class, 'provider_id');
++    }
++
+     public function serviceman(): \Illuminate\Database\Eloquent\Relations\HasOne
+     {
+         return $this->hasOne(Serviceman::class);
+diff --git a/app/Http/Controllers/BranchWorkspaceController.php b/app/Http/Controllers/BranchWorkspaceController.php
+index 5f2b8b7..cd24cf9 100644
+--- a/app/Http/Controllers/BranchWorkspaceController.php
++++ b/app/Http/Controllers/BranchWorkspaceController.php
+@@ -47,6 +47,7 @@ public function index(Request $request)
+         $context = $this->context($request);
+         $tab = $request->input('tab', $context['tabs'][0]);
+         abort_unless(in_array($tab, $context['tabs'], true), 403);
++        $request->merge(['tab' => $tab]);
+         $filters = BranchPeriod::filters($request);
+         $data = $context + compact('tab', 'filters');
+         if ($tab === 'operations') {
+diff --git a/app/Services/BranchWorkspaceNavigation.php b/app/Services/BranchWorkspaceNavigation.php
+new file mode 100644
+index 0000000..2931a08
+--- /dev/null
++++ b/app/Services/BranchWorkspaceNavigation.php
+@@ -0,0 +1,41 @@
++<?php
++
++namespace App\Services;
++
++use Illuminate\Http\Request;
++use Illuminate\Support\Arr;
++
++/** Carry list state as data, never as a user supplied return URL. */
++class BranchWorkspaceNavigation
++{
++    public const STATE_KEYS = ['tab', 'period', 'from', 'to', 'status', 'queue', 'payment', 'technician_id', 'service_id', 'search',
++        'invoice_status', 'sync_status', 'event', 'entity_id', 'page', 'payment_page', 'collection_page', 'refund_page', 'entry_page', 'outbox_page'];
++
++    private static function state(array $values): array
++    {
++        return array_filter(Arr::only($values, self::STATE_KEYS), fn ($value) => is_scalar($value) && $value !== '');
++    }
++
++    public static function detailPage(Request $request, array $pages = ['details', 'status']): string
++    {
++        $request->validate(['web_page' => 'nullable|in:' . implode(',', $pages)]);
++        return $request->input('web_page') ?: 'details';
++    }
++
++    public static function detailParameters(Request $request, string $id, ?array $filters = null): array
++    {
++        $state = self::state((array) $request->input('workspace', $request->query()));
++        if ($filters) $state = array_merge($state, Arr::only($filters, ['from', 'to', 'period']));
++        $state['tab'] ??= 'bookings';
++        return ['id' => $id, 'web_page' => 'details', 'branch_id' => $request->input('branch_id'), 'workspace' => $state];
++    }
++
++    public static function returnParameters(Request $request): array
++    {
++        $state = self::state((array) $request->input('workspace', []));
++        // Existing bookmarked links used only these two date parameters.
++        foreach (['from', 'to'] as $key) if (!isset($state[$key]) && $request->filled('workspace_' . $key)) $state[$key] = $request->input('workspace_' . $key);
++        $state['tab'] ??= 'bookings';
++        return array_merge($state, ['branch_id' => $request->input('branch_id')]);
++    }
++}
+diff --git a/app/Services/NirabFinanceAccess.php b/app/Services/NirabFinanceAccess.php
+index 7848486..2f4f4ae 100644
+--- a/app/Services/NirabFinanceAccess.php
++++ b/app/Services/NirabFinanceAccess.php
+@@ -37,7 +37,7 @@ public function allows(User $actor, string $permission, ?string $branchId = null
+             return false;
+         }
+         if (in_array($actor->user_type, ['provider-admin', 'provider-employee'], true)) {
+-            $ownBranch = $actor->provider?->id ?? $actor->getAttribute('provider_id');
++            $ownBranch = app(OperationalAccess::class)->branch($actor);
+             return $ownBranch !== null && ($branchId === null || $branchId === $ownBranch);
+         }
+         if ($permission === 'payment_review') return $scope->all_branches && $branchId === null;
+@@ -54,7 +54,7 @@ public function scope(Builder $query, User $actor, string $permission = 'view_ca
+             return $query;
+         }
+         if (in_array($actor->user_type, ['provider-admin', 'provider-employee'], true)) {
+-            return $query->where($column, $actor->provider?->id ?? $actor->getAttribute('provider_id'));
++            return $query->where($column, app(OperationalAccess::class)->branch($actor));
+         }
+         $scope = NirabFinanceScope::where('user_id', $actor->id)->firstOrFail();
+         return $scope->all_branches ? $query : $query->whereIn($column, $scope->branch_ids);
+diff --git a/app/Services/OperationalAccess.php b/app/Services/OperationalAccess.php
+index 9cae5f8..6e1c01d 100644
+--- a/app/Services/OperationalAccess.php
++++ b/app/Services/OperationalAccess.php
+@@ -11,8 +11,17 @@ class OperationalAccess
+ 
+     public function branch(User $actor): ?string
+     {
++        if ($actor->user_type === 'provider-employee') return $actor->getAttribute('provider_id');
+         return $actor->provider?->id ?? $actor->getAttribute('provider_id');
+     }
++
++    public function provider(User $actor): \Modules\ProviderManagement\Entities\Provider
++    {
++        abort_unless(in_array($actor->user_type, ['provider-admin', 'provider-employee'], true), 403);
++        $provider = $actor->user_type === 'provider-employee' ? $actor->branchProvider : $actor->provider;
++        abort_unless($provider && !$provider->deleted_at, 403);
++        return $provider;
++    }
+     public function allows(User $actor, string $permission, ?string $branch = null): bool
+     {
+         if ($actor->user_type === 'super-admin') {
+diff --git a/public/assets/common/js/nirab-branch.js b/public/assets/common/js/nirab-branch.js
+index d64aa9d..ff863a2 100644
+--- a/public/assets/common/js/nirab-branch.js
++++ b/public/assets/common/js/nirab-branch.js
+@@ -4,13 +4,20 @@
+     if (!config) return;
+     const text = key => config.labels[key] || key;
+     const byId = id => document.getElementById(id);
+-    const notice = (message, success = false) => { const el = byId('branch-message'); el.textContent = message; el.className = 'alert ' + (success ? 'alert-success' : 'alert-danger'); };
++    const notice = (message, success = false, refresh = null) => {
++        const el = byId('branch-message'); el.textContent = message; el.className = 'alert ' + (refresh ? 'alert-warning' : success ? 'alert-success' : 'alert-danger');
++        if (refresh) el.append(button('refresh', async () => {
++            try { await refresh(); notice(text('refreshed'), true); }
++            catch (error) { notice(text('saved_refresh_failed') + ' ' + error.message, true, refresh); }
++        }));
++    };
++    const successCodes = new Set(['default_200', 'default_store_200', 'default_update_200', 'default_status_update_200', 'default_delete_200', 'no_changes_found_200']);
+     const api = async (path, body, method = 'GET') => {
+         const url = new URL(config.base + '/' + path, window.location.origin);
+         url.searchParams.set('branch_id', config.branchId);
+         const response = await fetch(url, {method, credentials: 'same-origin', headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': config.csrf}, ...(body === undefined ? {} : {body: JSON.stringify(body)})});
+         const result = await response.json();
+-        if (!response.ok || (result.response_code && !String(result.response_code).startsWith('default_200') && result.errors?.length)) {
++        if (!response.ok || (result.response_code && !successCodes.has(result.response_code)) || Object.keys(result.errors || {}).length) {
+             const errors = result.errors || result.error || {};
+             const messages = Array.isArray(errors) ? errors.map(e => e.message || e) : Object.values(errors).flat();
+             throw new Error(messages.join('\n') || result.message || text('failed'));
+@@ -19,10 +26,15 @@
+     };
+     const submit = (form, task) => form?.addEventListener('submit', async event => {
+         event.preventDefault(); const button = event.submitter; if (button) button.disabled = true;
+-        try { await task(Object.fromEntries(new FormData(form)), form); notice(text('saved'), true); }
++        try { const result = await task(Object.fromEntries(new FormData(form)), form); notice(result?.message || text('saved'), true, result?.refresh); }
+         catch (error) { notice(error.message); }
+         finally { if (button) button.disabled = false; }
+     });
++    const saveThenRefresh = async (path, data, method, refresh) => {
++        await api(path, data, method);
++        try { await refresh(); }
++        catch (error) { return {message: text('saved_refresh_failed') + ' ' + error.message, refresh}; }
++    };
+     document.querySelectorAll('.branch-action').forEach(form => submit(form, async data => { await api(form.dataset.endpoint, data, 'POST'); window.location.reload(); }));
+     // Prevent accidental double submissions while the server enforces idempotency and state locks.
+     document.querySelectorAll('.nirab-branch form[method="post"]').forEach(form => form.addEventListener('submit', () => setTimeout(() => form.querySelectorAll('button').forEach(button => button.disabled = true), 0)));
+@@ -57,7 +69,7 @@
+             for (const state of ['scheduled','paid','completed','canceled']) { const option = document.createElement('option'); option.value = state; option.textContent = text(state); option.selected = state === inspection.status; select.append(option); }
+             select.setAttribute('aria-label', text('status'));
+             const save = document.createElement('button'); save.className = 'btn btn-outline-primary'; save.textContent = text('save'); form.append(select, save); cell.append(form);
+-            submit(form, async data => { await api('quotes/inspections/' + inspection.id, data, 'PUT'); await showQuote(id); });
++            submit(form, data => saveThenRefresh('quotes/inspections/' + inspection.id, data, 'PUT', () => showQuote(id)));
+         });
+         byId('quote-issue').closest('details').hidden = locked;
+         byId('quote-inspection').closest('details').hidden = locked;
+@@ -71,8 +83,9 @@
+     };
+     if (byId('quote-filter')) {
+         submit(byId('quote-filter'), () => loadQuotes());
+-        submit(byId('quote-issue'), async data => { await api('quotes/' + quoteId + '/issue', data, 'POST'); await showQuote(quoteId); await loadQuotes(); });
+-        submit(byId('quote-inspection'), async data => { await api('quotes/' + quoteId + '/inspections', data, 'POST'); await showQuote(quoteId); await loadQuotes(); });
++        const refreshQuote = async () => { await showQuote(quoteId); await loadQuotes(); };
++        submit(byId('quote-issue'), data => saveThenRefresh('quotes/' + quoteId + '/issue', data, 'POST', refreshQuote));
++        submit(byId('quote-inspection'), data => saveThenRefresh('quotes/' + quoteId + '/inspections', data, 'POST', refreshQuote));
+         loadQuotes().catch(error => notice(error.message));
+     }
+ })();
+diff --git a/resources/lang/ar/branch.php b/resources/lang/ar/branch.php
+index a93d463..3c59f19 100644
+--- a/resources/lang/ar/branch.php
++++ b/resources/lang/ar/branch.php
+@@ -18,4 +18,5 @@
+     'event' => 'الإجراء', 'entity' => 'معرف السجل', 'before' => 'قبل', 'after' => 'بعد', 'date' => 'التاريخ', 'alerts' => 'تنبيهات الإسناد', 'resolve' => 'معالجة التنبيه',
+     'edit_branch' => 'تعديل بيانات الفرع', 'subscribed_services' => 'خدمات الفرع', 'serviceman_list' => 'الفنيون', 'reviews' => 'التقييمات', 'settings_help' => 'تعديل بيانات الفرع والفنيين يتبع الصلاحيات الحالية. كتالوج الشركة ومفاتيح المحاسبة والإعدادات العامة تدار مركزياً.', 'quality_reports' => 'تحليلات الخدمات والفنيين والجودة', 'central_unassigned' => 'قائمة مركزية — بلا فرع مسند',
+     'quote_help' => 'أصدر نسخ العروض ونظّم المعاينات لهذا الفرع. قبول العميل مستقل ويبقى مطلوباً قبل إنشاء الحجز.', 'new_request' => 'طلبات قيد المراجعة', 'placed_offer' => 'عروض صادرة', 'booking_placed' => 'مقبول من العميل', 'submitted' => 'مقدم', 'under_review' => 'قيد المراجعة', 'inspection_required' => 'بحاجة لمعاينة', 'inspection_scheduled' => 'معاينة مجدولة', 'quote_ready' => 'العرض جاهز', 'ready' => 'جاهز', 'revised' => 'تمت مراجعته', 'expired' => 'منتهي الصلاحية', 'versions' => 'النسخ', 'inspections' => 'المعاينات', 'issue_quote' => 'إصدار عرض / نسخة جديدة', 'schedule_inspection' => 'ترتيب معاينة', 'duration' => 'الدقائق المقدرة', 'execution_type' => 'نوع التنفيذ', 'single' => 'فني واحد', 'team' => 'فريق', 'required_technicians' => 'الفنيون المطلوبون', 'expires_hours' => 'الصلاحية بالساعات', 'expires' => 'انتهاء الصلاحية', 'customer_acceptance' => 'تاريخ قبول العميل', 'note' => 'ملاحظة', 'terms' => 'الشروط', 'fee_type' => 'رسوم المعاينة', 'free' => 'مجانية', 'scheduled' => 'مجدول', 'service' => 'الخدمة', 'customer' => 'العميل', 'attachment' => 'مرفق', 'previous' => 'السابق', 'next' => 'التالي', 'return' => 'العودة إلى إدارة الفرع',
++    'saved_refresh_failed' => 'تم الحفظ بنجاح، لكن تعذر تحديث العرض. حدّث البيانات قبل إعادة الإجراء.', 'refresh' => 'تحديث البيانات', 'refreshed' => 'تم تحديث البيانات.',
+ ];
+diff --git a/resources/lang/en/branch.php b/resources/lang/en/branch.php
+index 9705bf1..f2c1c75 100644
+--- a/resources/lang/en/branch.php
++++ b/resources/lang/en/branch.php
+@@ -18,4 +18,5 @@
+     'event' => 'Event', 'entity' => 'Record ID', 'before' => 'Before', 'after' => 'After', 'date' => 'Date', 'alerts' => 'Dispatch alerts', 'resolve' => 'Resolve',
+     'edit_branch' => 'Edit branch information', 'subscribed_services' => 'Branch services', 'serviceman_list' => 'Technicians', 'reviews' => 'Reviews', 'settings_help' => 'Branch information and staffing use their existing edit permissions. Company catalog, accounting keys and general settings remain centrally managed.', 'quality_reports' => 'Service, technician and quality analytics', 'central_unassigned' => 'Central queue — no assigned branch',
+     'quote_help' => 'Issue revisions and arrange inspections for this branch. Customer acceptance is independent and remains required before booking.', 'new_request' => 'Requests under review', 'placed_offer' => 'Issued offers', 'booking_placed' => 'Accepted by customer', 'submitted' => 'Submitted', 'under_review' => 'Under review', 'inspection_required' => 'Inspection required', 'inspection_scheduled' => 'Inspection scheduled', 'quote_ready' => 'Quote ready', 'ready' => 'Ready', 'revised' => 'Revised', 'expired' => 'Expired', 'versions' => 'Revisions', 'inspections' => 'Inspections', 'issue_quote' => 'Issue quotation / revision', 'schedule_inspection' => 'Arrange inspection', 'duration' => 'Estimated minutes', 'execution_type' => 'Execution type', 'single' => 'Single technician', 'team' => 'Team', 'required_technicians' => 'Required technicians', 'expires_hours' => 'Validity in hours', 'expires' => 'Expires at', 'customer_acceptance' => 'Customer accepted at', 'note' => 'Note', 'terms' => 'Terms', 'fee_type' => 'Inspection fee', 'free' => 'Free', 'scheduled' => 'Scheduled', 'service' => 'Service', 'customer' => 'Customer', 'attachment' => 'Attachment', 'previous' => 'Previous', 'next' => 'Next', 'return' => 'Return to branch workspace',
++    'saved_refresh_failed' => 'Saved successfully, but the display could not refresh. Refresh the data before repeating the action.', 'refresh' => 'Refresh data', 'refreshed' => 'Data refreshed.',
+ ];
+diff --git a/resources/views/branch/bookings.blade.php b/resources/views/branch/bookings.blade.php
+index 0edbf20..d7ae262 100644
+--- a/resources/views/branch/bookings.blade.php
++++ b/resources/views/branch/bookings.blade.php
+@@ -2,7 +2,7 @@
+ @forelse($rows as $row)
+     @php($invoice = $invoicesBySubject->get($row->subject_id))
+     <tr><td>{{ $row->readable_id }} @if($row->booking_repeat_id)<small>{{ __('branch.visit') }} · {{ $row->subject_id }}</small>@endif</td><td>{{ __('branch.'.$row->booking_status) }}</td><td>{{ __('branch.'.($row->is_paid ? 'paid' : 'unpaid')) }}</td><td>{{ $invoice ? __('branch.'.$invoice->status) : __('branch.invoice_pending') }}</td><td>{{ \Carbon\Carbon::parse($row->service_schedule, 'UTC')->setTimezone($filters['timezone'])->format('Y-m-d H:i') }}</td><td>{{ optional($technicians->firstWhere('id', $row->serviceman_id))->user?->first_name ?? '—' }}</td><td>{{ with_currency_symbol($row->total_booking_amount) }}</td>
+-    <td><a class="btn btn-sm btn-outline-primary" href="{{ route($prefix.'.booking.'.($row->booking_repeat_id ? 'repeat_single_details' : 'details'), ['id' => $row->subject_id, 'branch_id' => $branchId, 'workspace_from' => $filters['from'], 'workspace_to' => $filters['to']]) }}">{{ __('branch.details') }}</a>
++    <td><a class="btn btn-sm btn-outline-primary" href="{{ route($prefix.'.booking.'.($row->booking_repeat_id ? 'repeat_single_details' : 'details'), \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $row->subject_id, $filters)) }}">{{ __('branch.details') }}</a>
+     @if(app(\App\Services\OperationalAccess::class)->allows(auth()->user(), 'dispatch.manage', $branchId))
+     <details class="mt-2"><summary>{{ __('branch.actions') }}</summary>
+         <form class="branch-action mt-2" data-endpoint="bookings/{{ $row->booking_repeat_id ? 'booking_repeat' : 'booking' }}/{{ $row->subject_id }}/status"><label>{{ __('branch.status') }}<select name="booking_status" class="form-control">@foreach(\App\Services\BranchReportService::STATUSES as $state)<option value="{{ $state }}" @selected($state === $row->booking_status)>{{ __('branch.'.$state) }}</option>@endforeach</select></label><label>{{ __('branch.reason') }}<input class="form-control" name="reason" required maxlength="2000"></label><button class="btn btn-primary btn-sm">{{ __('branch.save') }}</button></form>
+diff --git a/resources/views/branch/finance.blade.php b/resources/views/branch/finance.blade.php
+index dc102c0..ea32147 100644
+--- a/resources/views/branch/finance.blade.php
++++ b/resources/views/branch/finance.blade.php
+@@ -4,7 +4,7 @@
+ <a class="btn btn-primary mb-3" href="{{ route($prefix.'.cash.index', ['branch_id' => $branchId, 'date' => $filters['to']]) }}">{{ __('branch.cash_actions') }}</a>
+ <h2>{{ __('branch.payments') }}</h2><p>{{ __('branch.payment_ledger_help') }}</p>
+ <div class="card card-body table-responsive mb-3"><table class="table"><thead><tr>@foreach(['booking','date','payment','credit','debit'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($payments as $movement)<tr><td>{{ $movement->readable_id }}<small>{{ $movement->subject_id }}</small></td><td>{{ $movement->created_at }}</td><td>{{ $movement->payment_method }}</td><td>{{ $movement->credit }}</td><td>{{ $movement->debit }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $payments->links() }}</div>
+-<div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','status','booking_value','allocated','outstanding'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($balances as $row)<tr><td><a href="{{ route($prefix.'.booking.'.($row->booking_repeat_id ? 'repeat_single_details' : 'details'), ['id' => $row->subject_id, 'branch_id' => $branchId]) }}">{{ $row->readable_id }}</a><small>{{ $row->subject_id }}</small></td><td>{{ __('branch.'.$row->booking_status) }}</td><td>{{ $row->total_booking_amount }}</td><td>{{ $row->allocated }}</td><td>{{ $row->outstanding }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $balances->links() }}</div>
++<div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','status','booking_value','allocated','outstanding'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($balances as $row)<tr><td><a href="{{ route($prefix.'.booking.'.($row->booking_repeat_id ? 'repeat_single_details' : 'details'), \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $row->subject_id, $filters)) }}">{{ $row->readable_id }}</a><small>{{ $row->subject_id }}</small></td><td>{{ __('branch.'.$row->booking_status) }}</td><td>{{ $row->total_booking_amount }}</td><td>{{ $row->allocated }}</td><td>{{ $row->outstanding }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $balances->links() }}</div>
+ <h2 class="mt-4">{{ __('branch.custody') }}</h2><p>{{ __('branch.custody_definition') }}</p><div class="branch-cards mb-3">@foreach($custody as $key => $value)<div class="card card-body"><span>{{ __('branch.'.$key) }}</span><strong>{{ with_currency_symbol($value) }}</strong></div>@endforeach</div>
+ <div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['date','technician','event','amount','reason'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($entries as $entry)<tr><td>{{ $entry->occurred_at }}</td><td>{{ $entry->technician?->user?->first_name }} {{ $entry->technician?->user?->last_name }}<small>{{ $entry->technician_id }}</small></td><td>{{ $entry->type }} · {{ $entry->source_id }}</td><td>{{ $entry->amount }}</td><td>{{ $entry->reason }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $entries->links() }}</div>
+ <h2 class="mt-4">{{ __('branch.collections') }}</h2><p>{{ __('branch.collection_definition') }}</p><div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','technician','date','amount','status'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($collections as $collection)<tr><td>{{ $collection->booking_repeat_id ?? $collection->booking_id }}</td><td>{{ $collection->technician?->user?->first_name }}</td><td>{{ $collection->collected_at }}</td><td>{{ $collection->amount }}</td><td>{{ __('bookingmodule::execution.'.$collection->status) }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $collections->links() }}</div>
+diff --git a/resources/views/branch/return.blade.php b/resources/views/branch/return.blade.php
+new file mode 100644
+index 0000000..71aec00
+--- /dev/null
++++ b/resources/views/branch/return.blade.php
+@@ -0,0 +1,3 @@
++@if(nirab_branch_mode() && request('branch_id'))
++<div class="px-4 pt-3"><a class="btn btn-outline-primary" href="{{ route($workspacePanel.'.branch.index', \App\Services\BranchWorkspaceNavigation::returnParameters(request())) }}">{{ __('branch.return') }}</a></div>
++@endif
+diff --git a/tests/Unit/BranchWorkspaceTest.php b/tests/Unit/BranchWorkspaceTest.php
+index ba29ba8..ef33d99 100644
+--- a/tests/Unit/BranchWorkspaceTest.php
++++ b/tests/Unit/BranchWorkspaceTest.php
+@@ -26,6 +26,7 @@ protected function setUp(): void
+     {
+         $this->container = new class extends Container {
+             public function abort($code, $message = '', array $headers = []): never { throw new HttpException($code, $message, null, $headers); }
++            public function getLocale(): string { return 'en'; }
+         };
+         Container::setInstance($this->container);
+         Facade::clearResolvedInstances();
+@@ -34,6 +35,8 @@ public function abort($code, $message = '', array $headers = []): never { throw
+         $translator = new \Illuminate\Translation\Translator(new \Illuminate\Translation\ArrayLoader(), 'en');
+         $this->container->instance('translator', $translator);
+         $this->container->instance('validator', new \Illuminate\Validation\Factory($translator, $this->container));
++        $this->container->instance(OperationalAccess::class, new OperationalAccess());
++        \Illuminate\Http\Request::macro('validate', function (array $rules) { return app('validator')->make($this->all(), $rules)->validate(); });
+         $this->database = new Manager($this->container);
+         $this->database->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+         $this->database->setAsGlobal();
+@@ -297,4 +300,136 @@ public function testPaymentMovementsUsePaymentDateAndStillEnforceBranch(): void
+         $this->assertSame(['past'], $this->reports->paymentLedger($this->actor(), $this->filters())->pluck('subject_id')->all());
+         $this->assertSame(0, $this->reports->subjects($this->actor(), $this->filters())->count());
+     }
++
++    private function navigationRoutes(\Illuminate\Http\Request $request): void
++    {
++        $router = new \Illuminate\Routing\Router(new \Illuminate\Events\Dispatcher($this->container), $this->container);
++        foreach (['admin', 'provider'] as $panel) {
++            $router->get('/' . $panel . '/branch-workspace', fn () => null)->name($panel . '.branch.index');
++            $router->get('/' . $panel . '/booking/details/{id}', fn () => null)->name($panel . '.booking.details');
++            $router->get('/' . $panel . '/booking/repeat-single-details/{id}', fn () => null)->name($panel . '.booking.repeat_single_details');
++        }
++        $router->getRoutes()->refreshNameLookups();
++        $this->container->instance('url', new \Illuminate\Routing\UrlGenerator($router->getRoutes(), $request));
++        $this->container->alias('url', \Illuminate\Contracts\Routing\UrlGenerator::class);
++        $this->container->instance('request', $request);
++    }
++
++    private function renderFragment(string $source, array $data = []): string
++    {
++        $files = new \Illuminate\Filesystem\Filesystem();
++        $compiler = new \Illuminate\View\Compilers\BladeCompiler($files, sys_get_temp_dir());
++        $path = tempnam(sys_get_temp_dir(), 'nirab-supplement-');
++        file_put_contents($path, $compiler->compileString($source));
++        try { return (new \Illuminate\View\Engines\PhpEngine($files))->get($path, $data); }
++        finally { unlink($path); }
++    }
++
++    public function testActualBookingAndFinanceLinksSetDefaultVisitPageAndRoundTripAllFilters(): void
++    {
++        $values = ['branch_id' => 'a', 'tab' => 'finance', 'period' => 'custom', 'from' => '2026-10-01', 'to' => '2026-10-08',
++            'status' => 'completed', 'queue' => 'completed_unpaid', 'payment' => 'unpaid', 'technician_id' => 'tech', 'service_id' => 'service',
++            'search' => 'مرجع & رقم 42', 'page' => '3', 'collection_page' => '2', 'entry_page' => '4'];
++        $request = \Illuminate\Http\Request::create('/admin/branch-workspace', 'GET', $values);
++        $this->navigationRoutes($request);
++        foreach (['bookings', 'finance'] as $template) {
++            $source = file_get_contents(dirname(__DIR__, 2) . '/resources/views/branch/' . $template . '.blade.php');
++            preg_match('/href="(' . preg_quote("{{ route(\$prefix.'.booking.'", '/') . '.*?\}\})"/', $source, $match);
++            $this->assertNotEmpty($match, $template);
++            foreach (['admin', 'provider'] as $panel) foreach ([null, 'visit-id'] as $repeat) {
++                $url = $this->renderFragment($match[1], ['prefix' => $panel, 'row' => (object) ['subject_id' => 'visit-id', 'booking_repeat_id' => $repeat], 'filters' => $values]);
++                parse_str(parse_url(html_entity_decode($url), PHP_URL_QUERY), $query);
++                $this->assertSame('details', $query['web_page']);
++                $detail = \Illuminate\Http\Request::create('/' . $panel . '/booking/details/visit-id', 'GET', $query);
++                $this->assertEquals($values, \App\Services\BranchWorkspaceNavigation::returnParameters($detail));
++                $statusUrl = $detail->fullUrlWithQuery(['web_page' => 'status']);
++                parse_str(parse_url($statusUrl, PHP_URL_QUERY), $statusQuery);
++                $this->assertSame('status', $statusQuery['web_page']);
++                $this->assertSame($query['workspace'], $statusQuery['workspace']);
++                $this->navigationRoutes($detail);
++                $return = $this->renderFragment(file_get_contents(dirname(__DIR__, 2) . '/resources/views/branch/return.blade.php'), ['workspacePanel' => $panel]);
++                preg_match('/href="([^"]+)"/', $return, $returnMatch);
++                parse_str(parse_url(html_entity_decode($returnMatch[1]), PHP_URL_QUERY), $returned);
++                $this->assertEquals($values, $returned);
++                $this->navigationRoutes($request);
++            }
++        }
++    }
++
++    public function testReturnStateCannotChangeBranchOrInjectRedirectAndLegacyDatesStillWork(): void
++    {
++        $request = \Illuminate\Http\Request::create('/detail', 'GET', ['branch_id' => 'a', 'workspace' => ['tab' => 'reports', 'branch_id' => 'b', 'redirect' => 'https://example.invalid', 'search' => ['unexpected']], 'workspace_from' => '2026-10-01', 'workspace_to' => '2026-10-08']);
++        $this->assertSame(['tab' => 'reports', 'from' => '2026-10-01', 'to' => '2026-10-08', 'branch_id' => 'a'], \App\Services\BranchWorkspaceNavigation::returnParameters($request));
++    }
++
++    public function testNonOwnerEmployeeResolvesAssignedProviderAndKeepsOperationalAndFinancialBounds(): void
++    {
++        Manager::schema()->create('providers', function (Blueprint $t): void { $t->string('id')->primary(); $t->string('user_id'); $t->string('company_name'); $t->softDeletes(); });
++        DB::table('providers')->insert(['id' => 'a', 'user_id' => 'branch-owner', 'company_name' => 'Branch A']);
++        $employee = new User(); $employee->forceFill(['id' => 'user', 'user_type' => 'provider-employee', 'provider_id' => 'a', 'is_active' => 1]);
++        $this->assertNull($employee->provider);
++        $this->grant('nirab_operational_scopes', ['analytics.read', 'dispatch.manage'], ['a', 'b'], true);
++        $this->grant('nirab_finance_scopes', ['view_cash'], ['a', 'b'], true);
++        $access = new OperationalAccess();
++        $this->assertSame('a', $access->provider($employee)->id);
++        $this->assertSame('Branch A', $access->provider($employee)->company_name);
++        $this->assertNull($employee->provider, 'The owner relation must stay empty');
++        $this->assertTrue($access->allows($employee, 'dispatch.manage', 'a'));
++        $this->assertFalse($access->allows($employee, 'dispatch.manage', 'b'));
++        $this->booking('own'); $this->booking('other', ['provider_id' => 'b']);
++        $this->assertSame(['own'], $this->reports->subjects($employee, $this->filters())->pluck('subject_id')->all());
++        $this->assertSame(0, $this->reports->balances($employee, $this->filters(['branch_id' => 'b']), 'view_cash')->count());
++        $request = \Illuminate\Http\Request::create('/provider/branch-workspace', 'GET', ['branch_id' => 'a']); $request->setUserResolver(fn () => $employee);
++        $this->navigationRoutes($request);
++        $context = (new BranchWorkspaceController($access, new NirabFinanceAccess(), $this->reports))->context($request);
++        $this->assertSame('a', $context['branchId']); $this->assertContains('bookings', $context['tabs']);
++        $html = $this->renderFragment("{{ app(\\App\\Services\\OperationalAccess::class)->provider(request()->user())->company_name }}");
++        $this->assertSame('Branch A', $html);
++    }
++
++    public function testEmployeeCannotSelectAnotherBranchThroughWorkspaceMiddleware(): void
++    {
++        $employee = new User(); $employee->forceFill(['id' => 'user', 'user_type' => 'provider-employee', 'provider_id' => '11111111-1111-4111-8111-111111111111', 'is_active' => 1]);
++        $request = \Illuminate\Http\Request::create('/provider/branch-workspace', 'GET', ['branch_id' => '22222222-2222-4222-8222-222222222222']); $request->setUserResolver(fn () => $employee);
++        \Illuminate\Http\Request::macro('validate', function (array $rules) { return app('validator')->make($this->all(), $rules)->validate(); });
++        $this->expectException(HttpException::class);
++        (new \App\Http\Middleware\BranchWorkspaceContext())->handle($request, fn () => $this->fail('Foreign branch reached controller'));
++    }
++
++    public function testNonOwnerEmployeeCanUseRealProviderScheduleActionThroughWorkspace(): void
++    {
++        Manager::schema()->create('providers', function (Blueprint $t): void { $t->string('id')->primary(); $t->string('user_id'); $t->softDeletes(); });
++        DB::table('providers')->insert(['id' => 'a', 'user_id' => 'branch-owner']);
++        $employee = new User(); $employee->forceFill(['id' => 'user', 'user_type' => 'provider-employee', 'provider_id' => 'a', 'is_active' => 1]);
++        $this->assertNull($employee->provider);
++        $this->grant('nirab_operational_scopes', ['dispatch.manage']);
++        $this->booking('own', ['service_schedule' => '2026-10-09 08:00:00']);
++        $request = \Illuminate\Http\Request::create('/provider/branch-workspace/bookings/booking/own/schedule', 'POST', ['branch_id' => 'a', 'reason' => 'Keep confirmed appointment', 'service_schedule' => '2026-10-09T11:00']);
++        $request->setUserResolver(fn () => $employee); $this->container->instance('request', $request);
++        $legacy = (new \ReflectionClass(\Modules\BookingModule\Http\Controllers\Web\Provider\BookingController::class))->newInstanceWithoutConstructor();
++        foreach (['booking' => new \Modules\BookingModule\Entities\Booking(), 'bookingRepeat' => new \Modules\BookingModule\Entities\BookingRepeat(), 'bookingScheduleHistory' => new \Modules\BookingModule\Entities\BookingScheduleHistory()] as $property => $value) {
++            (new \ReflectionProperty($legacy, $property))->setValue($legacy, $value);
++        }
++        $this->container->instance(get_class($legacy), $legacy);
++        $responseFactory = $this->createMock(\Illuminate\Contracts\Routing\ResponseFactory::class);
++        $responseFactory->method('json')->willReturnCallback(fn ($data, $status = 200) => new \Illuminate\Http\JsonResponse($data, $status));
++        $this->container->instance(\Illuminate\Contracts\Routing\ResponseFactory::class, $responseFactory);
++        $audit = $this->createMock(\App\Services\AuditService::class); $audit->expects($this->once())->method('record')->willReturn(new \App\Models\AuditLog());
++        $this->container->instance(\App\Services\AuditService::class, $audit);
++        $response = (new BranchWorkspaceController(new OperationalAccess(), new NirabFinanceAccess(), $this->reports))->bookingAction($request, 'booking', 'own', 'schedule');
++        $this->assertSame(200, $response->getStatusCode());
++        $this->assertSame(NO_CHANGES_FOUND['response_code'], $response->getData(true)['response_code']);
++        $this->assertNull($employee->provider);
++        $this->assertSame('a', DB::table('bookings')->where('id', 'own')->value('provider_id'));
++    }
++
++    public function testVisitDetailPageDefaultsAndRejectsUnknownPages(): void
++    {
++        foreach ([[], ['web_page' => ''], ['web_page' => 'details'], ['web_page' => 'status']] as $values) {
++            $request = \Illuminate\Http\Request::create('/admin/booking/repeat-single-details/visit', 'GET', $values);
++            $this->assertSame(($values['web_page'] ?? '') ?: 'details', \App\Services\BranchWorkspaceNavigation::detailPage($request));
++        }
++        $this->expectException(\Illuminate\Validation\ValidationException::class);
++        \App\Services\BranchWorkspaceNavigation::detailPage(\Illuminate\Http\Request::create('/visit', 'GET', ['web_page' => 'unknown']));
++    }
+ }
+diff --git a/tests/branch-workspace-js.test.cjs b/tests/branch-workspace-js.test.cjs
+new file mode 100644
+index 0000000..263ef81
+--- /dev/null
++++ b/tests/branch-workspace-js.test.cjs
+@@ -0,0 +1,93 @@
++// Run the shipped script unchanged with an isolated DOM/fetch, without a browser or server.
++const {test} = require('node:test');
++const assert = require('node:assert/strict');
++const fs = require('node:fs');
++const path = require('node:path');
++const vm = require('node:vm');
++const source = fs.readFileSync(path.join(__dirname, '../public/assets/common/js/nirab-branch.js'), 'utf8');
++
++class Element {
++    constructor(tag = 'div') { this.tag = tag; this.children = []; this.listeners = {}; this.dataset = {}; this.fields = {}; this.hidden = false; this.disabled = false; this.className = ''; this.parent = {hidden: false}; }
++    set textContent(value) { this.text = String(value); this.children = []; }
++    get textContent() { return this.text || ''; }
++    append(...elements) { this.children.push(...elements); }
++    replaceChildren(...elements) { this.children = elements; }
++    addEventListener(type, listener) { this.listeners[type] = listener; }
++    setAttribute() {}
++    closest() { return this.parent; }
++    createTHead() { const el = new Element('thead'); this.append(el); return el; }
++    createTBody() { const el = new Element('tbody'); this.append(el); return el; }
++    insertRow() { const el = new Element('tr'); this.append(el); return el; }
++    insertCell() { const el = new Element('td'); this.append(el); return el; }
++}
++function descendants(element, tag) { return element.children.flatMap(child => [ ...(child.tag === tag ? [child] : []), ...descendants(child, tag)]); }
++const flush = () => new Promise(resolve => setImmediate(resolve));
++function world(fetcher, quotes = false) {
++    const elements = new Map([['branch-message', new Element()]]);
++    const action = new Element('form'); action.dataset.endpoint = 'bookings/booking/visit/status'; action.fields = {booking_status: 'accepted', reason: 'Reviewed'};
++    if (quotes) for (const id of ['quote-filter', 'quote-detail', 'quote-description', 'quote-versions', 'quote-inspections', 'quote-issue', 'quote-inspection', 'branch-quotes', 'quote-pages']) elements.set(id, new Element(id.includes('filter') || id.includes('issue') || id === 'quote-inspection' ? 'form' : 'div'));
++    const requests = [], location = {origin: 'https://nirab.test', reloads: 0, reload() { this.reloads++; }};
++    const document = {getElementById: id => elements.get(id), createElement: tag => new Element(tag), querySelectorAll: selector => selector === '.branch-action' ? [action] : []};
++    const labels = {saved: 'Saved', failed: 'Failed', saved_refresh_failed: 'Saved successfully; display refresh failed.', refresh: 'Refresh data', refreshed: 'Data refreshed.'};
++    const window = {location, nirabBranch: {base: 'https://nirab.test/provider/branch-workspace', branchId: 'branch-a', csrf: 'csrf-token', labels}};
++    class FormData { constructor(form) { this.values = Object.entries(form.fields); } [Symbol.iterator]() { return this.values[Symbol.iterator](); } }
++    vm.runInNewContext(source, {window, document, URL, URLSearchParams, FormData, setTimeout, fetch: async (url, options) => { requests.push({url, ...options}); return fetcher(url, options); }});
++    return {elements, action, location, requests};
++}
++const response = (code = 'default_200', content = null, status = 200, errors = [], message = '') => ({ok: status >= 200 && status < 300, json: async () => ({response_code: code, content, errors, message})});
++async function submit(form) { const button = new Element('button'); await form.listeners.submit({preventDefault() {}, submitter: button}); return button; }
++
++for (const code of ['default_200', 'default_store_200', 'default_update_200', 'default_status_update_200', 'default_delete_200', 'no_changes_found_200']) test('accepts supported success code ' + code, async () => {
++    const app = world(() => response(code)); await submit(app.action);
++    assert.equal(app.location.reloads, 1);
++    assert.equal(app.requests[0].url.searchParams.get('branch_id'), 'branch-a');
++    assert.equal(app.requests[0].method, 'POST');
++    assert.equal(app.requests[0].headers['X-CSRF-TOKEN'], 'csrf-token');
++    assert.equal(app.requests[0].credentials, 'same-origin');
++});
++for (const code of ['default_400', 'default_fail_200']) test('rejects application error with empty errors array: ' + code, async () => {
++    const app = world(() => response(code, null, 200, [], 'Business rule rejected'));
++    const button = await submit(app.action);
++    assert.equal(app.location.reloads, 0); assert.equal(button.disabled, false);
++    assert.equal(app.elements.get('branch-message').textContent, 'Business rule rejected');
++});
++test('rejects validation and network failures without leaving the form disabled', async () => {
++    for (const fetcher of [() => response('default_400', null, 422, [{message: 'Validation failed'}]), () => { throw new Error('Network unavailable'); }]) {
++        const app = world(fetcher); const button = await submit(app.action);
++        assert.equal(button.disabled, false); assert.equal(app.location.reloads, 0);
++        assert.equal(app.elements.get('branch-message').className, 'alert alert-danger');
++    }
++});
++
++for (const formId of ['quote-issue', 'quote-inspection']) test('reports successful ' + formId + ' save separately from refresh failure, and retries GET only', async () => {
++    let saved = false, mayRefresh = false;
++    const quote = {id: 'quote-a', quote_status: 'under_review', quotations: [], inspections: [], attachments: []};
++    const app = world((url, options) => {
++        if (options.method === 'POST') { saved = true; return response('default_store_200', {id: 'saved'}, 201); }
++        if (url.pathname.endsWith('/quotes/quote-a')) {
++            if (saved && !mayRefresh) throw new Error('Refresh unavailable');
++            return response('default_200', quote);
++        }
++        return response('default_200', {data: [quote], current_page: 1, last_page: 1});
++    }, true);
++    await flush();
++    await descendants(app.elements.get('branch-quotes'), 'button')[0].onclick();
++    await submit(app.elements.get(formId));
++    const notice = app.elements.get('branch-message');
++    assert.match(notice.textContent, /^Saved successfully/); assert.equal(notice.className, 'alert alert-warning');
++    assert.equal(app.requests.filter(r => r.method === 'POST').length, 1);
++    mayRefresh = true;
++    await notice.children[0].onclick();
++    assert.equal(notice.textContent, 'Data refreshed.');
++    assert.equal(app.requests.filter(r => r.method === 'POST').length, 1);
++});
++
++test('complaint attachment links use the same branch-aware endpoint as quality API calls', () => {
++    const template = fs.readFileSync(path.join(__dirname, '../Modules/AdminModule/Resources/views/quality/index.blade.php'), 'utf8');
++    const helper = template.match(/    function endpointUrl\(path\) \{[\s\S]*?(?=    async function api)/)[0];
++    assert.match(template, /link\.href=endpointUrl\('\/complaints\/'.*?\/attachments\//);
++    for (const branchId of ['branch-a', null]) {
++        const url = vm.runInNewContext(helper + "endpointUrl('/complaints/ticket-a/attachments/0').href", {base: 'https://nirab.test/admin/branch-workspace/quality', branchId, workspaceDates: {from: '2026-10-01', to: '2026-10-08'}, URL, window: {location: {origin: 'https://nirab.test'}}});
++        assert.equal(new URL(url).searchParams.get('branch_id'), branchId);
++    }
++});
+diff --git a/tests/compile-branch-views.php b/tests/compile-branch-views.php
+index 15e4e29..1e871ab 100644
+--- a/tests/compile-branch-views.php
++++ b/tests/compile-branch-views.php
+@@ -21,6 +21,18 @@
+     $root . '/Modules/ProviderManagement/Resources/views/admin/provider/detail/serviceman-list.blade.php',
+     $root . '/Modules/ProviderManagement/Resources/views/admin/provider/detail/subscribed-services.blade.php',
+     $root . '/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php',
++    $root . '/Modules/ProviderManagement/Resources/views/layouts/partials/_header.blade.php',
++    $root . '/Modules/ProviderManagement/Resources/views/layouts/master.blade.php',
++    $root . '/Modules/ProviderManagement/Resources/views/layouts/new-master.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/admin/booking/status.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/provider/booking/status.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php',
++    $root . '/Modules/BookingModule/Resources/views/provider/booking/list.blade.php',
+ ]);
+ $failed = 0;
+ foreach ($paths as $index => $path) {
+-- 
+2.53.0.windows.2
+

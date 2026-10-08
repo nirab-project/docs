@@ -1,0 +1,12 @@
+No syntax errors detected in Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
+No syntax errors detected in Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
+No syntax errors detected in Modules/UserManagement/Entities/User.php
+No syntax errors detected in app/Http/Controllers/BranchWorkspaceController.php
+No syntax errors detected in app/Services/BranchWorkspaceNavigation.php
+No syntax errors detected in app/Services/NirabFinanceAccess.php
+No syntax errors detected in app/Services/OperationalAccess.php
+No syntax errors detected in resources/lang/ar/branch.php
+No syntax errors detected in resources/lang/en/branch.php
+No syntax errors detected in tests/Unit/BranchWorkspaceTest.php
+No syntax errors detected in tests/compile-branch-views.php
+PHP files checked: 11; failures: 0

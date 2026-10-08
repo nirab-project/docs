@@ -1,0 +1,20 @@
+✔ accepts supported success code default_200 (3.1355ms)
+✔ accepts supported success code default_store_200 (0.7001ms)
+✔ accepts supported success code default_update_200 (0.7172ms)
+✔ accepts supported success code default_status_update_200 (0.6758ms)
+✔ accepts supported success code default_delete_200 (0.6552ms)
+✔ accepts supported success code no_changes_found_200 (0.6312ms)
+✔ rejects application error with empty errors array: default_400 (1.4179ms)
+✔ rejects application error with empty errors array: default_fail_200 (0.7033ms)
+✔ rejects validation and network failures without leaving the form disabled (1.5888ms)
+✔ reports successful quote-issue save separately from refresh failure, and retries GET only (7.7469ms)
+✔ reports successful quote-inspection save separately from refresh failure, and retries GET only (2.4779ms)
+✔ complaint attachment links use the same branch-aware endpoint as quality API calls (2.7599ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 105.1991
