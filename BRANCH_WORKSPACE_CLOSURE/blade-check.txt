@@ -1,0 +1,1 @@
+22 Blade templates compiled; failures: 0

@@ -1,0 +1,3 @@
+PASS public/assets/common/js/nirab-branch.js
+PASS public/assets/admin-module/js/nirab-branch-alerts.js
+PASS public/assets/admin-module/js/nirab-operations.js
