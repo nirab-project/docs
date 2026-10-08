@@ -1,0 +1,182 @@
+[
+  {
+    "id": "R00",
+    "file": "references/competitor/R00-home-team-banner.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.26 PM.jpeg",
+    "purpose": "الرئيسية: الترحيب وبانر الفريق وشبكة الخدمات",
+    "width": 702,
+    "height": 1600,
+    "sha256": "7900691da141f77abf22644ae8e0e5f51b8ecf621a4c03de9e62e7151f11a80e"
+  },
+  {
+    "id": "R01",
+    "file": "references/competitor/R01-home-promotion.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.25 PM (2).jpeg",
+    "purpose": "الرئيسية: بانر ترويجي وتنظيم التصنيفات؛ لا نسخ نسبة الخصم",
+    "width": 702,
+    "height": 1600,
+    "sha256": "f581d75ed30cc7d2482815ae9a3130ea2f55248813350c2e78dc1f258e4912ca"
+  },
+  {
+    "id": "R02",
+    "file": "references/competitor/R02-guest-account.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.27 PM (1).jpeg",
+    "purpose": "حالة الحساب للضيف",
+    "width": 899,
+    "height": 2048,
+    "sha256": "5ef9f6564f0fd8f817b6e6e7b3c3b9bc329ba864058e67e10100c86c677cb98f"
+  },
+  {
+    "id": "R03",
+    "file": "references/competitor/R03-guest-bookings.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.27 PM (2).jpeg",
+    "purpose": "حالة الحجوزات للضيف",
+    "width": 899,
+    "height": 2048,
+    "sha256": "ca5b1a124e16ab9a5f5781bc994052fd41df4b92aaa9081ef784c374625b8064"
+  },
+  {
+    "id": "R04",
+    "file": "references/competitor/R04-guest-packages.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.27 PM (3).jpeg",
+    "purpose": "حالة العقود لدى المنافس؛ مرجع بصري لباقات NIRAB فقط",
+    "width": 899,
+    "height": 2048,
+    "sha256": "5c6d45e2589b8729ad7d8e11ebfa4daff894fa929cfcbfe63c6bde15030598f5"
+  },
+  {
+    "id": "R05",
+    "file": "references/competitor/R05-laundry-service.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.22 PM (1).jpeg",
+    "purpose": "صفحة خدمة وملحوظة سعر وزر رئيسي",
+    "width": 702,
+    "height": 1600,
+    "sha256": "cbc9f1081bc92152fdb5042d1ddd1c196773b341912f2a32a9d49c837eba8b28"
+  },
+  {
+    "id": "R06",
+    "file": "references/competitor/R06-maintenance-scope.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.22 PM (2).jpeg",
+    "purpose": "نطاق الصيانة والأسئلة والإجراء السفلي",
+    "width": 702,
+    "height": 1600,
+    "sha256": "814aad304d0f386988a077b4004638167f7c3405e125993f629f8fd8a8ff541c"
+  },
+  {
+    "id": "R07",
+    "file": "references/competitor/R07-furniture-faq.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.22 PM (3).jpeg",
+    "purpose": "الأسئلة الشائعة ومعلومات الخدمة",
+    "width": 702,
+    "height": 1600,
+    "sha256": "4c348bcf660bb02a2b67bb26f34c535fa66b25d44dac80c782cad12029f26cf5"
+  },
+  {
+    "id": "R08",
+    "file": "references/competitor/R08-furniture-hero.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.22 PM (4).jpeg",
+    "purpose": "عنوان ووصف وصور خدمة الأثاث",
+    "width": 702,
+    "height": 1600,
+    "sha256": "c3adc7cd99235a54d692cfc8c117f37489f56c937417e6e8424ea6855fff4270"
+  },
+  {
+    "id": "R09",
+    "file": "references/competitor/R09-deep-cleaning-hero.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.22 PM (5).jpeg",
+    "purpose": "خدمة تنظيف مع توضيح التسعير؛ مرجع مسار quote بصري",
+    "width": 702,
+    "height": 1600,
+    "sha256": "b3a4af86f1c060510ae172188ad7f4e6414a71e1f9a9653112e1be625e08cd30"
+  },
+  {
+    "id": "R10",
+    "file": "references/competitor/R10-moving-scope.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.23 PM (1).jpeg",
+    "purpose": "نطاق نقل الأثاث ومعلومات السعر",
+    "width": 702,
+    "height": 1600,
+    "sha256": "67cdde1b8c35e3fa3756e2b5664a657f6da634f00db8f3408ed9f5309ee1e879"
+  },
+  {
+    "id": "R11",
+    "file": "references/competitor/R11-pest-faq.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.23 PM.jpeg",
+    "purpose": "قائمة الأسئلة الشائعة في خدمة مكافحة الحشرات",
+    "width": 702,
+    "height": 1600,
+    "sha256": "1e83c9bf4cbde876a9d342bcfce9eddfe1dd4e60c4a63a7072f4db6deec3999f"
+  },
+  {
+    "id": "R12",
+    "file": "references/competitor/R12-pest-scope.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.24 PM (1).jpeg",
+    "purpose": "نطاق الخدمة والقيود؛ المرجع للتنظيم لا لصحة الادعاءات",
+    "width": 702,
+    "height": 1600,
+    "sha256": "c76ac66c195ca3fedb9e64dc668ae638974126ad580cc0f4870074e85cb94810"
+  },
+  {
+    "id": "R13",
+    "file": "references/competitor/R13-maintenance-hero.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.24 PM (2).jpeg",
+    "purpose": "تعريف خدمة الصيانة ومعرضها",
+    "width": 702,
+    "height": 1600,
+    "sha256": "d77443242d1ce1565b6c8fe1fbb97f34020f7cbdc592558c3b3a0c6df1d2edeb"
+  },
+  {
+    "id": "R14",
+    "file": "references/competitor/R14-pest-hero.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.24 PM (3).jpeg",
+    "purpose": "تعريف خدمة مكافحة الحشرات ومعرضها",
+    "width": 702,
+    "height": 1600,
+    "sha256": "d30626bf7680c5f74e176bebf4c0d4969967d4cefb2db2e9c1fc43edfe59e464"
+  },
+  {
+    "id": "R15",
+    "file": "references/competitor/R15-mosque-carpet-hero.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.24 PM (4).jpeg",
+    "purpose": "تعريف خدمة سجاد المساجد وملحوظة السعر",
+    "width": 702,
+    "height": 1600,
+    "sha256": "98a3554fceec7653b9ef5d69f2deac01f57de32e8a446fb9876aac65941b5b16"
+  },
+  {
+    "id": "R16",
+    "file": "references/competitor/R16-pest-inclusions.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.24 PM.jpeg",
+    "purpose": "قائمة نطاق الخدمة وزر ثابت",
+    "width": 702,
+    "height": 1600,
+    "sha256": "c758f10a7bc9f11355d02c8c1be78f09edaebbf013498c86e4a09e851fc529c7"
+  },
+  {
+    "id": "R17",
+    "file": "references/competitor/R17-furniture-inclusions.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.25 PM.jpeg",
+    "purpose": "نطاق خدمة الأثاث ومزايا مختصرة",
+    "width": 702,
+    "height": 1600,
+    "sha256": "07b346f18e6bf26ebc4cabd6f0b8bbda11bf85f057ae1cafd8e955e9457754fb"
+  },
+  {
+    "id": "R18",
+    "file": "references/competitor/R18-car-wash-scope.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.26 PM (1).jpeg",
+    "purpose": "نطاق غسيل السيارات؛ لا نقل تناقض سياسة السعر",
+    "width": 702,
+    "height": 1600,
+    "sha256": "1b0e2bbc8688aadbc1987155833c9c7ad3bfebd64e49f25832fd0bba73ec6470"
+  },
+  {
+    "id": "R19",
+    "file": "references/competitor/R19-deep-cleaning-scope.jpeg",
+    "original_filename": "WhatsApp Image 2026-10-06 at 8.38.26 PM (2).jpeg",
+    "purpose": "تفصيل خدمة النظافة التأهيلية والإجراء السفلي",
+    "width": 702,
+    "height": 1600,
+    "sha256": "9508722a5b957116afbb7fc6e5a455e051a7d4f796409d852daecdd772f1cdd0"
+  }
+]
