@@ -1,0 +1,30 @@
+test_address_json_shape_is_validated (__main__.CartBookingContracts.test_address_json_shape_is_validated) ... ok
+test_booking_confirmation_remains_idempotent (__main__.CartBookingContracts.test_booking_confirmation_remains_idempotent) ... ok
+test_booking_data_scope_never_moves_to_marketplace_settlement (__main__.CartBookingContracts.test_booking_data_scope_never_moves_to_marketplace_settlement) ... ok
+test_branch_and_technician_keep_booking_line_id (__main__.CartBookingContracts.test_branch_and_technician_keep_booking_line_id) ... ok
+test_branch_zone_is_validated_when_switching_cart_provider (__main__.CartBookingContracts.test_branch_zone_is_validated_when_switching_cart_provider) ... ok
+test_cart_reload_is_awaited_not_fire_and_forget (__main__.CartBookingContracts.test_cart_reload_is_awaited_not_fire_and_forget) ... ok
+test_cart_routes_match_explicit_request_verbs (__main__.CartBookingContracts.test_cart_routes_match_explicit_request_verbs) ... ok
+test_cart_write_refreshes_authenticated_guest_id (__main__.CartBookingContracts.test_cart_write_refreshes_authenticated_guest_id) ... ok
+test_checkout_callback_uses_valid_browser_origin (__main__.CartBookingContracts.test_checkout_callback_uses_valid_browser_origin) ... ok
+test_checkout_guest_token_guards_both_endpoints (__main__.CartBookingContracts.test_checkout_guest_token_guards_both_endpoints) ... ok
+test_coupon_is_optional_in_stale_cart (__main__.CartBookingContracts.test_coupon_is_optional_in_stale_cart) ... ok
+test_digital_repeat_has_type_and_dates (__main__.CartBookingContracts.test_digital_repeat_has_type_and_dates) ... ok
+test_digital_repeat_not_forced_to_one_slot (__main__.CartBookingContracts.test_digital_repeat_not_forced_to_one_slot) ... ok
+test_guest_cart_auth_bound_to_server_token (__main__.CartBookingContracts.test_guest_cart_auth_bound_to_server_token) ... ok
+test_guest_issue_does_not_trust_user_supplied_uuid (__main__.CartBookingContracts.test_guest_issue_does_not_trust_user_supplied_uuid) ... ok
+test_guest_session_cannot_be_issued_twice_concurrently (__main__.CartBookingContracts.test_guest_session_cannot_be_issued_twice_concurrently) ... ok
+test_guest_web_cart_request_waits_for_issued_guest_session (__main__.CartBookingContracts.test_guest_web_cart_request_waits_for_issued_guest_session) ... ok
+test_no_content_is_not_spoofed_as_network_error (__main__.CartBookingContracts.test_no_content_is_not_spoofed_as_network_error) ... ok
+test_post_timeout_is_inside_catch_boundary (__main__.CartBookingContracts.test_post_timeout_is_inside_catch_boundary) ... ok
+test_private_cart_disables_shared_url_cache (__main__.CartBookingContracts.test_private_cart_disables_shared_url_cache) ... ok
+test_provider_ui_rolls_back_on_failed_switch (__main__.CartBookingContracts.test_provider_ui_rolls_back_on_failed_switch) ... ok
+test_repeat_gateway_does_not_require_single_schedule (__main__.CartBookingContracts.test_repeat_gateway_does_not_require_single_schedule) ... ok
+test_repeated_booking_has_single_authoritative_full_visit_check (__main__.CartBookingContracts.test_repeated_booking_has_single_authoritative_full_visit_check) ... ok
+test_repeated_booking_respects_explicit_payment_method (__main__.CartBookingContracts.test_repeated_booking_respects_explicit_payment_method) ... ok
+test_weekly_repeat_without_time_does_not_force_null (__main__.CartBookingContracts.test_weekly_repeat_without_time_does_not_force_null) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.041s
+
+OK

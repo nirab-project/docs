@@ -1,0 +1,485 @@
+diff --git a/lib/api/remote/client_api.dart b/lib/api/remote/client_api.dart
+index 3832b2b..fd0be25 100644
+--- a/lib/api/remote/client_api.dart
++++ b/lib/api/remote/client_api.dart
+@@ -80,6 +80,12 @@ class ApiClient extends GetxService {
+     if (changed) marketingRevision.value++;
+   }
+ 
++  void updateGuestIdHeader(String guestId) {
++    if (_mainHeaders[AppConstants.guestId] == guestId) return;
++    _mainHeaders[AppConstants.guestId] = guestId;
++    marketingRevision.value++;
++  }
++
+   Future<Response> getData(
+     String uri, {
+     Map<String, dynamic>? query,
+@@ -109,18 +115,19 @@ class ApiClient extends GetxService {
+     dynamic body, {
+     Map<String, String>? headers,
+   }) async {
+-    http.Response response = await http
+-        .post(
+-          Uri.parse(appBaseUrl! + uri!),
+-          body: jsonEncode(body),
+-          headers: {
+-            ...(headers ?? _mainHeaders),
+-            'X-Guest-Payment-Token':
+-                sharedPreferences.getString('nirab_guest_payment_token') ?? '',
+-          },
+-        )
+-        .timeout(Duration(seconds: timeoutInSeconds));
+     try {
++      final response = await http
++          .post(
++            Uri.parse(appBaseUrl! + uri!),
++            body: jsonEncode(body),
++            headers: {
++              ...(headers ?? _mainHeaders),
++              'X-Guest-Payment-Token':
++                  sharedPreferences.getString('nirab_guest_payment_token') ??
++                  '',
++            },
++          )
++          .timeout(Duration(seconds: timeoutInSeconds));
+       return handleResponse(response, uri);
+     } catch (e) {
+       return Response(statusCode: 1, statusText: noInternetMessage);
+@@ -308,7 +315,9 @@ class ApiClient extends GetxService {
+           statusText: response0.body['message'],
+         );
+       }
+-    } else if (response0.statusCode != 200 && response0.body == null) {
++    } else if (response0.statusCode != 200 &&
++        response0.statusCode != 204 &&
++        response0.body == null) {
+       response0 = Response(statusCode: 0, statusText: noInternetMessage);
+     }
+     return response0;
+diff --git a/lib/feature/cart/controller/cart_controller.dart b/lib/feature/cart/controller/cart_controller.dart
+index 0d934e0..136b5c4 100644
+--- a/lib/feature/cart/controller/cart_controller.dart
++++ b/lib/feature/cart/controller/cart_controller.dart
+@@ -92,7 +92,7 @@ class CartController extends GetxController implements GetxService {
+     totalProDiscountAmount = 0;
+     proBenefitType = null;
+ 
+-    DataSyncHelper.fetchAndSyncData(
++    await DataSyncHelper.fetchAndSyncData(
+       fetchFromLocal: () => cartRepo.getCartListFromServer<CacheResponseData>(
+         source: DataSourceEnum.local,
+       ),
+@@ -139,7 +139,7 @@ class CartController extends GetxController implements GetxService {
+     _invalidateBookingContext();
+     _isLoading = true;
+     Response response = await cartRepo.removeCartFromServer(cart.id);
+-    if (response.statusCode == 200) {
++    if (response.statusCode == 200 || response.statusCode == 204) {
+       _cartList.remove(cart);
+     }
+ 
+@@ -150,10 +150,18 @@ class CartController extends GetxController implements GetxService {
+ 
+   Future<void> removeAllCartItem() async {
+     _invalidateBookingContext();
+-    Response response = await cartRepo.removeAllCartFromServer();
+-    if (response.statusCode == 200) {
++    _isLoading = true;
++    update();
++    try {
++      final response = await cartRepo.removeAllCartFromServer();
++      if (response.statusCode == 200 || response.statusCode == 204) {
++        await getCartListFromServer(shouldUpdate: false);
++      } else {
++        ApiChecker.checkApi(response);
++      }
++    } finally {
+       _isLoading = false;
+-      getCartListFromServer(shouldUpdate: false);
++      update();
+     }
+   }
+ 
+@@ -201,17 +209,26 @@ class CartController extends GetxController implements GetxService {
+ 
+     _isCartLoading = true;
+     update();
+-    _selectedProvider = providerData;
+-
+-    Response response = await cartRepo.updateProvider(providerData?.id ?? "");
+-    if (response.statusCode == 200) {
+-      await getCartListFromServer();
+-      Get.find<ScheduleController>().buildSchedule(
+-        scheduleType: ScheduleType.asap,
+-      );
+-    } else {}
+-    _isCartLoading = false;
+-    update();
++    final previousProvider = _selectedProvider;
++    try {
++      final response = await cartRepo.updateProvider(providerData?.id ?? "");
++      if (response.statusCode == 200) {
++        _selectedProvider = providerData;
++        await getCartListFromServer();
++        Get.find<ScheduleController>().buildSchedule(
++          scheduleType: ScheduleType.asap,
++        );
++      } else {
++        _selectedProvider = previousProvider;
++        ApiChecker.checkApi(response);
++      }
++    } catch (_) {
++      _selectedProvider = previousProvider;
++      customSnackBar('something_went_wrong'.tr);
++    } finally {
++      _isCartLoading = false;
++      update();
++    }
+   }
+ 
+   void removeFromCartVariation(CartModel? cartModel) {
+diff --git a/lib/feature/cart/repository/cart_repo.dart b/lib/feature/cart/repository/cart_repo.dart
+index 6841b46..908aa92 100644
+--- a/lib/feature/cart/repository/cart_repo.dart
++++ b/lib/feature/cart/repository/cart_repo.dart
+@@ -11,45 +11,63 @@ class CartRepo extends DataSyncRepo {
+     required SharedPreferences super.sharedPreferences,
+   });
+ 
++  Future<bool> _ensureGuestIdentity() async {
++    if (Get.find<AuthController>().isLoggedIn()) return true;
++    final token = sharedPreferences?.getString('nirab_guest_payment_token');
++    final guest = sharedPreferences?.getString(AppConstants.guestId);
++    if (token?.isNotEmpty == true && guest?.isNotEmpty == true) return true;
++    return Get.find<SplashRepo>().ensurePaymentGuestSession();
++  }
++
+   Future<Response> addToCartListToServer(CartModelBody cartModel) async {
++    if (!await _ensureGuestIdentity()) {
++      return Response(statusCode: 401, statusText: 'guest_session_required');
++    }
++    if (!Get.find<AuthController>().isLoggedIn()) {
++      cartModel.guestId = Get.find<SplashRepo>().getGuestId();
++    }
+     return await apiClient.postData(AppConstants.addToCart, cartModel.toJson());
+   }
+ 
+   Future<ApiResponseModel<T>> getCartListFromServer<T>({
+     required DataSourceEnum source,
+   }) async {
+-    return await fetchData<T>(
++    if (source == DataSourceEnum.local) {
++      return ApiResponseModel.withError('private_cart_cache_disabled');
++    }
++    if (!await _ensureGuestIdentity()) {
++      return ApiResponseModel.withError('guest_session_required');
++    }
++    final response = await apiClient.getData(
+       "${AppConstants.getCartList}&&guest_id=${Get.find<SplashController>().getGuestId()}",
+-      source,
+     );
++    // Avoid DataSyncRepo.fetchData: it caches private user data by URL alone.
++    return ApiResponseModel.withSuccess(response as T);
+   }
+ 
+   Future<Response> removeCartFromServer(String cartID) async {
+-    return await apiClient.postData(
++    return await apiClient.deleteData(
+       "${AppConstants.removeCartItem}$cartID?guest_id=${Get.find<SplashController>().getGuestId()}",
+-      {"_method": "delete"},
+     );
+   }
+ 
+   Future<Response> removeAllCartFromServer() async {
+-    return await apiClient.postData(
++    return await apiClient.deleteData(
+       "${AppConstants.removeAllCartItem}?guest_id=${Get.find<SplashController>().getGuestId()}",
+-      {"_method": "delete"},
+     );
+   }
+ 
+   Future<Response> updateCartQuantity(String cartID, int quantity) async {
+-    return await apiClient.postData(
++    return await apiClient.putData(
+       "${AppConstants.updateCartQuantity}$cartID?guest_id=${Get.find<SplashController>().getGuestId()}",
+-      {'quantity': quantity, "_method": "put"},
++      {'quantity': quantity},
+     );
+   }
+ 
+   Future<Response> updateProvider(String providerId) async {
+-    return await apiClient.postData(AppConstants.updateCartProvider, {
++    return await apiClient.putData(AppConstants.updateCartProvider, {
+       'provider_id': providerId,
+       'checkout_cart_ids': Get.find<CartController>().checkoutCartIds,
+-      "_method": "put",
+       "guest_id": Get.find<SplashController>().getGuestId(),
+     });
+   }
+diff --git a/lib/feature/checkout/controller/checkout_controller.dart b/lib/feature/checkout/controller/checkout_controller.dart
+index 0c9eada..a63d701 100644
+--- a/lib/feature/checkout/controller/checkout_controller.dart
++++ b/lib/feature/checkout/controller/checkout_controller.dart
+@@ -390,15 +390,6 @@ class CheckOutController extends GetxController implements GetxService {
+           customSnackBar('no_available_slots'.tr);
+           return;
+         }
+-        for (final date in dates) {
+-          if (!await scheduleController.validateRealAvailability(
+-            address,
+-            date['date'].toString(),
+-          )) {
+-            customSnackBar('selected_slot_is_no_longer_available'.tr);
+-            return;
+-          }
+-        }
+       }
+ 
+       if (!retrying &&
+@@ -657,8 +648,9 @@ class CheckOutController extends GetxController implements GetxService {
+       if (revision != _quotationRevision) return;
+       if (response.statusCode != 200 ||
+           response.body is! Map ||
+-          response.body['content'] is! Map)
++          response.body['content'] is! Map) {
+         throw StateError('quotation');
++      }
+       final content = response.body['content'];
+       quotationPayableAmount = double.tryParse(
+         '${content['quotation_payable_amount'] ?? ''}',
+@@ -684,8 +676,9 @@ class CheckOutController extends GetxController implements GetxService {
+       }
+       if (!quotationCanCheckout) quotationLoadError = 'ux_quote_unavailable'.tr;
+     } catch (_) {
+-      if (revision == _quotationRevision)
++      if (revision == _quotationRevision) {
+         quotationLoadError = 'ux_quote_load_failed'.tr;
++      }
+     } finally {
+       if (revision == _quotationRevision) update();
+     }
+diff --git a/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart b/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart
+index 4f93063..62c748f 100644
+--- a/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart
++++ b/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart
+@@ -366,17 +366,7 @@ class _ProceedToCheckoutButtonWidgetState
+                                           .toString(),
+                                     );
+ 
+-                                    if (scheduleController
+-                                            .selectedServiceType ==
+-                                        ServiceType.repeat) {
+-                                      checkoutController.placeBookingRequest(
+-                                        paymentMethod: "cash_after_service",
+-                                        schedule: schedule,
+-                                        isPartial: 0,
+-                                        address: addressModel!,
+-                                      );
+-                                    } else if (cartController
+-                                            .walletPaymentStatus &&
++                                    if (cartController.walletPaymentStatus &&
+                                         isPartialPayment &&
+                                         checkoutController
+                                                 .selectedPaymentMethod ==
+@@ -398,7 +388,7 @@ class _ProceedToCheckoutButtonWidgetState
+                                         PaymentMethodName.cos) {
+                                       checkoutController.placeBookingRequest(
+                                         paymentMethod: "cash_after_service",
+-                                        schedule: schedule!,
++                                        schedule: schedule,
+                                         isPartial:
+                                             isPartialPayment &&
+                                                 cartController
+@@ -412,7 +402,7 @@ class _ProceedToCheckoutButtonWidgetState
+                                         PaymentMethodName.walletMoney) {
+                                       checkoutController.placeBookingRequest(
+                                         paymentMethod: "wallet_payment",
+-                                        schedule: schedule!,
++                                        schedule: schedule,
+                                         isPartial:
+                                             isPartialPayment &&
+                                                 cartController
+@@ -440,7 +430,7 @@ class _ProceedToCheckoutButtonWidgetState
+                                                 );
+                                         checkoutController.placeBookingRequest(
+                                           paymentMethod: "offline_payment",
+-                                          schedule: schedule!,
++                                          schedule: schedule,
+                                           isPartial:
+                                               isPartialPayment &&
+                                                   cartController
+@@ -514,13 +504,30 @@ class _ProceedToCheckoutButtonWidgetState
+     CheckOutController checkoutController,
+   ) async {
+     final scheduling = Get.find<ScheduleController>();
++    final repeat = scheduling.selectedServiceType == ServiceType.repeat;
++    final repeatDates = repeat
++        ? CheckoutHelper.getRepeatBookingScheduleList(
++            repeatBookingType: scheduling.selectedRepeatBookingType,
++            dateRange:
++                scheduling.selectedRepeatBookingType == RepeatBookingType.daily
++                ? scheduling.pickedDailyRepeatBookingDateRange
++                : scheduling.pickedWeeklyRepeatBookingDateRange,
++            time:
++                scheduling.selectedRepeatBookingType == RepeatBookingType.daily
++                ? scheduling.pickedDailyRepeatTime
++                : scheduling.pickedWeeklyRepeatTime,
++            dateTimeList: scheduling.pickedCustomRepeatBookingDateTimeList,
++            selectedDays: scheduling.getWeeklyPickedDays(),
++          )
++        : null;
+     if (address == null ||
+-        scheduling.scheduleTime == null ||
+-        scheduling.resolvedProviderId == null ||
+-        !await scheduling.validateRealAvailability(
+-          address,
+-          scheduling.scheduleTime!,
+-        )) {
++        (repeat && (repeatDates == null || repeatDates == '[]')) ||
++        (!repeat &&
++            (scheduling.scheduleTime == null ||
++                !await scheduling.validateRealAvailability(
++                  address,
++                  scheduling.scheduleTime!,
++                )))) {
+       customSnackBar('selected_slot_is_no_longer_available'.tr);
+       return;
+     }
+@@ -537,10 +544,6 @@ class _ProceedToCheckoutButtonWidgetState
+       return;
+     }
+     String url = '';
+-    String hostname = html.window.location.hostname!;
+-    String protocol = html.window.location.protocol;
+-    String port = html.window.location.port;
+-    String? path = html.window.location.pathname;
+     SignUpBody? newUserInfo = CheckoutHelper.getNewUserInfo(
+       address: address,
+       password: checkoutController.passwordController.text,
+@@ -563,7 +566,7 @@ class _ProceedToCheckoutButtonWidgetState
+         : address.id ?? "";
+     String zoneId = address.zoneId ?? '';
+     String callbackUrl = GetPlatform.isWeb
+-        ? "$protocol//$hostname:$port$path"
++        ? Uri.base.replace(query: '', fragment: '').toString()
+         : AppConstants.baseUrl;
+     int isPartial =
+         Get.find<CartController>().walletPaymentStatus && isPartialPayment
+@@ -581,8 +584,9 @@ class _ProceedToCheckoutButtonWidgetState
+       'new_user_info': encodedNewUserInfo,
+       'is_partial': isPartial,
+       'checkout_snapshot_id': checkoutController.checkoutSnapshotId,
+-      'service_type': 'regular',
++      'service_type': scheduling.selectedServiceType.name,
+       'booking_type': scheduling.selectedRepeatBookingType.name,
++      'dates': repeatDates,
+       'payment_platform': platform,
+       'service_location': serviceLocation,
+       'provider_id': scheduling.resolvedProviderId,
+diff --git a/lib/feature/splash/repository/splash_repo.dart b/lib/feature/splash/repository/splash_repo.dart
+index b4b5deb..aa10eb2 100644
+--- a/lib/feature/splash/repository/splash_repo.dart
++++ b/lib/feature/splash/repository/splash_repo.dart
+@@ -80,18 +80,35 @@ class SplashRepo extends DataSyncRepo {
+     return (sharedPreferences!.getBool(AppConstants.initialLanguage) ?? false);
+   }
+ 
+-  Future<bool> ensurePaymentGuestSession() async {
++  Future<bool>? _guestSessionInFlight;
++
++  Future<bool> ensurePaymentGuestSession() {
++    return _guestSessionInFlight ??= _issuePaymentGuestSession().whenComplete(
++      () {
++        _guestSessionInFlight = null;
++      },
++    );
++  }
++
++  Future<bool> _issuePaymentGuestSession() async {
+     try {
+       final response = await apiClient.postData(
+         '/api/v1/customer/payment-guest-session',
+         {},
+       );
+       if (response.statusCode != 200) return false;
+-      await setGuestId(response.body['content']['guest_id']);
++      final content = response.body['content'];
++      if (content is! Map ||
++          content['guest_id'] is! String ||
++          content['guest_payment_token'] is! String) {
++        return false;
++      }
++      await setGuestId(content['guest_id']);
+       await sharedPreferences!.setString(
+         'nirab_guest_payment_token',
+-        response.body['content']['guest_payment_token'],
++        content['guest_payment_token'],
+       );
++      apiClient.updateGuestIdHeader(content['guest_id']);
+       return true;
+     } catch (_) {
+       return false;
+diff --git a/lib/helper/checkout_helper.dart b/lib/helper/checkout_helper.dart
+index 9877d41..a04c9b4 100644
+--- a/lib/helper/checkout_helper.dart
++++ b/lib/helper/checkout_helper.dart
+@@ -230,7 +230,9 @@ class CheckoutHelper {
+         });
+       }
+     } else if (repeatBookingType == RepeatBookingType.weekly) {
+-      if (selectedDays == null || selectedDays.isEmpty) return null;
++      if (selectedDays == null || selectedDays.isEmpty || time == null) {
++        return null;
++      }
+ 
+       Map<String, int> dayNameToInt = {
+         'monday': DateTime.monday,
+@@ -259,7 +261,7 @@ class CheckoutHelper {
+         )) {
+           result.add({
+             "date": dateTimeFormat.format(
+-              combineDateAndTime(currentDate, time!),
++              combineDateAndTime(currentDate, time),
+             ),
+           });
+         }
+diff --git a/lib/main.dart b/lib/main.dart
+index 5bd8e56..df1cde9 100644
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -151,23 +151,26 @@ class _MyAppState extends State<MyApp> {
+     });
+   }
+ 
++  Future<void> _initializeWebCart() async {
++    await Get.find<SplashController>().initSharedData();
++    if (!Get.find<AuthController>().isLoggedIn()) {
++      final ready = await Get.find<SplashRepo>().ensurePaymentGuestSession();
++      if (!ready) return;
++    }
++    if (!mounted) return;
++    await Get.find<CartController>().getCartListFromServer();
++  }
++
+   @override
+   void initState() {
+     super.initState();
+ 
+     if (kIsWeb || widget.route != null) {
+-      Get.find<SplashController>().initSharedData();
++      _initializeWebCart();
+       Get.find<SplashController>().getCookiesData();
+-      Get.find<CartController>().getCartListFromServer();
+-
+       if (Get.find<AuthController>().isLoggedIn()) {
+         Get.find<UserController>().getUserInfo();
+       }
+-
+-      if (Get.find<SplashController>().getGuestId().isEmpty) {
+-        var uuid = const Uuid().v1();
+-        Get.find<SplashController>().setGuestId(uuid);
+-      }
+       _route();
+     }
+   }

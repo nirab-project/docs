@@ -1,0 +1,189 @@
+--- a/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php
+@@ -58,8 +58,9 @@
+     public function checkoutPrice(Request $request): JsonResponse
+     {
+         abort_unless(nirab_branch_mode(), 404);
+         $request->validate(['guest_id' => $this->isCustomerLoggedIn ? 'nullable' : 'required|uuid']);
++        $this->assertGuestBookingPrincipal($request);
+         abort_if(!$this->isCustomerLoggedIn && User::whereKey($this->customerUserId)->exists(), 403);
+         $snapshot = app(\Modules\BookingModule\Services\BranchCheckoutService::class)->preview((string) $this->customerUserId, $request->all());
+         $payload = $snapshot->payload;
+         return response()->json(response_formatter(DEFAULT_200, [
+@@ -90,34 +91,35 @@
+                 'json',
+                 function ($attribute, $value, $fail) {
+                     $decoded = json_decode($value, true);
+ 
+-                    if (json_last_error() !== JSON_ERROR_NONE) {
+-                        $fail($attribute . ' must be a valid JSON string.');
++                    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded) || array_is_list($decoded)) {
++                        $fail($attribute . ' must be a JSON address object.');
+                         return;
+                     }
+ 
+-                    if (is_null($decoded['lat']) || $decoded['lat'] == '') $fail($attribute . ' must contain "lat" properties.');
+-                    if (is_null($decoded['lon']) || $decoded['lon'] == '') $fail($attribute . ' must contain "lon" properties.');
+-                    if (is_null($decoded['address']) || $decoded['address'] == '') $fail($attribute . ' must contain "address" properties.');
+-                    if (is_null($decoded['contact_person_name']) || $decoded['contact_person_name'] == '') $fail($attribute . ' must contain "contact_person_name" properties.');
+-                    if (is_null($decoded['contact_person_number']) || $decoded['contact_person_number'] == '') $fail($attribute . ' must contain "contact_person_number" properties.');
+-                    if (is_null($decoded['address_label']) || $decoded['address_label'] == '') $fail($attribute . ' must contain "address_label" properties.');
++                    foreach (['lat', 'lon', 'address', 'contact_person_name', 'contact_person_number', 'address_label'] as $field) {
++                        if (!isset($decoded[$field]) || $decoded[$field] === '') {
++                            $fail($attribute . ' must contain "' . $field . '" properties.');
++                        }
++                    }
+                 },
+             ] : '',
+ 
+             'is_partial' => 'nullable|in:0,1',
+-            'service_location' => 'required|in:customer,provider',
+-            function ($attribute, $value, $fail) use ($serviceAtProviderPlace) {
+-                if ($value == 'provider' && $serviceAtProviderPlace != 1) {
+-                    $fail('The selected service location cannot be "provider" because the service is not available at the provider’s place.');
+-                }
+-            },
++            'service_location' => ['required', 'in:customer,provider',
++                function ($attribute, $value, $fail) use ($serviceAtProviderPlace) {
++                    if ($value == 'provider' && $serviceAtProviderPlace != 1) {
++                        $fail('The selected service location cannot be "provider" because the service is not available at the provider’s place.');
++                    }
++                },
++            ],
+         ]);
+ 
+         if ($validator->fails()) {
+             return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
+         }
++        $this->assertGuestBookingPrincipal($request);
+ 
+         $newUserInfo = null;
+         if ($request->has('new_user_info') && !empty($request->get('new_user_info')) && !$this->isCustomerLoggedIn) {
+             $newUserInfo = json_decode($request['new_user_info'], true);
+@@ -244,8 +246,17 @@
+             return response()->json(response_formatter(BOOKING_PLACE_SUCCESS_200, $response), 200);
+         } else {
+             return response()->json(response_formatter(BOOKING_PLACE_FAIL_200), 200);
+         }
++    }
++
++    private function assertGuestBookingPrincipal(Request $request): void
++    {
++        if ($this->isCustomerLoggedIn) return;
++        $principal = app(\Modules\PaymentModule\Services\PaymentPrincipal::class)->resolve($request);
++        abort_unless(($principal['is_guest'] ?? false)
++            && (string) ($principal['id'] ?? '') === (string) $this->customerUserId,
++            401, 'guest_session_required');
+     }
+ 
+     private function blockIneligibleProMemberCoupon($customerUserId): ?JsonResponse
+     {
+--- a/Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php
++++ b/Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php
+@@ -49,9 +49,19 @@
+         $this->booking = $booking;
+         $this->coupon = $coupon;
+ 
+         $this->isCustomerLoggedIn = (bool)auth('api')->user();
+-        $this->customerUserId = $this->isCustomerLoggedIn ? auth('api')->user()->id : $request['guest_id'];
++        if ($this->isCustomerLoggedIn) {
++            $this->customerUserId = auth('api')->user()->id;
++        } else {
++            // A guest id is not an authentication credential. Bind all cart operations
++            // to the server-issued guest payment token and its existing Guest row.
++            $principal = app(\Modules\PaymentModule\Services\PaymentPrincipal::class)->resolve($request);
++            abort_unless(($principal['is_guest'] ?? false)
++                && (string) ($principal['id'] ?? '') === (string) $request->input('guest_id'),
++                401, 'guest_session_required');
++            $this->customerUserId = $principal['id'];
++        }
+     }
+ 
+     /**
+      * @param Request $request
+@@ -67,9 +77,9 @@
+         ]);
+         return DB::transaction(function () use ($data, $request): JsonResponse {
+             $service = app(\Modules\ServiceManagement\Services\DirectServicePolicy::class)->catalog((string) Config::get('zone_id'))->findOrFail($data['service_id']);
+             abort_unless($service->pricing_type === 'fixed', 422, 'service_requires_quotation');
+-            $variation = app(\Modules\ServiceManagement\Services\ServicePriceResolver::class)->resolve($service->id, $data['variant_key'], Config::get('zone_id'));
++            $variation = app(\Modules\ServiceManagement\Services\ServicePriceResolver::class)->resolve($service->id, $data['variant_key'], Config::get('zone_id'));
+             $provider = $data['provider_id'] ?? null;
+             $area = $data['branch_service_area_id'] ?? null;
+             abort_if($area && !$provider, 422, 'branch_required_for_area');
+             if ($provider) abort_unless(app(\Modules\ServiceManagement\Services\DirectServicePolicy::class)->available($provider, $service->id, $area), 422, 'service_unavailable_for_branch');
+@@ -90,9 +100,8 @@
+                 'campaign_discount' => $campaign >= $basic ? $campaign : 0, 'coupon_discount' => 0, 'coupon_code' => null, 'coupon_id' => null,
+                 'is_guest' => !$this->isCustomerLoggedIn, 'tax_amount' => $pricing->tax, 'total_cost' => $pricing->total,
+                 'pricing_snapshot' => $pricing->jsonSerialize()])->save();
+             $this->addedToCartUpdate($this->customerUserId, $service->id, !$this->isCustomerLoggedIn);
+-            if (!$this->isCustomerLoggedIn) Guest::firstOrCreate(['guest_id' => $request->guest_id], ['ip_address' => $request->ip()]);
+             return response()->json(response_formatter(DEFAULT_STORE_200, $cart));
+         });
+     }
+ 
+@@ -128,11 +137,16 @@
+         }
+ 
+         foreach ($cart as $cartItem) {
+             if ($cartItem?->coupon_code && $cartItem?->coupon_id) {
+-                $coupon = $this->coupon->where('id', $cartItem->coupon_id)->first();
+-
+-                $repeatCount = $this->booking->where('customer_id', $this->customerUserId)
++                $coupon = $this->coupon->where('id', $cartItem->coupon_id)->with('discount')->first();
++                // Do not dereference a deleted/inactive coupon relationship on GET cart.
++                // Checkout has its own authoritative coupon revalidation.
++                if (!$coupon?->discount) {
++                    $cartItem['used_count'] = 0;
++                    $cartItem['remaining_uses'] = 0;
++                } else {
++                    $repeatCount = $this->booking->where('customer_id', $this->customerUserId)
+                     ->where('coupon_code', $coupon['coupon_code'])
+                     ->get()
+                     ->sum(function ($booking) use ($coupon) {
+                         $repeatCount = $booking->repeat()
+@@ -140,11 +154,11 @@
+                             ->count();
+ 
+                         return $repeatCount > 0 ? $repeatCount : 1;
+                     });
+-                $cartItem['used_count'] = $repeatCount;
+-                $cartItem['remaining_uses'] = max(0, $coupon->discount->limit_per_user - $repeatCount);
+-
++                    $cartItem['used_count'] = $repeatCount;
++                    $cartItem['remaining_uses'] = max(0, $coupon->discount->limit_per_user - $repeatCount);
++                }
+             }
+             if ($cartItem?->provider) {
+                 $providerId = optional($cartItem->provider)->id;
+                 $timeSchedule = provider_config('time_schedule', 'service_schedule', $providerId)->live_values ?? '';
+@@ -274,9 +288,15 @@
+         $provider = $data['provider_id'] ?? null;
+         DB::transaction(function () use ($provider, $data): void {
+             $items = Cart::where('customer_id', $this->customerUserId)->when(isset($data['checkout_cart_ids']), fn ($q) => $q->whereIn('id',$data['checkout_cart_ids']))->lockForUpdate()->get();
+             abort_if(isset($data['checkout_cart_ids']) && $items->count() !== count($data['checkout_cart_ids']),422,'checkout_cart_item_not_owned');
+-            if ($provider) abort_unless(app(\Modules\ServiceManagement\Services\DirectServicePolicy::class)->allAvailable($provider, $items->pluck('service_id')->unique()->all()), 422, 'no_branch_for_all_services_split_required');
++            if ($provider) {
++                $branch = Provider::withoutGlobalScopes()->find($provider);
++                abort_unless($branch && (string) $branch->zone_id === (string) Config::get('zone_id')
++                    && app(\Modules\ServiceManagement\Services\DirectServicePolicy::class)
++                        ->allAvailable($provider, $items->pluck('service_id')->unique()->all()),
++                    422, 'no_branch_for_all_services_split_required');
++            }
+             foreach ($items as $item) {
+                 $item->forceFill(['provider_id' => $provider, 'branch_service_area_id' => null])->save();
+                 abort_unless($this->updateCartQuantity($item->id, $item->quantity), 422, 'service_unavailable');
+             }
+--- a/Modules/PaymentModule/Http/Controllers/PaymentController.php
++++ b/Modules/PaymentModule/Http/Controllers/PaymentController.php
+@@ -81,9 +81,9 @@
+             $serviceAtProviderPlace = (int)((business_config('service_at_provider_place', 'provider_config'))->live_values ?? 0);
+ 
+             $validator = Validator::make($request->all(), [
+                 'zone_id' => 'required|uuid',
+-                'service_schedule' => 'required|date',
++                'service_schedule' => 'required_unless:service_type,repeat|nullable|date',
+                 'service_address_id' => is_null($request['service_address']) ? 'required' : 'nullable',
+                 'service_address' => is_null($request['service_address_id']) ? 'required' : 'nullable',
+                 'payment_method' => 'required|in:' . implode(',', array_column(GATEWAYS_PAYMENT_METHODS, 'key')),
+                 'callback' => 'nullable',

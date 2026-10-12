@@ -1,0 +1,9 @@
+PHPUnit 11.5.55 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.24
+Configuration: C:\Users\PC\Desktop\Projects\nirab-project\Admin Panel\phpunit.xml
+
+Time: 00:00.267, Memory: 28.00 MB
+
+OK, but there were issues!
+Tests: 8, Assertions: 24, PHPUnit Deprecations: 1.

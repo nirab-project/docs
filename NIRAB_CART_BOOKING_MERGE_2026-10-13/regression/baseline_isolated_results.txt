@@ -1,0 +1,11 @@
+PASS Cart recognizes authenticated, matching guest session
+FAIL Cart refuses guessed or mismatched guest UUID :: Expected status 401 but operation succeeded
+FAIL Cart refuses invalid guest payment token :: Expected status 401 but operation succeeded
+PASS Logged in customer cart uses own user id
+FAIL Guest checkout refuses a different guest session :: Method Modules\BookingModule\Http\Controllers\Api\V1\Customer\BookingController::assertGuestBookingPrincipal() does not exist
+FAIL Guest checkout accepts the issued guest session :: Method Modules\BookingModule\Http\Controllers\Api\V1\Customer\BookingController::assertGuestBookingPrincipal() does not exist
+FAIL Booking validator attaches provider location restriction to correct field :: service_location must have callback rule array
+FAIL Malformed address JSON scalar yields validation error, not TypeError :: Cannot access offset of type string on string
+FAIL Address JSON with missing keys reports validation errors instead of warnings :: Undefined array key "lat"
+FAIL JSON address arrays are rejected instead of indexing missing keys :: Undefined array key "lat"
+ISOLATED TEST TOTAL: passed=2 failed=8

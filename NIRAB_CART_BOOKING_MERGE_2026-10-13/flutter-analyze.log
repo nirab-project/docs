@@ -1,0 +1,8 @@
+Analyzing 8 items...                                            
+
+   info - Statements in an if should be enclosed in a block - lib\feature\checkout\controller\checkout_controller.dart:652:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\checkout\controller\checkout_controller.dart:679:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\feature\splash\repository\splash_repo.dart:104:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\helper\checkout_helper.dart:234:9 - curly_braces_in_flow_control_structures
+
+4 issues found. (ran in 17.0s)

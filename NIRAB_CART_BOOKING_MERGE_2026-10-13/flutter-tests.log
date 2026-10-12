@@ -1,0 +1,20 @@
+00:00 +0: loading C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart
+00:00 +0: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.rtl at 360.0 with 2x text
+00:01 +1: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.rtl at 649.0 with 2x text
+00:02 +2: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.rtl at 650.0 with 2x text
+00:02 +3: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.rtl at 1300.0 with 2x text
+00:02 +4: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.ltr at 360.0 with 2x text
+00:02 +5: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.ltr at 649.0 with 2x text
+00:02 +6: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.ltr at 650.0 with 2x text
+00:02 +7: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: checkout labels fit TextDirection.ltr at 1300.0 with 2x text
+00:02 +8: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/feature/checkout_progress_test.dart: cancelled payment is visible without changing step
+00:13 +9: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/api_error_message_test.dart: network and malformed responses retain readable fallback messages
+00:13 +10: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/api_error_message_test.dart: validation messages and server messages keep their existing priority
+00:18 +11: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/available_slot_localization_test.dart: Arabic availability renders dates, retry and localized calendar
+00:24 +12: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/quote_field_contract_test.dart: quote wire time en, 24h=false
+00:25 +13: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/quote_field_contract_test.dart: quote wire time en, 24h=true
+00:25 +14: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/quote_field_contract_test.dart: quote wire time ar, 24h=false
+00:25 +15: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/quote_field_contract_test.dart: quote wire time ar, 24h=true
+00:25 +16: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/quote_field_contract_test.dart: two attachment fields keep separate uploads with identical filenames and general attachment
+00:25 +17: C:/Users/PC/Desktop/Projects/nirab-project/User app and web/test/rui/quote_field_contract_test.dart: optional empty attachment and reset do not retain stale associations
+00:25 +18: All tests passed!

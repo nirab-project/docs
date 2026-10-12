@@ -1,0 +1,3 @@
+No syntax errors detected in /mnt/data/nirab_code_audit/patched/01-NIRAB-BACKEND-SOURCE/Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php
+No syntax errors detected in /mnt/data/nirab_code_audit/patched/01-NIRAB-BACKEND-SOURCE/Modules/PaymentModule/Http/Controllers/PaymentController.php
+No syntax errors detected in /mnt/data/nirab_code_audit/patched/01-NIRAB-BACKEND-SOURCE/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php

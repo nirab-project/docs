@@ -1,0 +1,79 @@
+[
+  {
+    "file": "01-NIRAB-BACKEND-SOURCE/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php",
+    "repo": "backend",
+    "old_sha256": "cada47a094b485ca90f75e50b766c996ec380f1222ae25015d4bb9dea8088b92",
+    "new_sha256": "b0d988d285e5b5162e9f8c86b31dce92317deebac53a5ae7abdd817e9fd9bfb3",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "01-NIRAB-BACKEND-SOURCE/Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php",
+    "repo": "backend",
+    "old_sha256": "73729db2baeaca200fe3da7e943d13c62fa1b299193b73b44f913a5eac3e67be",
+    "new_sha256": "0d9e46b7e5d9b98ce39dd40d24e7c46ef60a31524a83aa84cb829a2e051f921b",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "01-NIRAB-BACKEND-SOURCE/Modules/PaymentModule/Http/Controllers/PaymentController.php",
+    "repo": "backend",
+    "old_sha256": "579956f3dd41b5edc964111f468a5931399210f7e3c3a8138601a8ae50a65480",
+    "new_sha256": "b96acd29592c4802a65e480ef7ea2ab1f7cbe6ada7223e5cb6a11e2bfa76a045",
+    "source_line_ending": "LF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/api/remote/client_api.dart",
+    "repo": "customer",
+    "old_sha256": "d8b056f145aaa9c3021b0928bf90d5797a4c32332597ac196c3f65bc05140101",
+    "new_sha256": "41cb4ce4c36108c8da88a50434a8aa4521d5b5f94b11a5889e9bad2fd66c1b91",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/feature/cart/controller/cart_controller.dart",
+    "repo": "customer",
+    "old_sha256": "1002eb801d3af9d1fbcd6094c851206fc213bb9969ed9151b06879813d382566",
+    "new_sha256": "c851a1627227ca731e1a03dd07f726e1e34968961203fbd0df907d37907c0cf5",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/feature/cart/repository/cart_repo.dart",
+    "repo": "customer",
+    "old_sha256": "e59fa6458779836d2bf862212a771c00911ca6d89c145fd53c581b3c51d1deba",
+    "new_sha256": "41257a62675bfd819c0ea1eaf1b7f0b83984867ee8e27e3c4ca50bfd709ad2b7",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/feature/checkout/controller/checkout_controller.dart",
+    "repo": "customer",
+    "old_sha256": "deb9f3122aa2efb390a1e2e8be147ff0c7eac0d445792ea34b88d3be8ba72262",
+    "new_sha256": "8ca109853854609ed7df6fe7ec7aa27279e8fcd6f20899c7fea9ee809f3ccefd",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart",
+    "repo": "customer",
+    "old_sha256": "cc06f79de99c65dc28a3c36262ae06c68c56b58a07944e3f57bea4b3d52c550c",
+    "new_sha256": "ae03f02b98ad1539254aa2bb16484ccb4074b29dc28a410decc17ed83810ea86",
+    "source_line_ending": "CRLF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/feature/splash/repository/splash_repo.dart",
+    "repo": "customer",
+    "old_sha256": "b1902ebc6e6a006281c0bbb52c650d5193a18aa846b6377a566ebaae4faeed66",
+    "new_sha256": "71c3c3f4bf31dd0405a40e8a1596e8f5d6b3de91dc19660039fdf283da10a7fc",
+    "source_line_ending": "LF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/helper/checkout_helper.dart",
+    "repo": "customer",
+    "old_sha256": "f51abd68b0f6ca771317c1ec4a6f21064f191d243a2e99050b9e66aabfc04e12",
+    "new_sha256": "21af72a967e7b4570d9c00b4c7bf019f3d7d4b68c373aed4d146b69c3d0e9456",
+    "source_line_ending": "LF"
+  },
+  {
+    "file": "02-NIRAB-CUSTOMER-SOURCE/lib/main.dart",
+    "repo": "customer",
+    "old_sha256": "ae91c5fb091537a3d6ecacf51fde33254c41e0988cd540901f1eb1dfe0e2e7c1",
+    "new_sha256": "8a21d897005119f48abdaf4e3adb37ee649db9c6a9ebe6e520dad475d4c91b0c",
+    "source_line_ending": "CRLF"
+  }
+]

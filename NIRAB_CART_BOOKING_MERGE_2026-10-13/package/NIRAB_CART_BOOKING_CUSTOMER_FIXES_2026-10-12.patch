@@ -1,0 +1,476 @@
+--- a/lib/api/remote/client_api.dart
++++ b/lib/api/remote/client_api.dart
+@@ -79,8 +79,14 @@
+     // Opaque revision only: no credential or personal identifier in cache keys.
+     if (changed) marketingRevision.value++;
+   }
+ 
++  void updateGuestIdHeader(String guestId) {
++    if (_mainHeaders[AppConstants.guestId] == guestId) return;
++    _mainHeaders[AppConstants.guestId] = guestId;
++    marketingRevision.value++;
++  }
++
+   Future<Response> getData(
+     String uri, {
+     Map<String, dynamic>? query,
+     Map<String, String>? headers,
+@@ -108,20 +114,20 @@
+     String? uri,
+     dynamic body, {
+     Map<String, String>? headers,
+   }) async {
+-    http.Response response = await http
+-        .post(
+-          Uri.parse(appBaseUrl! + uri!),
+-          body: jsonEncode(body),
+-          headers: {
+-            ...(headers ?? _mainHeaders),
+-            'X-Guest-Payment-Token':
+-                sharedPreferences.getString('nirab_guest_payment_token') ?? '',
+-          },
+-        )
+-        .timeout(Duration(seconds: timeoutInSeconds));
+-    try {
++    try {
++      final response = await http
++          .post(
++            Uri.parse(appBaseUrl! + uri!),
++            body: jsonEncode(body),
++            headers: {
++              ...(headers ?? _mainHeaders),
++              'X-Guest-Payment-Token':
++                  sharedPreferences.getString('nirab_guest_payment_token') ?? '',
++            },
++          )
++          .timeout(Duration(seconds: timeoutInSeconds));
+       return handleResponse(response, uri);
+     } catch (e) {
+       return Response(statusCode: 1, statusText: noInternetMessage);
+     }
+@@ -307,9 +313,9 @@
+           body: response0.body,
+           statusText: response0.body['message'],
+         );
+       }
+-    } else if (response0.statusCode != 200 && response0.body == null) {
++    } else if (response0.statusCode != 200 && response0.statusCode != 204 && response0.body == null) {
+       response0 = Response(statusCode: 0, statusText: noInternetMessage);
+     }
+     return response0;
+   }
+--- a/lib/feature/cart/controller/cart_controller.dart
++++ b/lib/feature/cart/controller/cart_controller.dart
+@@ -91,9 +91,9 @@
+     proDiscountAmount = null;
+     totalProDiscountAmount = 0;
+     proBenefitType = null;
+ 
+-    DataSyncHelper.fetchAndSyncData(
++    await DataSyncHelper.fetchAndSyncData(
+       fetchFromLocal: () => cartRepo.getCartListFromServer<CacheResponseData>(
+         source: DataSourceEnum.local,
+       ),
+       fetchFromClient: () =>
+@@ -138,9 +138,9 @@
+   Future<void> removeCartFromServer(CartModel cart) async {
+     _invalidateBookingContext();
+     _isLoading = true;
+     Response response = await cartRepo.removeCartFromServer(cart.id);
+-    if (response.statusCode == 200) {
++    if (response.statusCode == 200 || response.statusCode == 204) {
+       _cartList.remove(cart);
+     }
+ 
+     await getCartListFromServer(shouldUpdate: false);
+@@ -149,12 +149,20 @@
+   }
+ 
+   Future<void> removeAllCartItem() async {
+     _invalidateBookingContext();
+-    Response response = await cartRepo.removeAllCartFromServer();
+-    if (response.statusCode == 200) {
++    _isLoading = true;
++    update();
++    try {
++      final response = await cartRepo.removeAllCartFromServer();
++      if (response.statusCode == 200 || response.statusCode == 204) {
++        await getCartListFromServer(shouldUpdate: false);
++      } else {
++        ApiChecker.checkApi(response);
++      }
++    } finally {
+       _isLoading = false;
+-      getCartListFromServer(shouldUpdate: false);
++      update();
+     }
+   }
+ 
+   Future<void> updateCartQuantityToApi(String cartID, int quantity) async {
+@@ -200,19 +208,28 @@
+     _invalidateBookingContext();
+ 
+     _isCartLoading = true;
+     update();
+-    _selectedProvider = providerData;
+-
+-    Response response = await cartRepo.updateProvider(providerData?.id ?? "");
+-    if (response.statusCode == 200) {
+-      await getCartListFromServer();
+-      Get.find<ScheduleController>().buildSchedule(
+-        scheduleType: ScheduleType.asap,
+-      );
+-    } else {}
+-    _isCartLoading = false;
+-    update();
++    final previousProvider = _selectedProvider;
++    try {
++      final response = await cartRepo.updateProvider(providerData?.id ?? "");
++      if (response.statusCode == 200) {
++        _selectedProvider = providerData;
++        await getCartListFromServer();
++        Get.find<ScheduleController>().buildSchedule(
++          scheduleType: ScheduleType.asap,
++        );
++      } else {
++        _selectedProvider = previousProvider;
++        ApiChecker.checkApi(response);
++      }
++    } catch (_) {
++      _selectedProvider = previousProvider;
++      customSnackBar('something_went_wrong'.tr);
++    } finally {
++      _isCartLoading = false;
++      update();
++    }
+   }
+ 
+   void removeFromCartVariation(CartModel? cartModel) {
+     if (cartModel == null) {
+--- a/lib/feature/cart/repository/cart_repo.dart
++++ b/lib/feature/cart/repository/cart_repo.dart
+@@ -10,47 +10,65 @@
+     required super.apiClient,
+     required SharedPreferences super.sharedPreferences,
+   });
+ 
++  Future<bool> _ensureGuestIdentity() async {
++    if (Get.find<AuthController>().isLoggedIn()) return true;
++    final token = sharedPreferences?.getString('nirab_guest_payment_token');
++    final guest = sharedPreferences?.getString(AppConstants.guestId);
++    if (token?.isNotEmpty == true && guest?.isNotEmpty == true) return true;
++    return Get.find<SplashRepo>().ensurePaymentGuestSession();
++  }
++
+   Future<Response> addToCartListToServer(CartModelBody cartModel) async {
++    if (!await _ensureGuestIdentity()) {
++      return Response(statusCode: 401, statusText: 'guest_session_required');
++    }
++    if (!Get.find<AuthController>().isLoggedIn()) {
++      cartModel.guestId = Get.find<SplashRepo>().getGuestId();
++    }
+     return await apiClient.postData(AppConstants.addToCart, cartModel.toJson());
+   }
+ 
+   Future<ApiResponseModel<T>> getCartListFromServer<T>({
+     required DataSourceEnum source,
+   }) async {
+-    return await fetchData<T>(
++    if (source == DataSourceEnum.local) {
++      return ApiResponseModel.withError('private_cart_cache_disabled');
++    }
++    if (!await _ensureGuestIdentity()) {
++      return ApiResponseModel.withError('guest_session_required');
++    }
++    final response = await apiClient.getData(
+       "${AppConstants.getCartList}&&guest_id=${Get.find<SplashController>().getGuestId()}",
+-      source,
+     );
++    // Avoid DataSyncRepo.fetchData: it caches private user data by URL alone.
++    return ApiResponseModel.withSuccess(response as T);
+   }
+ 
+   Future<Response> removeCartFromServer(String cartID) async {
+-    return await apiClient.postData(
++    return await apiClient.deleteData(
+       "${AppConstants.removeCartItem}$cartID?guest_id=${Get.find<SplashController>().getGuestId()}",
+-      {"_method": "delete"},
+     );
+   }
+ 
+   Future<Response> removeAllCartFromServer() async {
+-    return await apiClient.postData(
++    return await apiClient.deleteData(
+       "${AppConstants.removeAllCartItem}?guest_id=${Get.find<SplashController>().getGuestId()}",
+-      {"_method": "delete"},
+     );
+   }
+ 
+   Future<Response> updateCartQuantity(String cartID, int quantity) async {
+-    return await apiClient.postData(
++    return await apiClient.putData(
+       "${AppConstants.updateCartQuantity}$cartID?guest_id=${Get.find<SplashController>().getGuestId()}",
+-      {'quantity': quantity, "_method": "put"},
++      {'quantity': quantity},
+     );
+   }
+ 
+   Future<Response> updateProvider(String providerId) async {
+-    return await apiClient.postData(AppConstants.updateCartProvider, {
++    return await apiClient.putData(AppConstants.updateCartProvider, {
+       'provider_id': providerId,
+       'checkout_cart_ids': Get.find<CartController>().checkoutCartIds,
+-      "_method": "put",
+       "guest_id": Get.find<SplashController>().getGuestId(),
+     });
+   }
+ 
+--- a/lib/feature/checkout/controller/checkout_controller.dart
++++ b/lib/feature/checkout/controller/checkout_controller.dart
+@@ -389,17 +389,8 @@
+         if (dates.isEmpty) {
+           customSnackBar('no_available_slots'.tr);
+           return;
+         }
+-        for (final date in dates) {
+-          if (!await scheduleController.validateRealAvailability(
+-            address,
+-            date['date'].toString(),
+-          )) {
+-            customSnackBar('selected_slot_is_no_longer_available'.tr);
+-            return;
+-          }
+-        }
+       }
+ 
+       if (!retrying &&
+           !await reviewCheckoutPrice(
+--- a/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart
++++ b/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart
+@@ -365,18 +365,9 @@
+                                       (cartController.totalProDiscountAmount)
+                                           .toString(),
+                                     );
+ 
+-                                    if (scheduleController
+-                                            .selectedServiceType ==
+-                                        ServiceType.repeat) {
+-                                      checkoutController.placeBookingRequest(
+-                                        paymentMethod: "cash_after_service",
+-                                        schedule: schedule,
+-                                        isPartial: 0,
+-                                        address: addressModel!,
+-                                      );
+-                                    } else if (cartController
++                                    if (cartController
+                                             .walletPaymentStatus &&
+                                         isPartialPayment &&
+                                         checkoutController
+                                                 .selectedPaymentMethod ==
+@@ -397,9 +388,9 @@
+                                             .selectedPaymentMethod ==
+                                         PaymentMethodName.cos) {
+                                       checkoutController.placeBookingRequest(
+                                         paymentMethod: "cash_after_service",
+-                                        schedule: schedule!,
++                                        schedule: schedule,
+                                         isPartial:
+                                             isPartialPayment &&
+                                                 cartController
+                                                     .walletPaymentStatus
+@@ -411,9 +402,9 @@
+                                             .selectedPaymentMethod ==
+                                         PaymentMethodName.walletMoney) {
+                                       checkoutController.placeBookingRequest(
+                                         paymentMethod: "wallet_payment",
+-                                        schedule: schedule!,
++                                        schedule: schedule,
+                                         isPartial:
+                                             isPartialPayment &&
+                                                 cartController
+                                                     .walletPaymentStatus
+@@ -439,9 +430,9 @@
+                                                       .selectedOfflineMethod!,
+                                                 );
+                                         checkoutController.placeBookingRequest(
+                                           paymentMethod: "offline_payment",
+-                                          schedule: schedule!,
++                                          schedule: schedule,
+                                           isPartial:
+                                               isPartialPayment &&
+                                                   cartController
+                                                       .walletPaymentStatus
+@@ -513,15 +504,29 @@
+     bool isPartialPayment,
+     CheckOutController checkoutController,
+   ) async {
+     final scheduling = Get.find<ScheduleController>();
++    final repeat = scheduling.selectedServiceType == ServiceType.repeat;
++    final repeatDates = repeat
++        ? CheckoutHelper.getRepeatBookingScheduleList(
++            repeatBookingType: scheduling.selectedRepeatBookingType,
++            dateRange: scheduling.selectedRepeatBookingType == RepeatBookingType.daily
++                ? scheduling.pickedDailyRepeatBookingDateRange
++                : scheduling.pickedWeeklyRepeatBookingDateRange,
++            time: scheduling.selectedRepeatBookingType == RepeatBookingType.daily
++                ? scheduling.pickedDailyRepeatTime
++                : scheduling.pickedWeeklyRepeatTime,
++            dateTimeList: scheduling.pickedCustomRepeatBookingDateTimeList,
++            selectedDays: scheduling.getWeeklyPickedDays(),
++          )
++        : null;
+     if (address == null ||
+-        scheduling.scheduleTime == null ||
+-        scheduling.resolvedProviderId == null ||
+-        !await scheduling.validateRealAvailability(
+-          address,
+-          scheduling.scheduleTime!,
+-        )) {
++        (repeat && (repeatDates == null || repeatDates == '[]')) ||
++        (!repeat && (scheduling.scheduleTime == null ||
++            !await scheduling.validateRealAvailability(
++              address,
++              scheduling.scheduleTime!,
++            )))) {
+       customSnackBar('selected_slot_is_no_longer_available'.tr);
+       return;
+     }
+     final partial =
+@@ -536,12 +541,8 @@
+     )) {
+       return;
+     }
+     String url = '';
+-    String hostname = html.window.location.hostname!;
+-    String protocol = html.window.location.protocol;
+-    String port = html.window.location.port;
+-    String? path = html.window.location.pathname;
+     SignUpBody? newUserInfo = CheckoutHelper.getNewUserInfo(
+       address: address,
+       password: checkoutController.passwordController.text,
+       isCheckedCreateAccount: checkoutController.isCheckedCreateAccount,
+@@ -562,9 +563,9 @@
+         ? ""
+         : address.id ?? "";
+     String zoneId = address.zoneId ?? '';
+     String callbackUrl = GetPlatform.isWeb
+-        ? "$protocol//$hostname:$port$path"
++        ? Uri.base.replace(query: '', fragment: '').toString()
+         : AppConstants.baseUrl;
+     int isPartial =
+         Get.find<CartController>().walletPaymentStatus && isPartialPayment
+         ? 1
+@@ -580,10 +581,11 @@
+       'service_address': encodedAddress,
+       'new_user_info': encodedNewUserInfo,
+       'is_partial': isPartial,
+       'checkout_snapshot_id': checkoutController.checkoutSnapshotId,
+-      'service_type': 'regular',
++      'service_type': scheduling.selectedServiceType.name,
+       'booking_type': scheduling.selectedRepeatBookingType.name,
++      'dates': repeatDates,
+       'payment_platform': platform,
+       'service_location': serviceLocation,
+       'provider_id': scheduling.resolvedProviderId,
+       'branch_selection':
+--- a/lib/feature/splash/repository/splash_repo.dart
++++ b/lib/feature/splash/repository/splash_repo.dart
+@@ -79,20 +79,33 @@
+   bool isShowInitialLanguageScreen() {
+     return (sharedPreferences!.getBool(AppConstants.initialLanguage) ?? false);
+   }
+ 
+-  Future<bool> ensurePaymentGuestSession() async {
++  Future<bool>? _guestSessionInFlight;
++
++  Future<bool> ensurePaymentGuestSession() {
++    return _guestSessionInFlight ??= _issuePaymentGuestSession().whenComplete(() {
++      _guestSessionInFlight = null;
++    });
++  }
++
++  Future<bool> _issuePaymentGuestSession() async {
+     try {
+       final response = await apiClient.postData(
+         '/api/v1/customer/payment-guest-session',
+         {},
+       );
+       if (response.statusCode != 200) return false;
+-      await setGuestId(response.body['content']['guest_id']);
++      final content = response.body['content'];
++      if (content is! Map ||
++          content['guest_id'] is! String ||
++          content['guest_payment_token'] is! String) return false;
++      await setGuestId(content['guest_id']);
+       await sharedPreferences!.setString(
+         'nirab_guest_payment_token',
+-        response.body['content']['guest_payment_token'],
++        content['guest_payment_token'],
+       );
++      apiClient.updateGuestIdHeader(content['guest_id']);
+       return true;
+     } catch (_) {
+       return false;
+     }
+--- a/lib/helper/checkout_helper.dart
++++ b/lib/helper/checkout_helper.dart
+@@ -229,9 +229,9 @@
+           "date": dateTimeFormat.format(combineDateAndTime(currentDate, time)),
+         });
+       }
+     } else if (repeatBookingType == RepeatBookingType.weekly) {
+-      if (selectedDays == null || selectedDays.isEmpty) return null;
++      if (selectedDays == null || selectedDays.isEmpty || time == null) return null;
+ 
+       Map<String, int> dayNameToInt = {
+         'monday': DateTime.monday,
+         'tuesday': DateTime.tuesday,
+@@ -258,9 +258,9 @@
+           ),
+         )) {
+           result.add({
+             "date": dateTimeFormat.format(
+-              combineDateAndTime(currentDate, time!),
++              combineDateAndTime(currentDate, time),
+             ),
+           });
+         }
+       }
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -150,24 +150,27 @@
+       Get.find<AuthController>().updateToken();
+     });
+   }
+ 
++  Future<void> _initializeWebCart() async {
++    await Get.find<SplashController>().initSharedData();
++    if (!Get.find<AuthController>().isLoggedIn()) {
++      final ready = await Get.find<SplashRepo>().ensurePaymentGuestSession();
++      if (!ready) return;
++    }
++    if (!mounted) return;
++    await Get.find<CartController>().getCartListFromServer();
++  }
++
+   @override
+   void initState() {
+     super.initState();
+ 
+     if (kIsWeb || widget.route != null) {
+-      Get.find<SplashController>().initSharedData();
++      _initializeWebCart();
+       Get.find<SplashController>().getCookiesData();
+-      Get.find<CartController>().getCartListFromServer();
+-
+       if (Get.find<AuthController>().isLoggedIn()) {
+         Get.find<UserController>().getUserInfo();
+-      }
+-
+-      if (Get.find<SplashController>().getGuestId().isEmpty) {
+-        var uuid = const Uuid().v1();
+-        Get.find<SplashController>().setGuestId(uuid);
+       }
+       _route();
+     }
+   }

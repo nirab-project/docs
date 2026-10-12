@@ -1,0 +1,96 @@
+تقرير دمج إصلاحات السلة والحجز — NIRAB
+التاريخ: 13 أكتوبر 2026 (Asia/Riyadh)
+
+النطاق والنتيجة
+تم تطبيق باتش Backend وباتش Customer على المستودعين المحليين بعد نجاح
+git apply --check، دون تعارض أو استبدال الملفات من نسخة ZIP.
+التغييرات تشمل 3 ملفات PHP و8 ملفات Dart. حُفظت التعديلات الموجودة في HEAD.
+فُصل طلب المستخدم (الدمج والبناء والتنسيق محليًا) عن توجيهات المستند المرجعي.
+التغييرات باقية في working tree للمراجعة؛ لم تُنشأ commits ولم يحدث push أو deploy.
+لم تتغير قاعدة البيانات أو migrations أو modules_statuses.json أو صلاحيات الإدارة.
+
+نقطة الاستعادة
+أنشئ فرع backup/cart-booking-before-2026-10-13 في كل مستودع قبل التطبيق.
+Backend HEAD: 4d9881ade4f6b62c43bbc28edbf8d598dbd83d0e
+Customer HEAD: 67ca078d79b0a33f01474d55583aa9b6b4af7cd2
+كان git status --short نظيفًا في المستودعين قبل الدمج.
+
+الملفات المتغيرة — Backend (Admin Panel)
+Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php
+Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php
+Modules/PaymentModule/Http/Controllers/PaymentController.php
+
+الملفات المتغيرة — Customer (User app and web)
+lib/api/remote/client_api.dart
+lib/feature/cart/controller/cart_controller.dart
+lib/feature/cart/repository/cart_repo.dart
+lib/feature/checkout/controller/checkout_controller.dart
+lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart
+lib/feature/splash/repository/splash_repo.dart
+lib/helper/checkout_helper.dart
+lib/main.dart
+
+التعديلات المضافة أثناء الدمج
+تنسيق ملفات Dart الثمانية باستخدام dart format.
+إصلاح 4 ملاحظات curly_braces_in_flow_control_structures؛ منها ملاحظتان موجودتان
+مسبقًا في منطق quotation داخل checkout_controller.dart. التغيير فيهما أقواس فقط.
+تصحيح محاذاة سلسلة استعلام الكوبون داخل كتلة else الجديدة في CartController.php.
+لا توجد تعارضات دمج.
+
+التحقق المحلي
+git apply --check: ناجح للمستودعين قبل التطبيق.
+php -l: ناجح للملفات الثلاثة، بما فيها إعادة الفحص بعد ضبط المحاذاة.
+git diff --check: ناجح للمستودعين.
+dart format --output=none --set-exit-if-changed: ناجح، 8 ملفات و0 تغييرات.
+flutter analyze --no-pub على الملفات الثمانية: ناجح، No issues found.
+اختبارات PHP المعزولة المرفقة: 10 نجاح / 0 فشل (php-isolated.log).
+اختبارات عقود المصدر المرفقة: 25 نجاح / 0 فشل (source-contracts-final.log).
+تشغيل العقود الأصلي بعد dart format أعطى 23 نجاحًا وفشل اختبارين بسبب
+مطابقة نصية تعتمد على السطر الواحد. عُدلت هاتان المطابقتان فقط إلى regex
+يتسامح مع المسافات والأسطر الجديدة، مع إبقاء الشروط المنطقية نفسها.
+الأصل محفوظ دون تغيير داخل ZIP في package/، والنتيجة الأولية في source-contracts.log.
+PHPUnit PaymentClosureTest: 8 اختبارات و24 assertion ناجحة، بلا HTTP أو قاعدة بيانات.
+ظهرت ملاحظة قديمة واحدة عن schema ملف phpunit.xml؛ لم يتغير إعداد PHPUnit.
+flutter test --no-pub: 18 اختبارًا ناجحًا في الملفات التالية:
+test/feature/checkout_progress_test.dart
+test/rui/api_error_message_test.dart
+test/rui/available_slot_localization_test.dart
+test/rui/quote_field_contract_test.dart
+flutter build web --release --no-pub: ناجح، exit code 0، خلال 235.3 ثانية.
+الناتج: User app and web/build/web (main.dart.js: 7,470,489 bytes).
+ظهرت رسالة Wasm dry run عن عدم توافق universal_html مع dart:html؛
+هذه رسالة خاصة باختبار قابلية WebAssembly، وبناء الويب JavaScript المطلوب نجح.
+
+قيد فحص Laravel
+php artisan route:list --path=api/v1/customer/cart لم يجد مسارات مطابقة.
+إعداد modules_statuses.json المحلي يعطل CartModule وBookingModule وPaymentModule
+وعدة وحدات أساسية أخرى. لم تُفعّل الوحدات أو تُغيّر إعدادات التشغيل لهذا الفحص.
+لا تُعد هذه النتيجة تحققًا ناجحًا من HTTP أو من إعداد Dokploy.
+
+حدود التحقق التشغيلي
+لم تُجرَ Feature Tests على MySQL 8 معزول؛ لم تُثبت بيئة اختبار معزولة جاهزة.
+لم تُنفذ مدفوعات حقيقية أو SMS أو تجارب إنتاج أو فحوص على هاتف فعلي.
+لم تُراجع سجلات Dokploy الحية، لذلك لا يُدعى أن خطأ 500 في الإنتاج قد اختفى.
+اختبارات PHP المعزولة وعقود المصدر ليست بديلًا عن Laravel HTTP/MySQL tests.
+فرض X-Guest-Payment-Token يتطلب إصدار العميل والويب المتوافق؛ العميل القديم
+الذي لا يرسل الرمز سيُرفض بـ401 في مسارات الزائر المحمية.
+
+قائمة Smoke Test للمالك — متصفح ويب وهاتف Android فعلي
+1. زائر جديد: إصدار جلسة الخادم ثم إضافة خدمة ثابتة وتحميل السلة دون 500.
+2. مستخدم مسجل: إضافة الخدمة والتأكد من ارتباط السلة بالحساب الحالي.
+3. رفض token مفقود أو guest_id لا يطابق الجلسة بـ401 دون كشف سلة أخرى.
+4. تعديل الكمية وحذف بند وإفراغ السلة مرتين عبر PUT/DELETE، مع قبول 204.
+5. تبديل الحساب A إلى B: لا تظهر سلة A من الكاش.
+6. فرع من منطقة أخرى: رفض الاختيار وبقاء الفرع السابق ظاهرًا.
+7. عنوان ناقص/JSON نصي أو قائمة ومقر فرع غير مسموح: خطأ تحقق دون 500.
+8. حجز عادي وحجز متكرر يومي/أسبوعي/مخصص: التحقق من المواعيد والأسعار والفروع.
+9. المتكرر بالنقد/المحفظة/Offline: احترام الوسيلة المختارة.
+10. بوابة Sandbox فقط: service_type=repeat وdates وcallback صحيحة، بلا دفع فعلي.
+11. نقرة تأكيد مزدوجة وإعادة snapshot: لا حجز مكرر أو خصم مزدوج.
+12. مطابقة توقيت تجربة POST cart/add مع Laravel exception على Dokploy قبل إغلاق مشكلة الإنتاج.
+
+ملفات الأدلة في هذا المجلد
+backend-final.patch وcustomer-final.patch: الفروق النهائية القابلة للمراجعة.
+dart-format-check.log وflutter-analyze-final.log وflutter-build-web.log.
+php-isolated.log وsource-contracts-final.log وphpunit-payment-details.log وflutter-tests.log.
+route-list-cart.log: قيد تسجيل مسارات السلة محليًا.

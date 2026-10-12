@@ -1,0 +1,11 @@
+PASS Cart recognizes authenticated, matching guest session
+PASS Cart refuses guessed or mismatched guest UUID
+PASS Cart refuses invalid guest payment token
+PASS Logged in customer cart uses own user id
+PASS Guest checkout refuses a different guest session
+PASS Guest checkout accepts the issued guest session
+PASS Booking validator attaches provider location restriction to correct field
+PASS Malformed address JSON scalar yields validation error, not TypeError
+PASS Address JSON with missing keys reports validation errors instead of warnings
+PASS JSON address arrays are rejected instead of indexing missing keys
+ISOLATED TEST TOTAL: passed=10 failed=0
