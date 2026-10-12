@@ -1,0 +1,126 @@
+NIRAB — تقرير إصلاح خرائط Google وإحداثيات المواقع
+التاريخ: 13 أكتوبر 2026 — Asia/Riyadh
+
+النتيجة
+تم إصلاح النسخة المحلية من Backend وuser-app-web، وإنشاء Commit مستقل في كل مستودع:
+Backend: 99ca84fd7a07d6edeb68d32bfa2fb4e0a30cc6af
+  fix(maps): allow only public geographic response coordinates
+user-app-web: fbd7047999055e2df68aa873ffbbb7f166e71f87
+  fix(maps): validate place selection and separate viewing centers
+المستودعان على main ونظيفان بعد الـCommit. لم يتم Push أو نشر.
+
+الإصلاح الأمني
+ProtectPersonalData لا يزال يعمل على استجابات API وتبقى قواعد locations.read وcontacts.read وقواعد الملكية وإسناد الحجز وحجب الأسرار قائمة.
+السماح الجديد يطابق GET + المسار الدقيق + اسم Controller/action الفعلي + مسار الحقل داخل JSON.
+لا توجد علامة أو قيمة يرسلها العميل لتفعيل السماح، ولا يُورَّث السماح من كائن عام إلى كائناته الفرعية.
+
+المواضع العامة المسموحة:
+- customer/config/place-api-details، وكذلك مسار serviceman المقابل:
+  content.location.latitude/longitude
+  content.viewport.low.latitude/longitude
+  content.viewport.high.latitude/longitude
+- customer/config/geocode-api، وكذلك مسار serviceman المقابل:
+  content.results[i].geometry.location.lat/lng
+  content.results[i].geometry.viewport.northeast/southwest.lat/lng
+  content.results[i].geometry.bounds.northeast/southwest.lat/lng
+- customer/config: content.default_location.latitude/longitude
+- provider/config وserviceman/config: content.default_location.default.latitude/longitude
+- customer/config/get-zone-id: content.zone.formatted_coordinates[i].latitude/longitude
+- zones: content.data[i].formatted_coordinates[j].latitude/longitude
+
+الكائنات الخاصة المضافة إلى نفس الاستجابة، وإحداثيات العملاء والحجوزات غير المصرح بها، وأرقام التواصل والأسرار، تظل محجوبة.
+
+إصلاح Backend
+- Google HTTP errors وأجسام error وفشل الاتصال واستجابة Details التي لا تحمل إحداثيات صحيحة تُعاد HTTP 502 مع content=null ورسالة عامة، دون تمرير تفاصيل الخطأ أو بيانات الاعتماد.
+- Geocoding status مثل REQUEST_DENIED وOVER_QUERY_LIMIT وZERO_RESULTS لا يُعاد كنجاح.
+- Autocomplete الفارغ يُقبل كبحث بلا نتائج، وليس كفشل نقل.
+- Field Masks:
+  Autocomplete: suggestions.placePrediction.placeId,suggestions.placePrediction.text,suggestions.placePrediction.types
+  Details: id,location,viewport,formattedAddress,addressComponents,displayName,types
+  Route Matrix: originIndex,destinationIndex,status,condition,distanceMeters,duration
+- Geocoding Legacy لا يدعم Field Masks؛ تُفحص حالة الاستجابة ونتائجها بدلاً من إضافة رأس غير مدعوم.
+- تصحيح origins/destinations في Route Matrix لتكون قوائم كما يتطلب API، مع إحداثيات رقمية والتحقق من حالة عنصر المسار.
+- إزالة قيم بنغلاديش الاحتياطية من Config ومن إعداد موقع النشاط التجاري.
+- تصحيح ترتيب GeoJSON من [longitude, latitude] إلى حقول latitude/longitude، وإضافة formatted_coordinates لقائمة المناطق العامة.
+
+إصلاح user-app-web
+- رفض الإحداثيات المفقودة وغير المحدودة والخارجة عن المدى و(0,0).
+- فشل تحديد المكان لا يستبدل الموقع والعنوان السابقين ولا يرسل حركة كاميرا بديلة إلى (0,0).
+- استيعاب addressComponents وlongText وshortText وviewport.low/high في Places API (New)، مع توافق مكونات العنوان القديمة.
+- البحث يدعم «الرياض» وRiyadh، ويُشفِّر معاملات البحث والمعرّف، ويزيل النتائج القديمة عند البحث الفارغ أو الفشل.
+- فتح SearchAnchor عند الضغط على البحث؛ النتائج الفارغة عناصر غير قابلة للنقر.
+- انتظار نتيجة setLocation قبل إغلاق البحث ومنع تكرار الضغط أثناء الطلب.
+- تحريك كاميرا المدينة إلى موقع Google الصحيح؛ تحريكها لاحقًا إلى نقطة مختلفة يعيد تحديد عنوان نقطة الخدمة والتحقق من منطقتها.
+- مركز النشاط أو المنطقة العامة، والرياض عند غياب كليهما، مراكز عرض فقط ولا تُنشئ عنوان العميل تلقائيًا.
+- حراسة تهيئة خريطة المنطقة وشاشة إضافة العنوان لمنع اعتماد مركز العرض كعنوان.
+- تحديث مسار البحث داخل نموذج إضافة العنوان إلى بيانات العنوان الصحيحة، بدل الاعتماد على توقيت camera-idle لنقل البيانات.
+- التعامل مع فشل الموقع الحالي في المستدعين ومنع حفظ عنوان ذي إحداثيات غير صالحة.
+- إبقاء التصفح العام خارج التغطية وفق السياسة الحالية، مع اشتراط التغطية لاختيار عنوان خدمة داخل نموذج العنوان، والتحقق من المنطقة المطلوبة في Checkout.
+
+خريطة النشاط التجاري
+- إزالة فرع JavaScript الذي يشير إلى $webPage و$config وmodal غير المعرّفة؛ معالج إغلاق نافذة الصيانة الموجود يغطي السلوك المطلوب.
+- تحميل Maps للصفحة التي تحتوي الخريطة، والتحقق من وجود عناصرها والمكتبة قبل التهيئة.
+- اختيار نتيجة البحث يحدّث العلامة والإحداثيات والعنوان مباشرة، دون اشتراط نقرة ثانية على العلامة.
+- حماية النتائج الفارغة واستخدام أول نتيجة Geocoding.
+- تحديث Maps JavaScript إلى v=quarterly مع libraries=places؛ إزالة drawing غير المستخدمة في هذه الصفحة.
+- تحقق توافق API من وثائق Google: Map وMarker وGeocoder وSearchBox والأساليب المستخدمة. Marker وSearchBox ما زالا متاحين وفق سياسة Google للحسابات القائمة. استحقاق مشروع Google الفعلي لـSearchBox لم يُختبر بمفاتيح الإنتاج.
+مصادر التوافق:
+https://developers.google.com/maps/documentation/javascript/versions
+https://developers.google.com/maps/documentation/javascript/reference/places-widget#SearchBox
+https://developers.google.com/maps/documentation/javascript/reference/marker#Marker
+
+الملفات المعدلة — Backend (9)
+app/Http/Middleware/ProtectPersonalData.php
+Modules/CustomerModule/Http/Controllers/Api/V1/Customer/ConfigController.php
+Modules/ZoneManagement/Http/Controllers/PublicZoneController.php
+Modules/ZoneManagement/Lib/Zone.php
+Modules/BusinessSettingsModule/Http/Controllers/Web/Admin/BusinessInformationController.php
+Modules/BusinessSettingsModule/Resources/views/admin/business.blade.php
+tests/Unit/PublicMapsTest.php
+tests/business-maps-js.test.cjs
+tests/compile-business-map-view.php
+
+الملفات المعدلة — user-app-web (14)
+lib/feature/location/controller/location_controller.dart
+lib/feature/location/model/place_details_model.dart
+lib/feature/location/repository/location_repo.dart
+lib/feature/location/widget/location_search_dialog.dart
+lib/feature/location/widget/pickmap_dialog_widget.dart
+lib/feature/location/view/pick_map_screen.dart
+lib/feature/location/view/access_location_screen.dart
+lib/common/widgets/map_view_widget.dart
+lib/common/widgets/address_selection_bottom_sheet.dart
+lib/feature/address/view/add_address_screen.dart
+lib/feature/address/widget/address_map_section.dart
+lib/feature/onboarding/view/pager_content.dart
+lib/feature/web_landing/widget/web_landing_search_box.dart
+test/feature/location/public_maps_test.dart
+
+نتائج التحقق
+PHP 8.4.24 / Flutter 3.41.4 / Dart 3.11.1
+1. php -l: نجاح الملفات الخمسة المعدلة ذات PHP العادي وملفي اختبار PHP الجديدين.
+2. php tests/compile-business-map-view.php: نجاح تجميع Blade وفحص PHP الناتج دون تشغيل Laravel أو تحميل قاعدة البيانات.
+3. php vendor/bin/phpunit tests/Unit/PublicMapsTest.php: 12 اختبارًا و83 تحققًا، جميعها ناجحة.
+   يوجد تحذير قديم عن مخطط XML في phpunit.xml. لم يُعدّل ضمن نطاق هذا الإصلاح.
+4. node --test tests/business-maps-js.test.cjs: 4 اختبارات ناجحة.
+5. flutter test --no-pub test/feature/location/public_maps_test.dart test/common/models/config_model_test.dart test/feature/area/model/zone_model_test.dart:
+   19 اختبارًا ناجحًا (9 حالات خرائط جديدة + 10 حالات config/zone موجودة).
+6. flutter analyze --no-pub للموقع والعناوين والمكونات والمستدعين المعدلين واختبار الخرائط:
+   No issues found.
+7. git diff --check وgit diff --cached --check: نجاح في المستودعين.
+
+حدود التحقق ومعيار القبول
+أثبتت الاختبارات المحلية باستخدام HTTP مزيف وكاميرا مزيفة:
+- ظهور محتوى نتائج «الرياض» وRiyadh.
+- عبور إحداثيات الرياض 24.7135517, 46.6752957 وviewport عبر Controller والـMiddleware الحقيقيين.
+- توجيه حركة الكاميرا إلى الإحداثيات الصحيحة.
+- إعادة تحديد عنوان نقطة الخدمة بعد تحريك الخريطة والتحقق من منطقة هذه النقطة.
+- استمرار حجب المواقع الخاصة وعدم توسيع السماح إلى بيانات متداخلة.
+لم تُجرَ تجربة متصفح متصلة بإنتاج Google أو تحقق GIS على قاعدة الإنتاج، ولم يُنشر التغيير؛ لذلك لا يُدّعى إغلاق معيار القبول الحي على الإنتاج.
+عند النشر اليدوي، يُراجع السيناريو «الرياض» ثم Riyadh واختيار المدينة ثم نقطة خدمة داخل/خارج الحدود، مع فحص أن content.location وcontent.viewport وcontent.default_location وformatted_coordinates تصل صحيحة، وأن الموقع السابق يبقى عند فشل Google.
+
+ضوابط التنفيذ
+لا Migrations، ولا اتصالات اختبار بقاعدة الإنتاج أو تغييرات عليها.
+لا تعديل لمفاتيح Google أو بيانات الاعتماد أو ملفات .env.
+لا تعديل لهوية NIRAB أو ألوان الواجهات أو تخطيطها.
+لا بناء إصدار كامل أو اختبارات ثقيلة أو Push أو نشر تلقائي.
