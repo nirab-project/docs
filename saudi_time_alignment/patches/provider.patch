@@ -1,0 +1,1397 @@
+diff --git a/lib/common/widgets/nirab/booking_display.dart b/lib/common/widgets/nirab/booking_display.dart
+index fa9a432..ab69000 100644
+--- a/lib/common/widgets/nirab/booking_display.dart
++++ b/lib/common/widgets/nirab/booking_display.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/helper/extension_helper.dart';
+ import 'package:demandium_provider/theme/saudi_riyal.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+@@ -37,23 +38,10 @@ abstract final class BookingDisplay {
+ 
+   static String date(BuildContext context, String? raw, {required bool utc}) {
+     final value = raw?.trim() ?? '';
+-    final parsed = DateTime.tryParse(value);
+-    if (parsed == null) return 'booking_value_unavailable'.tr;
+-    // Creation timestamps are UTC; unzoned service schedules are local wall time.
+-    final hasZone = RegExp(
+-      r'(Z|[+-]\d{2}:?\d{2})$',
+-      caseSensitive: false,
+-    ).hasMatch(value);
+-    final date = utc && !hasZone
+-        ? DateTime.utc(
+-            parsed.year,
+-            parsed.month,
+-            parsed.day,
+-            parsed.hour,
+-            parsed.minute,
+-            parsed.second,
+-          ).toLocal()
+-        : parsed.toLocal();
++    final date = utc
++        ? SaudiTime.tryInstant(value)
++        : SaudiTime.tryAppointment(value);
++    if (date == null) return 'booking_value_unavailable'.tr;
+     final locale = Localizations.localeOf(context).languageCode;
+     final timeFormat =
+         Get.find<SplashController>().configModel.content?.timeFormat == '24'
+diff --git a/lib/feature/booking_details/controller/booking_edit_controller.dart b/lib/feature/booking_details/controller/booking_edit_controller.dart
+index 232b291..6c90b1e 100644
+--- a/lib/feature/booking_details/controller/booking_edit_controller.dart
++++ b/lib/feature/booking_details/controller/booking_edit_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'dart:convert';
+ import 'package:demandium_provider/util/core_export.dart';
+ import 'package:get/get.dart';
+@@ -70,10 +71,10 @@ class BookingEditController extends GetxController implements GetxService {
+ 
+   List<BookingPriceItem>? bookingPriceList;
+ 
+-  DateTime _selectedDate = DateTime.now();
++  DateTime _selectedDate = SaudiTime.now();
+   DateTime get selectedDate => _selectedDate;
+ 
+-  TimeOfDay _selectedTimeOfDay = TimeOfDay.now();
++  TimeOfDay _selectedTimeOfDay = TimeOfDay.fromDateTime(SaudiTime.now());
+   TimeOfDay get selectedTimeOfDay => _selectedTimeOfDay;
+ 
+   bool _isCheckedAllUpcomingBooking = false;
+@@ -388,12 +389,12 @@ class BookingEditController extends GetxController implements GetxService {
+   Future<void> selectDate() async {
+     final DateTime? picked = await showDatePicker(
+       context: Get.context!,
+-      initialDate: DateTime.now(),
++      initialDate: SaudiTime.now(),
+       initialEntryMode: DatePickerEntryMode.calendarOnly,
+       builder: (context, child) {
+         return child!;
+       },
+-      firstDate: DateTime.now(),
++      firstDate: SaudiTime.now(),
+       lastDate: DateTime(2101),
+     );
+     if (picked != null) {
+@@ -408,10 +409,10 @@ class BookingEditController extends GetxController implements GetxService {
+     if (pickedTime != null) {
+       _selectedTimeOfDay = pickedTime;
+ 
+-      if (DateTime.tryParse(
++      if (SaudiTime.tryAppointment(
+         "${DateConverter.dateTimeStringToDate(_selectedDate.toString())} "
+         "${DateConverter.timeToTimeString(_selectedTimeOfDay)}",
+-      )!.isBefore(DateTime.now())) {
++      )!.isBefore(SaudiTime.now())) {
+         showCustomSnackBar(
+           "schedule_time_must_be_after_current_time".tr,
+           type: ToasterMessageType.info,
+diff --git a/lib/feature/booking_details/controller/invoice_controller.dart b/lib/feature/booking_details/controller/invoice_controller.dart
+index 1d70beb..dc15af2 100644
+--- a/lib/feature/booking_details/controller/invoice_controller.dart
++++ b/lib/feature/booking_details/controller/invoice_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'dart:io';
+ import 'package:demandium_provider/util/app_constants.dart';
+ import 'package:demandium_provider/util/dimensions.dart';
+@@ -37,7 +38,7 @@ class PdfInvoiceApi {
+       }
+     }
+ 
+-    final date = DateTime.now();
++    final date = SaudiTime.now();
+ 
+     var invoice = Invoice(
+       provider: provider.Provider(
+diff --git a/lib/feature/booking_details/model/bookings_details_model.dart b/lib/feature/booking_details/model/bookings_details_model.dart
+index 1b5ec4f..dcd6ecb 100644
+--- a/lib/feature/booking_details/model/bookings_details_model.dart
++++ b/lib/feature/booking_details/model/bookings_details_model.dart
+@@ -158,7 +158,7 @@ class BookingDetailsContent {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+@@ -930,7 +930,7 @@ class RepeatBooking {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/booking_details/view/booking_edit_screen.dart b/lib/feature/booking_details/view/booking_edit_screen.dart
+index 20f3b55..193480e 100644
+--- a/lib/feature/booking_details/view/booking_edit_screen.dart
++++ b/lib/feature/booking_details/view/booking_edit_screen.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/booking_status_button_widget.dart';
+ import 'package:demandium_provider/helper/booking_helper.dart';
+ import 'package:demandium_provider/helper/extension_helper.dart';
+@@ -572,7 +573,7 @@ class _NextUpcomingBookingWidget extends StatelessWidget {
+           const SizedBox(height: Dimensions.paddingSizeSmall),
+ 
+           Text(
+-            "${'scheduled_date'.tr} : ${DateConverter.dateMonthYearTime(DateTime.tryParse(booking.serviceSchedule!))}",
++            "${'scheduled_date'.tr} : ${DateConverter.dateMonthYearTime(SaudiTime.tryAppointment(booking.serviceSchedule!))}",
+             style: robotoLight,
+           ),
+         ],
+diff --git a/lib/feature/booking_details/widget/regular_booking/booking_status.dart b/lib/feature/booking_details/widget/regular_booking/booking_status.dart
+index 8d7f997..3f935bd 100644
+--- a/lib/feature/booking_details/widget/regular_booking/booking_status.dart
++++ b/lib/feature/booking_details/widget/regular_booking/booking_status.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/timeline/connectors.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/timeline/indicator_theme.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/timeline/indicators.dart';
+@@ -89,7 +90,9 @@ class _BookingStatusState extends State<BookingStatus> {
+                     if (bookingDetails.serviceSchedule != null)
+                       Text(
+                         DateConverter.dateMonthYearTime(
+-                          DateTime.tryParse(bookingDetails.serviceSchedule!),
++                          SaudiTime.tryAppointment(
++                            bookingDetails.serviceSchedule!,
++                          ),
+                         ),
+                         style: robotoRegular.copyWith(
+                           fontSize: Dimensions.fontSizeDefault,
+diff --git a/lib/feature/booking_details/widget/repeat_booking/all_booking_summary_widget.dart b/lib/feature/booking_details/widget/repeat_booking/all_booking_summary_widget.dart
+index 1c67ca5..dd8e697 100644
+--- a/lib/feature/booking_details/widget/repeat_booking/all_booking_summary_widget.dart
++++ b/lib/feature/booking_details/widget/repeat_booking/all_booking_summary_widget.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/helper/extension_helper.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+ import 'package:get/get.dart';
+@@ -96,7 +97,7 @@ class AllBookingSummaryWidget extends StatelessWidget {
+               _ItemWidget(
+                 title: "arrival_time",
+                 subtitle: DateConverter.convertDateTimeToTime(
+-                  DateTime.tryParse(bookingDetails.startDate!) ??
++                  SaudiTime.tryAppointment(bookingDetails.startDate!) ??
+                       DateTime.now(),
+                 ),
+               ),
+@@ -120,10 +121,12 @@ class AllBookingSummaryWidget extends StatelessWidget {
+               subtitle: DateConverter.convertDateTimeRangeToString(
+                 DateTimeRange(
+                   start:
+-                      DateTime.tryParse(bookingDetails.startDate ?? "") ??
++                      SaudiTime.tryAppointment(
++                        bookingDetails.startDate ?? "",
++                      ) ??
+                       DateTime.now(),
+                   end:
+-                      DateTime.tryParse(bookingDetails.endDate ?? "") ??
++                      SaudiTime.tryAppointment(bookingDetails.endDate ?? "") ??
+                       DateTime.now(),
+                 ),
+                 format: "d MMM, y",
+diff --git a/lib/feature/booking_details/widget/repeat_booking/next_upcoming_service_widget.dart b/lib/feature/booking_details/widget/repeat_booking/next_upcoming_service_widget.dart
+index c60c7de..200f7c7 100644
+--- a/lib/feature/booking_details/widget/repeat_booking/next_upcoming_service_widget.dart
++++ b/lib/feature/booking_details/widget/repeat_booking/next_upcoming_service_widget.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/booking_status_button_widget.dart';
+ import 'package:demandium_provider/helper/extension_helper.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+@@ -93,7 +94,7 @@ class NextUpcomingServiceWidget extends StatelessWidget {
+                       const Row(),
+                       Text(
+                         DateConverter.dateStringMonthYear(
+-                          DateTime.tryParse(booking.serviceSchedule!),
++                          SaudiTime.tryAppointment(booking.serviceSchedule!),
+                           format: "EEEE, dd-MMM-yyyy",
+                         ),
+                         style: robotoLight.copyWith(
+@@ -103,7 +104,7 @@ class NextUpcomingServiceWidget extends StatelessWidget {
+                       const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                       Text(
+                         DateConverter.convert24HourTimeTo12HourTime(
+-                          DateTime.tryParse(booking.serviceSchedule!),
++                          SaudiTime.tryAppointment(booking.serviceSchedule!),
+                         ),
+                         style: robotoLight.copyWith(
+                           fontSize: Dimensions.fontSizeSmall,
+diff --git a/lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart b/lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart
+index 83d7f5f..77d4ec6 100644
+--- a/lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart
++++ b/lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/booking_workflow_panel.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/booking_status_button_widget.dart';
+ import 'package:demandium_provider/feature/booking_details/widget/repeat_booking/repeat_booking_info_view.dart';
+@@ -217,7 +218,7 @@ class _ServiceLogItem extends StatelessWidget {
+                             children: [
+                               Text(
+                                 DateConverter.dateMonthYearTime(
+-                                  DateTime.tryParse(
++                                  SaudiTime.tryAppointment(
+                                     serviceList[index]!.serviceSchedule!,
+                                   ),
+                                 ),
+diff --git a/lib/feature/booking_requests/controller/calendar_controller.dart b/lib/feature/booking_requests/controller/calendar_controller.dart
+index 5e95a04..0c61b75 100644
+--- a/lib/feature/booking_requests/controller/calendar_controller.dart
++++ b/lib/feature/booking_requests/controller/calendar_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:get/get.dart';
+ import 'package:syncfusion_flutter_calendar/calendar.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+@@ -23,7 +24,7 @@ class BookingCalendarController extends GetxController implements GetxService {
+     }
+   }
+ 
+-  DateTime _selectedDate = DateTime.now();
++  DateTime _selectedDate = SaudiTime.now();
+   DateTime get selectedDate => _selectedDate;
+ 
+   // Store complete calendar data
+@@ -628,7 +629,7 @@ class BookingCalendarController extends GetxController implements GetxService {
+   /// This ensures a clean state when the screen is initialized
+   void resetToInitialState() {
+     _currentViewType = CalendarViewType.month;
+-    _selectedDate = DateTime.now();
++    _selectedDate = SaudiTime.now();
+     calendarController.view = calendarView;
+     calendarController.displayDate = selectedDate;
+   }
+diff --git a/lib/feature/booking_requests/controller/calender_order_filter_controller.dart b/lib/feature/booking_requests/controller/calender_order_filter_controller.dart
+index bd23477..e139177 100644
+--- a/lib/feature/booking_requests/controller/calender_order_filter_controller.dart
++++ b/lib/feature/booking_requests/controller/calender_order_filter_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:get/get.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+ import 'package:demandium_provider/feature/booking_requests/controller/calendar_controller.dart';
+@@ -117,8 +118,8 @@ class CalenderOrderFilterController extends GetxController
+     DateTime? pickedDate = await showDatePicker(
+       context: context,
+       initialDate: type == 'start'
+-          ? (_startDate ?? DateTime.now())
+-          : (_endDate ?? _startDate ?? DateTime.now()),
++          ? (_startDate ?? SaudiTime.now())
++          : (_endDate ?? _startDate ?? SaudiTime.now()),
+       firstDate: DateTime(2000),
+       lastDate: DateTime(2100),
+       builder: (context, child) {
+diff --git a/lib/feature/booking_requests/model/calender_order_model.dart b/lib/feature/booking_requests/model/calender_order_model.dart
+index 41674cc..26eda1a 100644
+--- a/lib/feature/booking_requests/model/calender_order_model.dart
++++ b/lib/feature/booking_requests/model/calender_order_model.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ // To parse this JSON data, do
+ //
+ //     final calenderOrderModel = calenderOrderModelFromJson(jsonString);
+@@ -6,9 +7,11 @@ import 'dart:convert';
+ 
+ import 'package:demandium_provider/common/enums/enums.dart';
+ 
+-CalenderOrderModel calenderOrderModelFromJson(String str) => CalenderOrderModel.fromJson(json.decode(str));
++CalenderOrderModel calenderOrderModelFromJson(String str) =>
++    CalenderOrderModel.fromJson(json.decode(str));
+ 
+-String calenderOrderModelToJson(CalenderOrderModel data) => json.encode(data.toJson());
++String calenderOrderModelToJson(CalenderOrderModel data) =>
++    json.encode(data.toJson());
+ 
+ class CalenderOrderModel {
+   List<CalenderData>? dayGridMonth;
+@@ -29,26 +32,57 @@ class CalenderOrderModel {
+     this.bookingStatus,
+   });
+ 
+-  factory CalenderOrderModel.fromJson(Map<String, dynamic> json) => CalenderOrderModel(
+-    dayGridMonth: json["dayGridMonth"] != null ? List<CalenderData>.from(json["dayGridMonth"].map((x) => CalenderData.fromJson(x))) : null,
+-    timeGridWeek: json["timeGridWeek"] != null ?  List<CalenderData>.from(json["timeGridWeek"].map((x) => CalenderData.fromJson(x))) : null,
+-    timeGridDay: json["timeGridDay"] != null ? List<CalenderData>.from(json["timeGridDay"].map((x) => CalenderData.fromJson(x))) : null,
+-    filterStartDate: json["filter_start_date"] != null ? DateTime.tryParse(json["filter_start_date"]) : null,
+-    filterEndDate: json["filter_end_date"] != null ? DateTime.tryParse(json["filter_end_date"]) : null,
+-    bookingType: json["booking_type"] != null ? ServiceTypeExtension.serviceTypeFromValue(json["booking_type"]) : null,
+-    bookingStatus: json["booking_status"] != null
+-        ? List<BookingStatusEnum>.from(json["booking_status"].map((x) =>
+-        BookingStatusEnumExtension.fromValue(x)).where((x) => x != null)) : null,
+-  );
++  factory CalenderOrderModel.fromJson(Map<String, dynamic> json) =>
++      CalenderOrderModel(
++        dayGridMonth: json["dayGridMonth"] != null
++            ? List<CalenderData>.from(
++                json["dayGridMonth"].map((x) => CalenderData.fromJson(x)),
++              )
++            : null,
++        timeGridWeek: json["timeGridWeek"] != null
++            ? List<CalenderData>.from(
++                json["timeGridWeek"].map((x) => CalenderData.fromJson(x)),
++              )
++            : null,
++        timeGridDay: json["timeGridDay"] != null
++            ? List<CalenderData>.from(
++                json["timeGridDay"].map((x) => CalenderData.fromJson(x)),
++              )
++            : null,
++        filterStartDate: json["filter_start_date"] != null
++            ? DateTime.tryParse(json["filter_start_date"])
++            : null,
++        filterEndDate: json["filter_end_date"] != null
++            ? DateTime.tryParse(json["filter_end_date"])
++            : null,
++        bookingType: json["booking_type"] != null
++            ? ServiceTypeExtension.serviceTypeFromValue(json["booking_type"])
++            : null,
++        bookingStatus: json["booking_status"] != null
++            ? List<BookingStatusEnum>.from(
++                json["booking_status"]
++                    .map((x) => BookingStatusEnumExtension.fromValue(x))
++                    .where((x) => x != null),
++              )
++            : null,
++      );
+ 
+   Map<String, dynamic> toJson() => {
+-    "dayGridMonth": dayGridMonth != null ? List<dynamic>.from(dayGridMonth!.map((x) => x.toJson())) : null,
+-    "timeGridWeek": timeGridWeek != null ? List<dynamic>.from(timeGridWeek!.map((x) => x.toJson())) : null,
+-    "timeGridDay": timeGridDay != null ? List<dynamic>.from(timeGridDay!.map((x) => x.toJson())) : null,
++    "dayGridMonth": dayGridMonth != null
++        ? List<dynamic>.from(dayGridMonth!.map((x) => x.toJson()))
++        : null,
++    "timeGridWeek": timeGridWeek != null
++        ? List<dynamic>.from(timeGridWeek!.map((x) => x.toJson()))
++        : null,
++    "timeGridDay": timeGridDay != null
++        ? List<dynamic>.from(timeGridDay!.map((x) => x.toJson()))
++        : null,
+     "filter_start_date": filterStartDate,
+     "filter_end_date": filterEndDate,
+     "booking_type": bookingType?.value,
+-    "booking_status": bookingStatus != null ? List<dynamic>.from(bookingStatus!.map((x) => x.value)) : null,
++    "booking_status": bookingStatus != null
++        ? List<dynamic>.from(bookingStatus!.map((x) => x.value))
++        : null,
+   };
+ }
+ 
+@@ -74,18 +108,22 @@ class CalenderData {
+   factory CalenderData.fromJson(Map<String, dynamic> json) => CalenderData(
+     mode: json["mode"],
+     count: json["count"],
+-    start: DateTime.parse(json["start"]),
+-    end: DateTime.parse(json["end"]),
++    start: SaudiTime.appointment(json["start"]),
++    end: SaudiTime.appointment(json["end"]),
+     startHourTime: json["start_hour_time"],
+     endHourTime: json["end_hour_time"],
+-    bookings: List<CalenderBooking>.from(json["bookings"].map((x) => CalenderBooking.fromJson(x))),
++    bookings: List<CalenderBooking>.from(
++      json["bookings"].map((x) => CalenderBooking.fromJson(x)),
++    ),
+   );
+ 
+   Map<String, dynamic> toJson() => {
+     "mode": mode,
+     "count": count,
+-    "start": "${start.year.toString().padLeft(4, '0')}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}",
+-    "end": "${end.year.toString().padLeft(4, '0')}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}",
++    "start":
++        "${start.year.toString().padLeft(4, '0')}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}",
++    "end":
++        "${end.year.toString().padLeft(4, '0')}-${end.month.toString().padLeft(2, '0')}-${end.day.toString().padLeft(2, '0')}",
+     "start_hour_time": startHourTime,
+     "end_hour_time": endHourTime,
+     "bookings": List<dynamic>.from(bookings.map((x) => x.toJson())),
+@@ -102,7 +140,6 @@ class CalenderBooking {
+   DateTime createdAt;
+   bool? isRepeatBooking;
+ 
+-
+   CalenderBooking({
+     required this.id,
+     required this.readableId,
+@@ -114,16 +151,20 @@ class CalenderBooking {
+     required this.isRepeatBooking,
+   });
+ 
+-  factory CalenderBooking.fromJson(Map<String, dynamic> json) => CalenderBooking(
+-    id: json["id"],
+-    readableId: json["readable_id"],
+-    serviceSchedule: DateTime.parse(json["service_schedule"]),
+-    bookingStatus: json["booking_status"],
+-    serviceLocation: serviceLocationValues.map[json["service_location"]]!,
+-    totalBookingAmount: double.tryParse('${json["total_booking_amount"]}') ?? 0,
+-    createdAt: DateTime.parse(json["created_at"]),
+-    isRepeatBooking: '${json["is_repeated"]}'.contains('1'),
+-  );
++  factory CalenderBooking.fromJson(Map<String, dynamic> json) =>
++      CalenderBooking(
++        id: json["id"],
++        readableId: json["readable_id"],
++        serviceSchedule: SaudiTime.appointment(
++          (json["service_schedule_at"] ?? json["service_schedule"]).toString(),
++        ),
++        bookingStatus: json["booking_status"],
++        serviceLocation: serviceLocationValues.map[json["service_location"]]!,
++        totalBookingAmount:
++            double.tryParse('${json["total_booking_amount"]}') ?? 0,
++        createdAt: SaudiTime.instant(json["created_at"]),
++        isRepeatBooking: '${json["is_repeated"]}'.contains('1'),
++      );
+ 
+   Map<String, dynamic> toJson() => {
+     "id": id,
+@@ -137,14 +178,11 @@ class CalenderBooking {
+   };
+ }
+ 
+-enum ServiceLocation {
+-  customer,
+-  provider
+-}
++enum ServiceLocation { customer, provider }
+ 
+ final serviceLocationValues = EnumValues({
+   "customer": ServiceLocation.customer,
+-  "provider": ServiceLocation.provider
++  "provider": ServiceLocation.provider,
+ });
+ 
+ class EnumValues<T> {
+diff --git a/lib/feature/booking_requests/model/request_model.dart b/lib/feature/booking_requests/model/request_model.dart
+index 1d55f81..92a90e6 100644
+--- a/lib/feature/booking_requests/model/request_model.dart
++++ b/lib/feature/booking_requests/model/request_model.dart
+@@ -75,7 +75,7 @@ class BookingRequestModel {
+     );
+     isGuest = int.tryParse(json['is_guest'].toString());
+     isRepeatBooking = int.tryParse(json['is_repeated'].toString());
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     if (json['repeats'] != null) {
+       repeatBookingList = <RepeatBooking>[];
+       json['repeats'].forEach((v) {
+diff --git a/lib/feature/booking_requests/widgets/booking_item_card.dart b/lib/feature/booking_requests/widgets/booking_item_card.dart
+index aa12d7f..4947186 100644
+--- a/lib/feature/booking_requests/widgets/booking_item_card.dart
++++ b/lib/feature/booking_requests/widgets/booking_item_card.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/helper/extension_helper.dart';
+ import 'package:get/get.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+@@ -123,7 +124,7 @@ class _BookingCardServiceDate extends StatelessWidget {
+           Expanded(
+             child: Text(
+               DateConverter.dateMonthYearLocalTime(
+-                booking.serviceSchedule.toLocal(),
++                SaudiTime.forDisplay(booking.serviceSchedule),
+               ),
+               style: robotoMedium.copyWith(
+                 fontSize: Dimensions.fontSizeDefault,
+diff --git a/lib/feature/booking_requests/widgets/month_cell_order_count_widget.dart b/lib/feature/booking_requests/widgets/month_cell_order_count_widget.dart
+index 339a67f..bb91bb0 100644
+--- a/lib/feature/booking_requests/widgets/month_cell_order_count_widget.dart
++++ b/lib/feature/booking_requests/widgets/month_cell_order_count_widget.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/feature/booking_requests/controller/calendar_controller.dart';
+ import 'package:demandium_provider/helper/extension_helper.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+@@ -21,9 +22,9 @@ class MonthCellOrderCountWidget extends StatelessWidget {
+         details.date.month ==
+         details.visibleDates[details.visibleDates.length ~/ 2].month;
+     final bool isToday =
+-        details.date.day == DateTime.now().day &&
+-        details.date.month == DateTime.now().month &&
+-        details.date.year == DateTime.now().year;
++        details.date.day == SaudiTime.now().day &&
++        details.date.month == SaudiTime.now().month &&
++        details.date.year == SaudiTime.now().year;
+ 
+     // Check if the date is within the filter date range
+     final bool isWithinFilterRange = DateConverter.isDateWithinRange(
+diff --git a/lib/feature/dashboard/model/dashboard_json.dart b/lib/feature/dashboard/model/dashboard_json.dart
+index f110b41..4f095fe 100644
+--- a/lib/feature/dashboard/model/dashboard_json.dart
++++ b/lib/feature/dashboard/model/dashboard_json.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/helper/date_converter.dart';
+ 
+ Map<String, dynamic>? dashboardMap(dynamic value) => value is Map
+@@ -12,23 +13,7 @@ double? dashboardNumber(dynamic value) {
+ int? dashboardInt(dynamic value) => dashboardNumber(value)?.toInt();
+ 
+ String dashboardDateLabel(String? value) {
+-  final parsed = DateTime.tryParse(value ?? '');
+-  // The API's timestamps without an offset are UTC, as in DateConverter.
+-  final date = parsed == null
+-      ? null
+-      : (parsed.isUtc
+-                ? parsed
+-                : DateTime.utc(
+-                    parsed.year,
+-                    parsed.month,
+-                    parsed.day,
+-                    parsed.hour,
+-                    parsed.minute,
+-                    parsed.second,
+-                    parsed.millisecond,
+-                    parsed.microsecond,
+-                  ))
+-            .toLocal();
++  final date = SaudiTime.tryInstant(value);
+   if (date == null) return '—';
+   return DateConverter.dateMonthYearTime(date);
+ }
+diff --git a/lib/feature/dashboard/model/recent_activity_model.dart b/lib/feature/dashboard/model/recent_activity_model.dart
+index 7ade2b1..8229b16 100644
+--- a/lib/feature/dashboard/model/recent_activity_model.dart
++++ b/lib/feature/dashboard/model/recent_activity_model.dart
+@@ -65,7 +65,8 @@ class DashboardRecentActivityModel {
+     totalBookingAmount = json['total_booking_amount'].toString();
+     totalTaxAmount = json['total_tax_amount'].toString();
+     totalDiscountAmount = json['total_discount_amount'].toString();
+-    serviceSchedule = json['service_schedule']?.toString();
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule'])
++        ?.toString();
+     serviceAddressId = json['service_address_id']?.toString();
+     createdAt = json['created_at']?.toString();
+     updatedAt = json['updated_at']?.toString();
+diff --git a/lib/feature/quality/view/branch_quality_screen.dart b/lib/feature/quality/view/branch_quality_screen.dart
+index 009da55..f13e26c 100644
+--- a/lib/feature/quality/view/branch_quality_screen.dart
++++ b/lib/feature/quality/view/branch_quality_screen.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+ import 'package:get/get.dart';
+ import 'package:url_launcher/url_launcher.dart';
+@@ -279,9 +280,9 @@ class _BranchQualityScreenState extends State<BranchQualityScreen> {
+   Future<void> _warranty(String id) async {
+     final day = await showDatePicker(
+       context: context,
+-      firstDate: DateTime.now(),
+-      lastDate: DateTime.now().add(const Duration(days: 90)),
+-      initialDate: DateTime.now().add(const Duration(days: 1)),
++      firstDate: SaudiTime.now(),
++      lastDate: SaudiTime.now().add(const Duration(days: 90)),
++      initialDate: SaudiTime.now().add(const Duration(days: 1)),
+     );
+     if (day == null || !mounted) return;
+     final time = await showTimePicker(
+@@ -389,7 +390,7 @@ class _BranchQualityScreenState extends State<BranchQualityScreen> {
+                     final range = await showDateRangePicker(
+                       context: context,
+                       firstDate: DateTime(2020),
+-                      lastDate: DateTime.now(),
++                      lastDate: SaudiTime.now(),
+                       initialDateRange: _range,
+                     );
+                     if (range != null) {
+diff --git a/lib/feature/reporting/model/booking_report_model.dart b/lib/feature/reporting/model/booking_report_model.dart
+index d31d0fc..e614621 100644
+--- a/lib/feature/reporting/model/booking_report_model.dart
++++ b/lib/feature/reporting/model/booking_report_model.dart
+@@ -340,7 +340,7 @@ class BookingFilterData {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/reporting/model/business_report_earning_model.dart b/lib/feature/reporting/model/business_report_earning_model.dart
+index 0abe4aa..35e461b 100644
+--- a/lib/feature/reporting/model/business_report_earning_model.dart
++++ b/lib/feature/reporting/model/business_report_earning_model.dart
+@@ -183,7 +183,7 @@ class BusinessReportEarningFilterData {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/reporting/model/business_report_expense_model.dart b/lib/feature/reporting/model/business_report_expense_model.dart
+index 416d1a5..066a284 100644
+--- a/lib/feature/reporting/model/business_report_expense_model.dart
++++ b/lib/feature/reporting/model/business_report_expense_model.dart
+@@ -270,7 +270,7 @@ class Booking {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/review/model/review_model.dart b/lib/feature/review/model/review_model.dart
+index 2e4b3b8..2afdab0 100644
+--- a/lib/feature/review/model/review_model.dart
++++ b/lib/feature/review/model/review_model.dart
+@@ -198,7 +198,7 @@ class Booking {
+     isPaid = json['is_paid'];
+     paymentMethod = json['payment_method'];
+     transactionId = json['transaction_id'];
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/serviceman/operations/workforce_editors.dart b/lib/feature/serviceman/operations/workforce_editors.dart
+index c3ee89d..0ed5c89 100644
+--- a/lib/feature/serviceman/operations/workforce_editors.dart
++++ b/lib/feature/serviceman/operations/workforce_editors.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+ import 'package:get/get.dart';
+ import 'package:intl/intl.dart';
+@@ -244,7 +245,7 @@ class _LeaveEditorState extends State<LeaveEditor> {
+ 
+   DateTime? _projectDate(dynamic value) {
+     final date = value?.toString() ?? '';
+-    return date.length < 19 ? null : DateTime.tryParse(date.substring(0, 19));
++    return SaudiTime.tryInstant(date);
+   }
+ 
+   @override
+@@ -254,7 +255,7 @@ class _LeaveEditorState extends State<LeaveEditor> {
+   }
+ 
+   Future<void> _pick(bool start) async {
+-    final initial = (start ? _start : _end) ?? DateTime.now();
++    final initial = (start ? _start : _end) ?? SaudiTime.now();
+     final day = await showDatePicker(
+       context: context,
+       initialDate: initial,
+@@ -336,8 +337,8 @@ class _LeaveEditorState extends State<LeaveEditor> {
+             return;
+           }
+           Navigator.pop(context, {
+-            'starts_at': DateFormat('yyyy-MM-dd HH:mm:ss').format(_start!),
+-            'ends_at': DateFormat('yyyy-MM-dd HH:mm:ss').format(_end!),
++            'starts_at': SaudiTime.appointmentToken(_start!),
++            'ends_at': SaudiTime.appointmentToken(_end!),
+             'reason': _reason.text.trim(),
+           });
+         },
+diff --git a/lib/feature/serviceman/view/technician_operations_screen.dart b/lib/feature/serviceman/view/technician_operations_screen.dart
+index f101d0d..49d7d28 100644
+--- a/lib/feature/serviceman/view/technician_operations_screen.dart
++++ b/lib/feature/serviceman/view/technician_operations_screen.dart
+@@ -377,7 +377,7 @@ class _TechnicianOperationsScreenState
+                             final leave = Map<String, dynamic>.from(item);
+                             return ListTile(
+                               title: Text(
+-                                '${leave['starts_at'].toString().replaceFirst('T', ' ').substring(0, 16)} – ${leave['ends_at'].toString().replaceFirst('T', ' ').substring(0, 16)}',
++                                '${DateConverter.isoStringToLocalDateAndTime(leave['starts_at'].toString())} – ${DateConverter.isoStringToLocalDateAndTime(leave['ends_at'].toString())}',
+                               ),
+                               subtitle: Text(
+                                 '${(leave['status'] == 'rejected' ? 'leave_canceled' : leave['status'].toString()).tr}\n${leave['reason'] ?? ''}',
+diff --git a/lib/feature/subscriptions/controller/subscription_invoice_controller.dart b/lib/feature/subscriptions/controller/subscription_invoice_controller.dart
+index 6d43a62..ab108d7 100644
+--- a/lib/feature/subscriptions/controller/subscription_invoice_controller.dart
++++ b/lib/feature/subscriptions/controller/subscription_invoice_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'dart:io';
+ import 'package:demandium_provider/helper/date_converter.dart';
+ import 'package:demandium_provider/feature/profile/model/provider_model.dart';
+@@ -247,7 +248,7 @@ class SubscriptionInvoice {
+                   buildTitleText(
+                     title: "Duration",
+                     subtitle:
+-                        "${DateConverter.countDays(dateTime: DateTime.tryParse(transaction.packageLog?.startDate ?? ""), endDate: DateTime.tryParse(transaction.packageLog?.endDate ?? ""))} days",
++                        "${DateConverter.countDays(dateTime: SaudiTime.tryAppointment(transaction.packageLog?.startDate ?? ""), endDate: SaudiTime.tryAppointment(transaction.packageLog?.endDate ?? ""))} days",
+                   ),
+ 
+                   pw.SizedBox(),
+@@ -304,12 +305,12 @@ class SubscriptionInvoice {
+         pw.Container(height: 15, width: 0.5, color: PdfColor.fromHex("d7dae0")),
+         (transaction.packageLog != null)
+             ? DateConverter.dateStringMonthYear(
+-                DateTime.tryParse(transaction.packageLog!.endDate ?? ""),
++                SaudiTime.tryAppointment(transaction.packageLog!.endDate ?? ""),
+               )
+             : "Receivable Balance",
+         pw.Container(height: 15, width: 0.5, color: PdfColor.fromHex("d7dae0")),
+         // if(transaction.packageLog !=null)"${DateConverter.countDays(
+-        //     dateTime: DateTime.tryParse(transaction.packageLog?.startDate ?? ""), endDate: DateTime.tryParse(transaction.packageLog?.endDate ?? "")
++        //     dateTime: SaudiTime.tryAppointment(transaction.packageLog?.startDate ?? ""), endDate: SaudiTime.tryAppointment(transaction.packageLog?.endDate ?? "")
+         // )} days",
+         if (transaction.packageLog != null)
+           "${(transaction.credit ?? 0) - (transaction.packageLog?.vatAmount ?? 0)}",
+diff --git a/lib/helper/date_converter.dart b/lib/helper/date_converter.dart
+index bc1d813..542008c 100644
+--- a/lib/helper/date_converter.dart
++++ b/lib/helper/date_converter.dart
+@@ -1,17 +1,19 @@
++import 'package:demandium_provider/helper/saudi_time.dart';
+ import 'package:demandium_provider/util/core_export.dart';
+ import 'package:get/get.dart';
+ import 'package:intl/intl.dart';
+ 
+ class DateConverter {
+-  static String stringYear(DateTime ? dateTime) {
+-    return DateFormat('y').format(dateTime!);
++  static String stringYear(DateTime? dateTime) {
++    return DateFormat('y').format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static String dateTimeStringToDateTime(String dateTime) {
+-    return DateFormat('dd MMM yyyy  ${_timeFormatter()}').format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
++    return DateFormat(
++      'dd MMM yyyy  ${_timeFormatter()}',
++    ).format(SaudiTime.appointment(dateTime));
+   }
+ 
+-
+   static String convertStringDateTo24HourFormat(String dateTime) {
+     try {
+       return DateFormat('HH:mm').format(DateFormat('hh:mm a').parse(dateTime));
+@@ -21,174 +23,220 @@ class DateConverter {
+     }
+   }
+ 
+-
+-  static String dateToDateAndTime(DateTime ? dateTime) {
+-    return DateFormat('yyyy-MM-dd ${_timeFormatter()}').format(dateTime!);
++  static String dateToDateAndTime(DateTime? dateTime) {
++    return DateFormat(
++      'yyyy-MM-dd ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static String dateTimeStringToDateOnly(String dateTime) {
+-    return DateFormat(_timeFormatter()).format(DateFormat('hh:mm').parse(dateTime));
++    return DateFormat(
++      _timeFormatter(),
++    ).format(DateFormat('hh:mm').parse(dateTime));
+   }
+ 
+   static String dateTimeStringToDate(String dateTime) {
+-    return DateFormat('yyyy-MM-dd').format(DateTime.parse(dateTime).toLocal());
++    return DateFormat('yyyy-MM-dd').format(SaudiTime.appointment(dateTime));
+   }
+ 
+   static String stringToLocalDateOnly(String dateTime) {
+-    return _localDateFormatter('dd MMM,yyyy').format(DateTime.parse(dateTime).toLocal());
++    return _localDateFormatter(
++      'dd MMM,yyyy',
++    ).format(SaudiTime.appointment(dateTime));
+   }
+ 
+   static String timeToTimeString(TimeOfDay time) {
+     DateTime dateTime = DateTime(2000, 01, 01, time.hour, time.minute);
+-    return DateFormat('HH:mm:ss').format(dateTime);
++    return DateFormat('HH:mm:ss').format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static DateTime dateTimeString(String dateTime) {
+-    return DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime);
++    return SaudiTime.appointment(dateTime);
+   }
+ 
+   static DateTime isoStringToLocalDate(String dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime);
++    return SaudiTime.appointment(dateTime);
+   }
+ 
+   static DateTime isoUtcStringToLocalDate(String dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime, true).toLocal();
++    return SaudiTime.instant(dateTime);
+   }
+ 
+   static DateTime isoUtcStringToLocalDateOnly(String dateTime) {
+-    return DateFormat('yyyy-MM-dd').parse(dateTime, true).toLocal();
++    return SaudiTime.instant(dateTime);
+   }
+ 
+   static DateTime isoUtcStringToLocalTimeOnly(String dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime, true).toLocal();
++    return SaudiTime.instant(dateTime);
+   }
+ 
+   static String isoStringToLocalDateAndTime(String dateTime) {
+-    return DateFormat('dd MMM yyyy \'at\' ${_timeFormatter()}').format(isoUtcStringToLocalDate(dateTime));
++    return DateFormat(
++      'dd MMM yyyy \'at\' ${_timeFormatter()}',
++    ).format(isoUtcStringToLocalDate(dateTime));
+   }
+ 
+-
+   static String isoStringToLocalDateOnly(String dateTime) {
+-    return _localDateFormatter('dd MMM, yyyy').format(isoStringToLocalDate(dateTime));
++    return _localDateFormatter(
++      'dd MMM, yyyy',
++    ).format(isoStringToLocalDate(dateTime));
+   }
+ 
+-
+   static String localDateToIsoString(DateTime dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').format(dateTime);
++    return DateFormat(
++      'yyyy-MM-ddTHH:mm:ss.SSS',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static String convertStringTimeToDate(DateTime time) {
+-    return DateFormat('EEE \'at\' ${_timeFormatter()}').format(time.toLocal());
++    return DateFormat(
++      'EEE \'at\' ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(time));
+   }
+ 
+   static String convertStringTimeOnly(DateTime time) {
+-    return DateFormat(_timeFormatter()).format(time);
++    return DateFormat(_timeFormatter()).format(SaudiTime.forDisplay(time));
+   }
+ 
+-
+-  static String dateMonthYearTime(DateTime ? dateTime) {
+-    return _localDateFormatter('d MMM, y ${_timeFormatter()}').format(dateTime!);
++  static String dateMonthYearTime(DateTime? dateTime) {
++    return _localDateFormatter(
++      'd MMM, y ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+-  static String dateStringMonthYear(DateTime ? dateTime, {String format = "d MMM, y"}) {
+-    return _localDateFormatter(format).format(dateTime ?? DateTime.now());
+-  }
+-
+-
+-  static String convert24HourTimeTo12HourTimeWithDay(DateTime time, bool isToday) {
+-    if(isToday){
+-      return DateFormat('\'Today at\' ${_timeFormatter()}').format(time);
+-    }else{
+-      return DateFormat('\'Yesterday at\' ${_timeFormatter()}').format(time);
++  static String dateStringMonthYear(
++    DateTime? dateTime, {
++    String format = "d MMM, y",
++  }) {
++    return _localDateFormatter(
++      format,
++    ).format(SaudiTime.forDisplay(dateTime ?? SaudiTime.now()));
++  }
++
++  static String convert24HourTimeTo12HourTimeWithDay(
++    DateTime time,
++    bool isToday,
++  ) {
++    if (isToday) {
++      return DateFormat(
++        '\'Today at\' ${_timeFormatter()}',
++      ).format(SaudiTime.forDisplay(time));
++    } else {
++      return DateFormat(
++        '\'Yesterday at\' ${_timeFormatter()}',
++      ).format(SaudiTime.forDisplay(time));
+     }
+   }
+ 
+-
+   static String convert24HourTimeTo12HourTime(DateTime? time) {
+-    return DateFormat(_timeFormatter()).format(time ?? DateTime.now());
++    return DateFormat(
++      _timeFormatter(),
++    ).format(SaudiTime.forDisplay(time ?? SaudiTime.now()));
+   }
+ 
+-
+-
+   /// Format date as yyyy-MM-dd (e.g., 2026-01-15)
+   /// Standard ISO 8601 date format, commonly used for indexing and database storage
+   static String formatDateToYYYYMMDD(DateTime date) {
+-    return DateFormat('yyyy-MM-dd').format(date);
++    return DateFormat('yyyy-MM-dd').format(SaudiTime.forDisplay(date));
+   }
+ 
+   /// Format datetime as yyyy-MM-dd-HH (e.g., 2026-01-15-14)
+   /// Useful for hourly indexing and time-based data structures
+   static String formatDateTimeToYYYYMMDDHH(DateTime dateTime) {
+-    return DateFormat('yyyy-MM-dd-HH').format(dateTime);
++    return DateFormat('yyyy-MM-dd-HH').format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   /// Add time string (HH:mm:ss or HH:mm format) to a date
+   /// Returns the DateTime with the time added to it
+   /// If [timeString] is null or empty, returns the original date
+-  /// 
++  ///
+   /// Throws [FormatException] if the time string is invalid
+   static DateTime addTimeStringToDate(DateTime date, String? timeString) {
+     if (timeString == null || timeString.trim().isEmpty) return date;
+-    
++
+     try {
+       final timeParts = timeString.split(':');
+       if (timeParts.isEmpty || timeParts.length > 3) {
+-        throw FormatException('Invalid time format. Expected HH:mm or HH:mm:ss, got: $timeString');
++        throw FormatException(
++          'Invalid time format. Expected HH:mm or HH:mm:ss, got: $timeString',
++        );
+       }
+-      
++
+       final hours = int.parse(timeParts[0]);
+       final minutes = timeParts.length > 1 ? int.parse(timeParts[1]) : 0;
+       final seconds = timeParts.length > 2 ? int.parse(timeParts[2]) : 0;
+-      
++
+       // Validate time ranges
+       if (hours < 0 || hours > 23) {
+-        throw FormatException('Invalid hour value: $hours. Must be between 0 and 23');
++        throw FormatException(
++          'Invalid hour value: $hours. Must be between 0 and 23',
++        );
+       }
+       if (minutes < 0 || minutes > 59) {
+-        throw FormatException('Invalid minute value: $minutes. Must be between 0 and 59');
++        throw FormatException(
++          'Invalid minute value: $minutes. Must be between 0 and 59',
++        );
+       }
+       if (seconds < 0 || seconds > 59) {
+-        throw FormatException('Invalid second value: $seconds. Must be between 0 and 59');
++        throw FormatException(
++          'Invalid second value: $seconds. Must be between 0 and 59',
++        );
+       }
+-      
+-      return date.add(Duration(
+-        hours: hours,
+-        minutes: minutes,
+-        seconds: seconds,
+-      ));
++
++      return date.add(
++        Duration(hours: hours, minutes: minutes, seconds: seconds),
++      );
+     } on FormatException catch (e) {
+-      throw FormatException('Failed to parse time string "$timeString": ${e.message}');
++      throw FormatException(
++        'Failed to parse time string "$timeString": ${e.message}',
++      );
+     }
+   }
+ 
+   static String dateMonthYearLocalTime(DateTime dateTime) {
+-    return DateFormat('dd MMM yyyy, ${_timeFormatter()}').format(dateTime);
++    return DateFormat(
++      'dd MMM yyyy, ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+-
+-
+-  static int countDays({DateTime ? dateTime, DateTime? endDate}) {
+-    final start = DateTime(dateTime?.year ?? DateTime.now().year, dateTime?.month ?? DateTime.now().month, dateTime?.day ?? DateTime.now().day) ;
+-    final end = DateTime(endDate?.year ?? DateTime.now().year, endDate?.month ?? DateTime.now().month, endDate?.day ?? DateTime.now().day) ;
++  static int countDays({DateTime? dateTime, DateTime? endDate}) {
++    final start = DateTime(
++      dateTime?.year ?? SaudiTime.now().year,
++      dateTime?.month ?? SaudiTime.now().month,
++      dateTime?.day ?? SaudiTime.now().day,
++    );
++    final end = DateTime(
++      endDate?.year ?? SaudiTime.now().year,
++      endDate?.month ?? SaudiTime.now().month,
++      endDate?.day ?? SaudiTime.now().day,
++    );
+     final difference = end.difference(start).inDays + 1;
+     return difference;
+   }
+ 
+-
+   static String _timeFormatter() {
+-    return Get.find<SplashController>().configModel.content?.timeFormat == '24' ? 'HH:mm' : 'hh:mm a';
++    return Get.find<SplashController>().configModel.content?.timeFormat == '24'
++        ? 'HH:mm'
++        : 'hh:mm a';
+   }
+ 
+-
+-  static DateFormat _localDateFormatter(String format){
+-    return DateFormat(format
+-        //Get.find<LocalizationController>().locale.languageCode
++  static DateFormat _localDateFormatter(String format) {
++    return DateFormat(
++      format,
++      //Get.find<LocalizationController>().locale.languageCode
+     );
+   }
+ 
+-  static String convertDateTimeRangeToString(DateTimeRange dateRange, {String format = 'dd / MM / yy'}) {
+-    final startDate = DateFormat(format).format(dateRange.start);
+-    final endDate = DateFormat(format).format(dateRange.end);
++  static String convertDateTimeRangeToString(
++    DateTimeRange dateRange, {
++    String format = 'dd / MM / yy',
++  }) {
++    final startDate = DateFormat(
++      format,
++    ).format(SaudiTime.forDisplay(dateRange.start));
++    final endDate = DateFormat(
++      format,
++    ).format(SaudiTime.forDisplay(dateRange.end));
+     if (startDate == endDate) {
+       return startDate;
+     }
+@@ -196,7 +244,7 @@ class DateConverter {
+   }
+ 
+   static String convertDateTimeToTime(DateTime time) {
+-    return DateFormat(_timeFormatter()).format(time);
++    return DateFormat(_timeFormatter()).format(SaudiTime.forDisplay(time));
+   }
+ 
+   /// Formats a date range into a display string with the following behavior:
+@@ -213,7 +261,7 @@ class DateConverter {
+     String fallbackText = 'No date selected',
+   }) {
+     final format = dateFormat ?? DateFormat('dd-MMM-yyyy');
+-    
++
+     if (startDate != null && endDate != null) {
+       return '${format.format(startDate)} → ${format.format(endDate)}';
+     } else if (startDate != null) {
+@@ -224,13 +272,13 @@ class DateConverter {
+   }
+ 
+   /// Checks if a date falls within a specified date range (inclusive)
+-  /// 
++  ///
+   /// Returns `true` if:
+   /// - No filter is active (both [startDate] and [endDate] are null)
+   /// - The [date] is within the range [startDate, endDate] (inclusive)
+-  /// 
++  ///
+   /// Returns `false` if the date is outside the range
+-  /// 
++  ///
+   /// The comparison ignores time components and only compares dates
+   static bool isDateWithinRange(
+     DateTime date, {
+@@ -248,22 +296,8 @@ class DateConverter {
+     final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
+ 
+     // Check if date is within the range (inclusive)
+-    return (dateOnly.isAtSameMomentAs(startOnly) || dateOnly.isAfter(startOnly)) &&
+-           (dateOnly.isAtSameMomentAs(endOnly) || dateOnly.isBefore(endOnly));
++    return (dateOnly.isAtSameMomentAs(startOnly) ||
++            dateOnly.isAfter(startOnly)) &&
++        (dateOnly.isAtSameMomentAs(endOnly) || dateOnly.isBefore(endOnly));
+   }
+-
+-
+ }
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+diff --git a/macos/Flutter/GeneratedPluginRegistrant.swift b/macos/Flutter/GeneratedPluginRegistrant.swift
+index e440b3e..6b40175 100644
+--- a/macos/Flutter/GeneratedPluginRegistrant.swift
++++ b/macos/Flutter/GeneratedPluginRegistrant.swift
+@@ -1,44 +1,44 @@
+-//
+-//  Generated file. Do not edit.
+-//
+-
+-import FlutterMacOS
+-import Foundation
+-
+-import connectivity_plus
+-import file_picker
+-import file_selector_macos
+-import firebase_auth
+-import firebase_core
+-import firebase_messaging
+-import flutter_inappwebview_macos
+-import flutter_local_notifications
+-import geolocator_apple
+-import open_file_mac
+-import package_info_plus
+-import printing
+-import shared_preferences_foundation
+-import sqflite_darwin
+-import url_launcher_macos
+-import video_player_avfoundation
+-import wakelock_plus
+-
+-func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+-  ConnectivityPlusPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlusPlugin"))
+-  FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
+-  FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
+-  FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))
+-  FLTFirebaseCorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseCorePlugin"))
+-  FLTFirebaseMessagingPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseMessagingPlugin"))
+-  InAppWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "InAppWebViewFlutterPlugin"))
+-  FlutterLocalNotificationsPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalNotificationsPlugin"))
+-  GeolocatorPlugin.register(with: registry.registrar(forPlugin: "GeolocatorPlugin"))
+-  OpenFilePlugin.register(with: registry.registrar(forPlugin: "OpenFilePlugin"))
+-  FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
+-  PrintingPlugin.register(with: registry.registrar(forPlugin: "PrintingPlugin"))
+-  SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
+-  SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
+-  UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
+-  VideoPlayerPlugin.register(with: registry.registrar(forPlugin: "VideoPlayerPlugin"))
+-  WakelockPlusMacosPlugin.register(with: registry.registrar(forPlugin: "WakelockPlusMacosPlugin"))
+-}
++//
++//  Generated file. Do not edit.
++//
++
++import FlutterMacOS
++import Foundation
++
++import connectivity_plus
++import file_picker
++import file_selector_macos
++import firebase_auth
++import firebase_core
++import firebase_messaging
++import flutter_inappwebview_macos
++import flutter_local_notifications
++import geolocator_apple
++import open_file_mac
++import package_info_plus
++import printing
++import shared_preferences_foundation
++import sqflite_darwin
++import url_launcher_macos
++import video_player_avfoundation
++import wakelock_plus
++
++func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
++  ConnectivityPlusPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlusPlugin"))
++  FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
++  FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
++  FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))
++  FLTFirebaseCorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseCorePlugin"))
++  FLTFirebaseMessagingPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseMessagingPlugin"))
++  InAppWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "InAppWebViewFlutterPlugin"))
++  FlutterLocalNotificationsPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalNotificationsPlugin"))
++  GeolocatorPlugin.register(with: registry.registrar(forPlugin: "GeolocatorPlugin"))
++  OpenFilePlugin.register(with: registry.registrar(forPlugin: "OpenFilePlugin"))
++  FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
++  PrintingPlugin.register(with: registry.registrar(forPlugin: "PrintingPlugin"))
++  SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
++  SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
++  UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
++  VideoPlayerPlugin.register(with: registry.registrar(forPlugin: "VideoPlayerPlugin"))
++  WakelockPlusMacosPlugin.register(with: registry.registrar(forPlugin: "WakelockPlusMacosPlugin"))
++}
+diff --git a/pubspec.lock b/pubspec.lock
+index f34acbe..735f2c1 100644
+--- a/pubspec.lock
++++ b/pubspec.lock
+@@ -1555,7 +1555,7 @@ packages:
+     source: hosted
+     version: "0.7.10"
+   timezone:
+-    dependency: transitive
++    dependency: "direct main"
+     description:
+       name: timezone
+       sha256: "981d1020d6ef8fe1e7b3de5054e5b25579ae7c403d7734adc508ffc47668e9cb"
+diff --git a/pubspec.yaml b/pubspec.yaml
+index b31b02b..8fc250a 100644
+--- a/pubspec.yaml
++++ b/pubspec.yaml
+@@ -10,6 +10,7 @@ environment:
+   sdk: ^3.10.0
+ 
+ dependencies:
++  timezone: ^0.11.1
+   flutter:
+     sdk: flutter
+ 
+diff --git a/lib/helper/saudi_time.dart b/lib/helper/saudi_time.dart
+new file mode 100644
+index 0000000..c53402a
+--- /dev/null
++++ b/lib/helper/saudi_time.dart
+@@ -0,0 +1,80 @@
++import 'package:timezone/data/latest.dart' as tzdata;
++import 'package:timezone/timezone.dart' as tz;
++
++/// Saudi appointments are civil wall time; technical timestamps are UTC instants.
++/// Never use the device timezone to interpret a business appointment.
++abstract final class SaudiTime {
++  static const timezone = 'Asia/Riyadh';
++  static final tz.Location _riyadh = _location();
++
++  static tz.Location _location() {
++    tzdata.initializeTimeZones();
++    return tz.getLocation(timezone);
++  }
++
++  static bool _hasZone(String value) =>
++      RegExp(r'(Z|[+-]\d{2}:?\d{2})$', caseSensitive: false).hasMatch(value);
++
++  static DateTime now() => tz.TZDateTime.now(_riyadh);
++
++  /// Legacy unzoned appointments keep their Saudi hour without any +3 shift.
++  static DateTime appointment(String value) {
++    final raw = value.trim();
++    final civil = raw.contains(RegExp('[T ]')) ? raw : '${raw}T00:00:00';
++    return tz.TZDateTime.from(
++      DateTime.parse(_hasZone(raw) ? raw : '$civil+03:00'),
++      _riyadh,
++    );
++  }
++
++  static DateTime? tryAppointment(String? value) {
++    try {
++      return value == null ? null : appointment(value);
++    } on FormatException {
++      return null;
++    }
++  }
++
++  /// Unzoned creation, expiry and event timestamps are UTC, unlike appointments.
++  static DateTime instant(String value) {
++    final raw = value.trim();
++    final civil = raw.contains(RegExp('[T ]')) ? raw : '${raw}T00:00:00';
++    return tz.TZDateTime.from(
++      DateTime.parse(_hasZone(raw) ? raw : '${civil}Z'),
++      _riyadh,
++    );
++  }
++
++  static DateTime? tryInstant(String? value) {
++    try {
++      return value == null ? null : instant(value);
++    } on FormatException {
++      return null;
++    }
++  }
++
++  /// Picker values hold civil components, not a device-local instant.
++  static DateTime wall(DateTime value) => tz.TZDateTime(
++    _riyadh,
++    value.year,
++    value.month,
++    value.day,
++    value.hour,
++    value.minute,
++    value.second,
++    value.millisecond,
++    value.microsecond,
++  );
++
++  static DateTime forDisplay(DateTime value) =>
++      value is tz.TZDateTime || value.isUtc
++      ? tz.TZDateTime.from(value, _riyadh)
++      : wall(value);
++
++  static String appointmentToken(DateTime value) {
++    final date = forDisplay(value);
++    String two(int n) => n.toString().padLeft(2, '0');
++    return '${date.year.toString().padLeft(4, '0')}-${two(date.month)}-${two(date.day)}'
++        'T${two(date.hour)}:${two(date.minute)}:${two(date.second)}+03:00';
++  }
++}
+diff --git a/test/unit/saudi_time_contract_check.dart b/test/unit/saudi_time_contract_check.dart
+new file mode 100644
+index 0000000..f15920e
+--- /dev/null
++++ b/test/unit/saudi_time_contract_check.dart
+@@ -0,0 +1,71 @@
++import 'package:timezone/timezone.dart' as tz;
++import 'package:demandium_provider/helper/saudi_time.dart';
++
++// Run with dart run; no Flutter binding, device, widgets or application startup.
++void main() {
++  var checks = 0;
++  void check(bool value, String label) {
++    checks++;
++    if (!value) throw StateError(label);
++  }
++
++  const canonical = '2026-10-26T11:00:00+03:00';
++  for (final value in [
++    canonical,
++    '2026-10-26 11:00:00',
++    '2026-10-26T08:00:00Z',
++    '2026-10-26T04:00:00-04:00',
++  ]) {
++    final date = SaudiTime.appointment(value);
++    check(date.hour == 11 && date.day == 26, 'appointment $value');
++    check(SaudiTime.appointmentToken(date) == canonical, 'canonical $value');
++  }
++  for (final zone in [
++    'UTC',
++    'Europe/London',
++    'America/New_York',
++    'Asia/Riyadh',
++  ]) {
++    final device = tz.TZDateTime.from(
++      DateTime.parse('2026-10-26T08:00:00Z'),
++      zone == 'UTC' ? tz.UTC : tz.getLocation(zone),
++    );
++    check(SaudiTime.forDisplay(device).hour == 11, 'display from $zone');
++  }
++  check(SaudiTime.instant('2026-10-26 08:00:00').hour == 11, 'naive UTC event');
++  check(
++    SaudiTime.instant('2026-10-26T11:00:00+03:00').hour == 11,
++    'zoned event',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26T20:30:00Z').day == 26,
++    '23:30 Saudi day',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26T21:30:00Z').day == 27,
++    '00:30 Saudi day',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26').hour == 0,
++    'Saudi date-only midnight',
++  );
++  check(
++    SaudiTime.instant('2026-10-26').hour == 3,
++    'date-only UTC legacy event',
++  );
++  check(SaudiTime.tryAppointment('invalid') == null, 'invalid appointment');
++  check(SaudiTime.tryInstant(null) == null, 'missing event');
++  check(
++    SaudiTime.appointmentToken(DateTime(2026, 10, 26, 11)) == canonical,
++    'picker civil value',
++  );
++  final monthly = SaudiTime.appointment(
++    '2026-10-27 11:00:00',
++  ).add(const Duration(days: 30));
++  check(
++    monthly.day == 26 && monthly.month == 11 && monthly.hour == 11,
++    'monthly boundary',
++  );
++  // ignore: avoid_print
++  print('Saudi time contract: $checks checks passed');
++}

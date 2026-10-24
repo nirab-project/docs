@@ -1,0 +1,2298 @@
+diff --git a/.env.example b/.env.example
+index 94642f4..633a903 100644
+--- a/.env.example
++++ b/.env.example
+@@ -196,3 +196,6 @@ OFFLINE_RECEIPT_DISK=offline_receipts
+ NIRAB_CUSTOMER_WEB_URL=https://app.nirabclean.com
+ NIRAB_LANDING_INDEXABLE=false
+ NIRAB_LANDING_TESTIMONIALS_ENABLED=false
++
++# Saudi appointment clock; app/ORM/queue timestamps remain UTC.
++NIRAB_BUSINESS_TIMEZONE=Asia/Riyadh
+diff --git a/Modules/BidModule/Entities/Post.php b/Modules/BidModule/Entities/Post.php
+index 6e7fba4..4e561a2 100644
+--- a/Modules/BidModule/Entities/Post.php
++++ b/Modules/BidModule/Entities/Post.php
+@@ -24,9 +24,9 @@ class Post extends Model
+ 
+     protected $casts = [
+         'is_booked' => 'boolean',
+-        'booking_schedule' => 'datetime',
+-        'requested_window_start' => 'datetime',
+-        'requested_window_end' => 'datetime',
++        'booking_schedule' => \App\Casts\SaudiAppointment::class,
++        'requested_window_start' => \App\Casts\SaudiAppointment::class,
++        'requested_window_end' => \App\Casts\SaudiAppointment::class,
+         'location_snapshot' => 'array',
+     ];
+ 
+diff --git a/Modules/BidModule/Entities/QuoteInspection.php b/Modules/BidModule/Entities/QuoteInspection.php
+index dc695ff..66d4e06 100644
+--- a/Modules/BidModule/Entities/QuoteInspection.php
++++ b/Modules/BidModule/Entities/QuoteInspection.php
+@@ -13,7 +13,7 @@ class QuoteInspection extends Model
+     protected $guarded = [];
+     protected $casts = [
+         'amount' => 'float',
+-        'scheduled_at' => 'datetime',
++        'scheduled_at' => \App\Casts\SaudiAppointment::class,
+         'paid_at' => 'datetime',
+         'completed_at' => 'datetime',
+         'deducted_at' => 'datetime',
+diff --git a/Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php b/Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php
+index 546e1bc..4aae374 100644
+--- a/Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php
++++ b/Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php
+@@ -93,7 +93,7 @@ public function store(Request $request, BranchAssignmentService $branches, Branc
+             $request->merge(['service_address_id' => $this->add_address(json_decode($request->service_address), $request->user()->id)]);
+         }
+         $address = UserAddress::where('user_id', $request->user()->id)->findOrFail($request->service_address_id);
+-        $schedule = Carbon::parse($request->input('requested_window_start', now()->addHours(2)));
++        $schedule = \App\Support\SaudiTime::parseCustomerAppointment($request->input('requested_window_start', \App\Support\SaudiTime::now()->addHours(2)));
+         Validator::make($address->getAttributes(), [
+             'lat' => 'required|numeric|between:-90,90', 'lon' => 'required|numeric|between:-180,180',
+             'address' => 'required|string', 'contact_person_name' => 'required|string', 'contact_person_number' => 'required|string',
+@@ -190,7 +190,7 @@ public function paymentSnapshot(PostBid $quote, ?string $schedule): array
+         abort_unless(Service::withoutGlobalScopes()->whereNull('deleted_at')->whereKey($post->service_id)->where('is_active', 1)->where('pricing_type', 'quote')->exists(), 409, 'service_unavailable');
+         abort_if($quote->status !== 'ready' || $quote->isExpired() || $post->booking_id || $quote->provider_id !== $post->branch_id, 409);
+         abort_unless($schedule, 422, 'execution_schedule_required');
+-        $start = Carbon::parse($schedule);
++        $start = \App\Support\SaudiTime::parseCustomerAppointment($schedule);
+         $address = $post->location_snapshot ?: [];
+         $lat = $address['lat'] ?? $address['latitude'] ?? null;
+         $lon = $address['lon'] ?? $address['longitude'] ?? null;
+@@ -263,7 +263,7 @@ public function accept(Request $request, string $id): JsonResponse
+                     throw ValidationException::withMessages(['payment_method' => translate('Insufficient wallet balance.')]);
+                 }
+             }
+-            $schedule = Carbon::parse($request->input('service_schedule'));
++            $schedule = \App\Support\SaudiTime::parseCustomerAppointment($request->input('service_schedule'));
+             if ($verifiedPayment) {
+                 $additional = json_decode($verifiedPayment->additional_data ?? '{}', true) ?: [];
+                 abort_unless(json_encode($additional['quotation_snapshot'] ?? null) === json_encode($this->paymentSnapshot($quote->setRelation('post', $post), $schedule->toIso8601String())), 409, 'quotation_context_changed');
+diff --git a/Modules/BidModule/Http/Controllers/APi/V1/Provider/QuotationController.php b/Modules/BidModule/Http/Controllers/APi/V1/Provider/QuotationController.php
+index 6680544..7b158fb 100644
+--- a/Modules/BidModule/Http/Controllers/APi/V1/Provider/QuotationController.php
++++ b/Modules/BidModule/Http/Controllers/APi/V1/Provider/QuotationController.php
+@@ -104,9 +104,9 @@ public function issue(Request $request, string $postId): JsonResponse
+ 
+     public function inspection(Request $request, string $postId): JsonResponse
+     {
+-        if ($request->attributes->get('branch_workspace') && $request->filled('scheduled_at')) {
++        if ($request->filled('scheduled_at')) {
+             $request->validate(['scheduled_at' => 'date']);
+-            $request->merge(['scheduled_at' => \Carbon\Carbon::parse($request->scheduled_at, config('nirab_execution.settlement_timezone'))->utc()->toDateTimeString()]);
++            $request->merge(['scheduled_at' => \App\Support\SaudiTime::forAppointmentStorage($request->scheduled_at)]);
+         }
+         $validator = Validator::make($request->all(), [
+             'fee_type' => 'required|in:free,paid',
+diff --git a/Modules/BookingModule/Entities/Booking.php b/Modules/BookingModule/Entities/Booking.php
+index acefcda..3015fda 100644
+--- a/Modules/BookingModule/Entities/Booking.php
++++ b/Modules/BookingModule/Entities/Booking.php
+@@ -77,7 +77,7 @@ class Booking extends Model
+         'assignment_due_at' => 'datetime',
+         'estimated_arrival_at' => 'datetime',
+         'late_alerted_at' => 'datetime',
+-        'service_schedule' => 'datetime',
++        'service_schedule' => \App\Casts\SaudiAppointment::class,
+         'pricing_snapshot' => 'array',
+         'inspection_deduction_amount' => 'float',
+     ];
+@@ -126,7 +126,9 @@ class Booking extends Model
+         'inspection_deduction_amount',
+     ];
+ 
+-    protected $appends = ['evidence_photos_full_path', 'branch_id', 'branch', 'payment_status', 'execution_requires_otp'];
++    use \App\Traits\HasSaudiAppointment;
++
++    protected $appends = ['service_schedule_at', 'timezone', 'evidence_photos_full_path', 'branch_id', 'branch', 'payment_status', 'execution_requires_otp'];
+ 
+ 
+     public function service_address(): BelongsTo
+diff --git a/Modules/BookingModule/Entities/BookingRepeat.php b/Modules/BookingModule/Entities/BookingRepeat.php
+index b3b185f..52dea06 100644
+--- a/Modules/BookingModule/Entities/BookingRepeat.php
++++ b/Modules/BookingModule/Entities/BookingRepeat.php
+@@ -31,7 +31,7 @@ class BookingRepeat extends Model
+     protected $casts = [
+         'estimated_duration_minutes' => 'integer',
+         'required_technicians' => 'integer',
+-        'service_schedule' => 'datetime',
++        'service_schedule' => \App\Casts\SaudiAppointment::class,
+         'arrival_location' => 'array',
+         'finish_location' => 'array',
+         'arrived_at' => 'datetime',
+@@ -91,7 +91,9 @@ class BookingRepeat extends Model
+         'service_location',
+     ];
+ 
+-    protected $appends = ['evidence_photos_full_path', 'skipNotification', 'branch_id', 'branch', 'payment_status', 'execution_requires_otp'];
++    use \App\Traits\HasSaudiAppointment;
++
++    protected $appends = ['service_schedule_at', 'timezone', 'evidence_photos_full_path', 'skipNotification', 'branch_id', 'branch', 'payment_status', 'execution_requires_otp'];
+ 
+     protected $hidden = ['category_id', 'sub_category_id', 'skipNotification'];
+ 
+diff --git a/Modules/BookingModule/Entities/BookingScheduleHistory.php b/Modules/BookingModule/Entities/BookingScheduleHistory.php
+index d988f8b..33a20bb 100644
+--- a/Modules/BookingModule/Entities/BookingScheduleHistory.php
++++ b/Modules/BookingModule/Entities/BookingScheduleHistory.php
+@@ -10,6 +10,8 @@ class BookingScheduleHistory extends Model
+ {
+     use HasFactory;
+ 
++    protected $casts = ['schedule' => \App\Casts\SaudiAppointment::class];
++
+     protected $fillable = [];
+ 
+ 
+diff --git a/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php b/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php
+index dd36b8e..6a44d62 100644
+--- a/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php
+@@ -65,7 +65,7 @@ public function checkoutPrice(Request $request): JsonResponse
+         $payload = $snapshot->payload;
+         return response()->json(response_formatter(DEFAULT_200, [
+             'checkout_snapshot_id' => $snapshot->id, 'price_hash' => $snapshot->price_hash,
+-            'total' => $payload['total'], 'wallet_amount' => $payload['wallet_amount'], 'currency' => $payload['currency'], 'timezone' => config('app.timezone'),
++            'total' => $payload['total'], 'wallet_amount' => $payload['wallet_amount'], 'currency' => $payload['currency'], 'timezone' => \App\Support\SaudiTime::timezone(),
+             'expires_at' => $snapshot->expires_at->toIso8601String(), 'groups' => $payload['groups'],
+         ]));
+     }
+diff --git a/Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php b/Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php
+index 401fc6f..8320287 100644
+--- a/Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php
++++ b/Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php
+@@ -27,13 +27,13 @@ public function availability(Request $request): JsonResponse
+     {
+         $validator = Validator::make($request->all(), [
+             'zone_id' => 'required|uuid', 'items' => 'required_without:quotation_id|array|min:1|max:100',
+-            'date' => 'required|date|after_or_equal:today|before_or_equal:'.now()->addDays(365)->toDateString(), 'provider_id' => 'nullable|uuid',
++            'date' => 'required|date|after_or_equal:'.\App\Support\SaudiTime::now()->toDateString().'|before_or_equal:'.\App\Support\SaudiTime::now()->addDays(365)->toDateString(), 'provider_id' => 'nullable|uuid',
+             'latitude' => 'required_without:quotation_id|nullable|numeric|between:-90,90', 'longitude' => 'required_without:quotation_id|nullable|numeric|between:-180,180',
+             'starts_at' => 'nullable|date',
+             'quotation_id' => 'nullable|uuid', 'branch_selection' => 'nullable|in:manual,auto',
+         ]);
+         if ($validator->fails()) return response()->json(response_formatter(DEFAULT_400, null, error_processor($validator)), 400);
+-        $day = Carbon::parse($request->date, config('app.timezone'))->startOfDay();
++        $day = Carbon::parse($request->date, \App\Support\SaudiTime::timezone())->startOfDay();
+         $requirements = !$request->quotation_id ? app(\Modules\ServiceManagement\Services\ServiceItemRequirements::class)->evaluate($request->input('items', []), $request->zone_id) : null;
+         $serviceIds = $requirements['service_ids'] ?? [];
+         $duration = $requirements['duration_minutes'] ?? 0;
+@@ -112,7 +112,7 @@ function ($group, $date, $items) use ($start, $request): bool {
+             }
+         }
+         return response()->json(response_formatter(DEFAULT_200, [
+-            'provider_id' => $selectedGroups[0]['provider_id'] ?? null, 'branch_id' => $selectedGroups[0]['provider_id'] ?? null, 'groups' => $selectedGroups, 'unavailability_message_key' => !$selectedGroups ? 'no_slots_for_date' : null, 'timezone' => config('app.timezone'),
++            'provider_id' => $selectedGroups[0]['provider_id'] ?? null, 'branch_id' => $selectedGroups[0]['provider_id'] ?? null, 'groups' => $selectedGroups, 'unavailability_message_key' => !$selectedGroups ? 'no_slots_for_date' : null, 'timezone' => \App\Support\SaudiTime::timezone(),
+             'execution_type' => $executionType,
+             'required_technicians' => $required, 'duration_minutes' => $duration,
+             'requested_slot_available' => $requestedStart ? $selectedGroups !== [] : null,
+diff --git a/Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php b/Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php
+index f14107d..6dbd04c 100644
+--- a/Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php
+@@ -571,7 +571,9 @@ public function bookingCalendar(Request $request)
+                 'id' => $booking->id,
+                 'readable_id' => $booking->readable_id,
+                 'is_repeated' => $booking->is_repeated,
+-                'service_schedule' => $dt,
++                'service_schedule' => \App\Support\SaudiTime::forAppointmentStorage($dt),
++                'service_schedule_at' => \App\Support\SaudiTime::appointmentForApi($dt),
++                'timezone' => \App\Support\SaudiTime::timezone(),
+                 'booking_status' => $repeat?->booking_status ?? $booking->booking_status,
+                 'service_location' => $booking->service_location ?? 'At your location',
+                 'total_booking_amount' => $booking->total_booking_amount,
+diff --git a/Modules/BookingModule/Http/Controllers/Api/V1/Provider/DispatchController.php b/Modules/BookingModule/Http/Controllers/Api/V1/Provider/DispatchController.php
+index 0f2ddcf..498d30c 100644
+--- a/Modules/BookingModule/Http/Controllers/Api/V1/Provider/DispatchController.php
++++ b/Modules/BookingModule/Http/Controllers/Api/V1/Provider/DispatchController.php
+@@ -42,7 +42,7 @@ public function context(Request $request): JsonResponse
+         return $this->response([
+             'provider_id' => $branch, 'zone_id' => $provider->zone_id,
+             'coordinates' => $provider->zone?->coordinates,
+-            'timezone' => config('app.timezone'),
++            'timezone' => \App\Support\SaudiTime::timezone(),
+             'permissions' => collect(OperationalAccess::MANAGEMENT_PERMISSIONS)
+                 ->mapWithKeys(fn ($permission) => [$permission => $this->access->allows($request->user(), $permission, $branch)]),
+         ]);
+@@ -63,8 +63,8 @@ public function technician(Request $request, string $servicemanId): JsonResponse
+         $serviceman = $this->branchServiceman($request, $servicemanId)->load(['user', 'skills.service', 'shifts', 'leaves']);
+         $payload = $serviceman->toArray();
+         $payload['leaves'] = $serviceman->leaves->map(fn ($leave) => array_merge($leave->toArray(), [
+-            'starts_at' => $leave->starts_at->setTimezone(config('app.timezone'))->toIso8601String(),
+-            'ends_at' => $leave->ends_at->setTimezone(config('app.timezone'))->toIso8601String(),
++            'starts_at' => $leave->starts_at->setTimezone(\App\Support\SaudiTime::timezone())->toIso8601String(),
++            'ends_at' => $leave->ends_at->setTimezone(\App\Support\SaudiTime::timezone())->toIso8601String(),
+         ]));
+         return $this->response($payload);
+     }
+@@ -233,8 +233,8 @@ private function saveLeave(Request $request, string $servicemanId, ?string $leav
+     {
+         $data = $request->validate(['starts_at' => 'required|date', 'ends_at' => 'required|date|after:starts_at', 'reason' => 'nullable|string|max:255']);
+         $serviceman = $this->branchServiceman($request, $servicemanId);
+-        $data['starts_at'] = \Carbon\Carbon::parse($data['starts_at'], config('app.timezone'))->setTimezone(config('app.timezone'));
+-        $data['ends_at'] = \Carbon\Carbon::parse($data['ends_at'], config('app.timezone'))->setTimezone(config('app.timezone'));
++        $data['starts_at'] = \Carbon\Carbon::parse($data['starts_at'], \App\Support\SaudiTime::timezone())->utc();
++        $data['ends_at'] = \Carbon\Carbon::parse($data['ends_at'], \App\Support\SaudiTime::timezone())->utc();
+         $leave = DB::transaction(function () use ($serviceman, $leaveId, $data, $request) {
+             Provider::withoutGlobalScopes()->whereKey($serviceman->provider_id)->lockForUpdate()->firstOrFail();
+             Serviceman::withoutGlobalScopes()->whereKey($serviceman->id)->lockForUpdate()->firstOrFail();
+diff --git a/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php b/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
+index 83c682e..75ff2c3 100644
+--- a/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php
+@@ -1180,7 +1180,7 @@ public function scheduleUpdate($bookingId, Request $request): JsonResponse
+         $bookingRepeat = $this->bookingRepeat->where('id', $bookingId)->first();
+ 
+         if (isset($booking)) {
+-            $booking->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
++            $booking->service_schedule = \App\Support\SaudiTime::forAppointmentStorage($request->service_schedule);
+ 
+             $bookingScheduleHistory = $this->bookingScheduleHistory;
+             $bookingScheduleHistory->booking_id = $bookingId;
+@@ -1196,7 +1196,7 @@ public function scheduleUpdate($bookingId, Request $request): JsonResponse
+         }
+ 
+         if (isset($bookingRepeat)) {
+-            $bookingRepeat->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
++            $bookingRepeat->service_schedule = \App\Support\SaudiTime::forAppointmentStorage($request->service_schedule);
+ 
+             $bookingRepeatScheduleHistory = $this->bookingScheduleHistory;
+             $bookingRepeatScheduleHistory->booking_id = $bookingRepeat->booking_id;
+@@ -1232,7 +1232,7 @@ public function upComingBookingScheduleUpdate($bookingId, Request $request): Red
+         $bookingRepeat = $this->bookingRepeat->where('id', $bookingId)->first();
+ 
+         if (isset($bookingRepeat)) {
+-            $bookingRepeat->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
++            $bookingRepeat->service_schedule = \App\Support\SaudiTime::forAppointmentStorage($request->service_schedule);
+ 
+             $bookingRepeatScheduleHistory = $this->bookingScheduleHistory;
+             $bookingRepeatScheduleHistory->booking_id = $bookingRepeat->booking_id;
+diff --git a/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php b/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
+index e491839..0413b6a 100644
+--- a/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
++++ b/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php
+@@ -938,7 +938,7 @@ public function scheduleUpdate($bookingId, Request $request): JsonResponse
+         $bookingRepeat = $this->bookingRepeat->where('id', $bookingId)->where('provider_id', app(\App\Services\OperationalAccess::class)->provider($request->user())->id)->first();
+ 
+         if (isset($booking)) {
+-            $booking->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
++            $booking->service_schedule = \App\Support\SaudiTime::forAppointmentStorage($request->service_schedule);
+ 
+             $bookingScheduleHistory = $this->bookingScheduleHistory;
+             $bookingScheduleHistory->booking_id = $bookingId;
+@@ -953,7 +953,7 @@ public function scheduleUpdate($bookingId, Request $request): JsonResponse
+             return response()->json(response_formatter(NO_CHANGES_FOUND), 200);
+         }
+         if (isset($bookingRepeat)) {
+-            $bookingRepeat->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
++            $bookingRepeat->service_schedule = \App\Support\SaudiTime::forAppointmentStorage($request->service_schedule);
+ 
+             $bookingRepeatScheduleHistory = $this->bookingScheduleHistory;
+             $bookingRepeatScheduleHistory->booking_id = $bookingRepeat->booking_id;
+@@ -1133,7 +1133,7 @@ public function upComingBookingScheduleUpdate($bookingId, Request $request): Red
+         $bookingRepeat = $this->bookingRepeat->where('id', $bookingId)->first();
+ 
+         if (isset($bookingRepeat)) {
+-            $bookingRepeat->service_schedule = Carbon::parse($request->service_schedule)->toDateTimeString();
++            $bookingRepeat->service_schedule = \App\Support\SaudiTime::forAppointmentStorage($request->service_schedule);
+ 
+             $bookingRepeatScheduleHistory = $this->bookingScheduleHistory;
+             $bookingRepeatScheduleHistory->booking_id = $bookingRepeat->booking_id;
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/details.blade.php b/Modules/BookingModule/Resources/views/admin/booking/details.blade.php
+index d2103d9..8da8876 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/details.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/details.blade.php
+@@ -27,7 +27,7 @@
+                     </span>
+                 </div>
+                 <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                    : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                    : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+             </div>
+             <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                 <div class="d-flex flex-wrap gap-3">
+@@ -299,7 +299,7 @@ class="c1 text-capitalize">{{ $booking?->booking_otp ?? '' }}</span></p>
+ <section class="nirab-booking-execution nirab-form-panel"><h3>{{ __('admin_ui.booking_execution') }}</h3><h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                         <div>{{ translate('Schedule_Date') }} :</div>
+                                         <div id="service_schedule__span">
+-                                            <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }} <span
++                                            <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }} <span
+                                                     class="text-secondary">{{ $booking?->schedule_histories->count() > 1 ? translate('(Edited)') : '' }}</span>
+                                             </div>
+ 
+@@ -602,8 +602,8 @@ class="fz-12">({{ translate('Vat_Excluded') }})</small></td>
+                             @if (!in_array($booking->booking_status, ['ongoing', 'completed']))
+                                 @can('booking_can_manage_status')
+                                     <input type="datetime-local" class="form-control h-45" name="service_schedule"
+-                                        value="{{ $booking->service_schedule }}" id="service_schedule"
+-                                        data-original="{{ $booking->service_schedule }}" min="<?php        echo date('Y-m-d\TH:i'); ?>"
++                                        value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}" id="service_schedule"
++                                        data-original="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}" min="<?php        echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>"
+                                         onchange="service_schedule_update()">
+                                 @endcan
+                             @endif
+@@ -1232,8 +1232,8 @@ function service_schedule_update() {
+                 }
+ 
+                 // Normalize formats (replace space with 'T' for parsing)
+-                var newDate = new Date(service_schedule);
+-                var originalDate = new Date(original.replace(" ", "T"));
++                var newDate = new Date(service_schedule.replace(' ', 'T') + '+03:00');
++                var originalDate = new Date(original.replace(" ", "T") + "+03:00");
+                 var now = new Date();
+ 
+                 // Compare with current time
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/fullbooking-invoice.blade.php b/Modules/BookingModule/Resources/views/admin/booking/fullbooking-invoice.blade.php
+index fe80bd4..29ec188 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/fullbooking-invoice.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/fullbooking-invoice.blade.php
+@@ -185,7 +185,7 @@
+                     <td>
+                         <h3 class="text-uppercase fw-700">{{translate("invoice")}}</h3>
+                         <div>{{translate('Booking')}} #{{$booking->readable_id}} <img src="{{ asset('public/assets/admin-module/img/repeat.png') }}" width="15px" height="15px" alt=""></div>
+-                        <div>{{ translate('date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                        <div>{{ translate('date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                     </td>
+                     <td class="company-details">
+                         <a target="_blank" href="#">
+@@ -273,7 +273,7 @@
+ 
+                             <td class="border-left">
+                                 <h6 class="fz-12">{{translate('Service Details')}}</h6>
+-                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                                 <div class="fs-9">{{translate('Booking Type')}}
+                                     : {{ucwords($booking->repeat[0]->booking_type)}}</div>
+                                 <div class="fs-9">{{ translate('Booking Date range') }}:
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/fullbooking-single-invoice.blade.php b/Modules/BookingModule/Resources/views/admin/booking/fullbooking-single-invoice.blade.php
+index de81a99..5a7307c 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/fullbooking-single-invoice.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/fullbooking-single-invoice.blade.php
+@@ -170,7 +170,7 @@
+                     <td>
+                         <h3 class="text-uppercase fw-700">{{translate("invoice")}}</h3>
+                         <div>{{translate('Booking')}} #{{$booking->readable_id}} <img src="{{ asset('public/assets/admin-module/img/repeat.png') }}" width="15px" height="15px" alt=""></div>
+-                        <div>{{ translate('date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                        <div>{{ translate('date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                     </td>
+                     <td class="company-details">
+                         <a target="_blank" href="#">
+@@ -258,8 +258,8 @@
+ 
+                             <td class="border-left">
+                                 <h6 class="fz-12">{{translate('Service Time')}}</h6>
+-                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
+-                                <div class="fs-9">{{ translate('Service Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->service_schedule))]) }}</div>
++                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
++                                <div class="fs-9">{{ translate('Service Date: :date', ['date' => \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')]) }}</div>
+                             </td>
+ 
+                             <td>
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/invoice.blade.php b/Modules/BookingModule/Resources/views/admin/booking/invoice.blade.php
+index ae4b027..ec26472 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/invoice.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/invoice.blade.php
+@@ -170,7 +170,7 @@
+                     <td>
+                         <h3 class="text-uppercase fw-700">{{translate("invoice")}}</h3>
+                         <div>{{translate('Booking')}} #{{$booking->readable_id}}</div>
+-                        <div>{{ translate('date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                        <div>{{ translate('date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                     </td>
+                     <td class="company-details">
+                         <a target="_blank" href="#">
+@@ -265,8 +265,8 @@
+ 
+                             <td class="border-left">
+                                 <h6 class="fz-12">{{translate('Service Time')}}</h6>
+-                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
+-                                <div class="fs-9">{{ translate('Service Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->service_schedule))]) }}</div>
++                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
++                                <div class="fs-9">{{ translate('Service Date: :date', ['date' => \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')]) }}</div>
+                             </td>
+                         </tr>
+                     </table>
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/offline-payment-list.blade.php b/Modules/BookingModule/Resources/views/admin/booking/offline-payment-list.blade.php
+index ca00c7b..ab411d3 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/offline-payment-list.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/offline-payment-list.blade.php
+@@ -148,8 +148,8 @@ class="badge badge badge-{{$booking->is_paid?'success':'danger'}} radius-50">
+                                                     {{$booking->is_paid?translate('paid'):translate('unpaid')}}
+                                                 </span>
+                                             </td>
+-                                            <td>{{date('d-M-Y h:ia',strtotime($booking->service_schedule))}}</td>
+-                                            <td>{{date('d-M-Y h:ia',strtotime($booking->created_at))}}</td>
++                                            <td>{{\App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')}}</td>
++                                            <td>{{\App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')}}</td>
+                                             <td class="text-center">
+                                                 <label class="badge badge-info">{{__('offline_transfer.'.($offline?->payment_status ?? 'incomplete'))}}</label>
+                                             </td>
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php b/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php
+index 029ba20..219f4f8 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php
+@@ -31,7 +31,7 @@
+ 
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -269,7 +269,7 @@ class="c1 text-capitalize">{{ $booking?->booking_otp ?? '' }}</span></p>
+                                                 <h5 class="d-flex gap-1 flex-wrap align-items-center mt-3">
+                                                     <div>{{ translate('Re-schedule_Date') }} :</div>
+                                                     <div id="service_schedule__span">
+-                                                        <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }}</div>
++                                                        <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }}</div>
+                                                         <div class="timeline-container">
+                                                             <ul class="timeline-sessions">
+                                                                 <p class="fs-14">{{ translate('Schedule Change Log') }}</p>
+@@ -294,7 +294,7 @@ class="c1 text-capitalize">{{ $booking?->booking_otp ?? '' }}</span></p>
+                                                 <h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                                     <div>{{ translate('Schedule_Date') }} :</div>
+                                                     <div id="service_schedule__span">
+-                                                        <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }}</div>
++                                                        <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }}</div>
+                                                         <div class="timeline-container">
+                                                             <ul class="timeline-sessions">
+                                                                 <p class="fs-14">{{ translate('Schedule Change Log') }}</p>
+@@ -554,10 +554,10 @@ class="fz-12">({{ translate('Vat_Excluded') }})</small></td>
+                                     @can('booking_can_manage_status')
+                                         <input type="datetime-local" class="form-control h-45"
+                                                name="service_schedule"
+-                                               value="{{ $booking->service_schedule }}"
++                                               value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
+                                                id="service_schedule"
+-                                               data-original="{{ $booking->service_schedule }}"
+-                                               min="<?php echo date('Y-m-d\TH:i'); ?>"
++                                               data-original="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
++                                               min="<?php echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>"
+                                                onchange="service_schedule_update()">
+                                     @endcan
+                                 @endif
+@@ -1142,7 +1142,7 @@ class="btn btn--primary"
+                         <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                             <div>{{ translate('Schedule_Date') }} :</div>
+                             <div id="service_schedule__span">
+-                                <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                             </div>
+                         </h5>
+                     </div>
+@@ -1311,8 +1311,8 @@ function service_schedule_update() {
+             }
+ 
+             // Normalize formats (replace space with 'T' for parsing)
+-            var newDate = new Date(service_schedule);
+-            var originalDate = new Date(original.replace(" ", "T"));
++            var newDate = new Date(service_schedule.replace(' ', 'T') + '+03:00');
++            var originalDate = new Date(original.replace(" ", "T") + "+03:00");
+             var now = new Date();
+ 
+             // Compare with current time
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php b/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php
+index c110742..7283c59 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php
+@@ -32,7 +32,7 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -238,7 +238,7 @@ class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-
+                                     <button type="button"
+                                         class="btn btn--light border-dashed text-capitalize title-color d-flex flex-wrap gap-1">
+                                         {{ translate('Scheduled At') }}:
+-                                        <span class="opacity-75">{{ date('d-M-Y h:ia', strtotime($booking->nextService['service_schedule'])) }}</span>
++                                        <span class="opacity-75">{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->nextService['service_schedule'], 'd-M-Y h:ia') }}</span>
+                                     </button>
+                                 </div>
+                                 <div class="col-md-6">
+@@ -881,7 +881,7 @@ class="rounded-circle border border-white aspect-square object-fit-cover"
+                         <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                             <div>{{ translate('Schedule_Date') }} :</div>
+                             <div id="service_schedule__span">
+-                                <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                             </div>
+                         </h5>
+                     </div>
+@@ -1027,7 +1027,7 @@ class="form-control qty-width dark-color-bo m-auto"
+                                     </td>
+                                     <td>#{{$repeat['readable_id']}}</td>
+                                     <td>
+-                                        <div>{{ date('d-M-Y h:ia', strtotime($booking['created_at'])) }}</div>
++                                        <div>{{ \App\Support\SaudiTime::formatInstantSaudi($booking['created_at'], 'd-M-Y h:ia') }}</div>
+                                     </td>
+                                     <td>
+                                         <div class="d-flex align-items-center gap-1 justify-content-center">
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php b/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php
+index 1c921cd..f4284d7 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php
+@@ -23,7 +23,7 @@
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -176,7 +176,7 @@ class="text-capitalize">{{ str_replace(['_', '-'], ' ', $booking->payment_method
+ <section class="nirab-booking-execution nirab-form-panel"><h3>{{ __('admin_ui.booking_execution') }}</h3><h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                             <div>{{ translate('Schedule_Date') }} :</div>
+                                             <div id="service_schedule__span">
+-                                                <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }} <span
++                                                <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }} <span
+                                                        class="text-secondary">{{ $booking?->scheduleHistories->count() > 1 ? translate('(Edited)') : '' }}</span>
+                                                 </div>
+ 
+@@ -217,7 +217,7 @@ class="{{ $booking->service_schedule == $history->schedule ? 'active' : '' }}">
+                                             <p class="timeline-title text-capitalize">{{ translate('Booking_Placed') }}
+                                             </p>
+                                             <p class="timeline-text">
+-                                                {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                                                {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                                             <p class="timeline-text">{{ translate('By') }}
+                                                 -
+                                                 {{ isset($booking->customer) ? Str::limit($booking->customer->first_name . ' ' . $booking->customer->last_name, 30) : translate('Not_Available') }}
+@@ -236,7 +236,7 @@ class="{{ $booking->service_schedule == $history->schedule ? 'active' : '' }}">
+                                                 <p class="timeline-title text-capitalize">
+                                                     {{ $status_history->booking_status }}</p>
+                                                 <p class="timeline-text">
+-                                                    {{ date('d-M-Y h:ia', strtotime($status_history->created_at)) }}</p>
++                                                    {{ \App\Support\SaudiTime::formatInstantSaudi($status_history->created_at, 'd-M-Y h:ia') }}</p>
+                                                 <p class="timeline-text">{{ translate('By') }}
+                                                     @if (isset($status_history->user->provider))
+                                                         -
+@@ -311,10 +311,10 @@ class="{{ $booking->service_schedule == $history->schedule ? 'active' : '' }}">
+                                     @can('booking_can_manage_status')
+                                         <input type="datetime-local" class="form-control h-45"
+                                                name="service_schedule"
+-                                               value="{{ $booking->service_schedule }}"
++                                               value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
+                                                id="service_schedule"
+-                                               data-original="{{ $booking->service_schedule }}"
+-                                               min="<?php echo date('Y-m-d\TH:i'); ?>"
++                                               data-original="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
++                                               min="<?php echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>"
+                                                onchange="service_schedule_update()">
+                                     @endcan
+                                 @endif
+@@ -658,7 +658,7 @@ class="rounded-circle border border-white aspect-square object-fit-cover"
+                         <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                             <div>{{ translate('Schedule_Date') }} :</div>
+                             <div id="service_schedule__span">
+-                                <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                             </div>
+                         </h5>
+                     </div>
+@@ -986,8 +986,8 @@ function service_schedule_update() {
+             }
+ 
+             // Normalize formats (replace space with 'T' for parsing)
+-            var newDate = new Date(service_schedule);
+-            var originalDate = new Date(original.replace(" ", "T"));
++            var newDate = new Date(service_schedule.replace(' ', 'T') + '+03:00');
++            var originalDate = new Date(original.replace(" ", "T") + "+03:00");
+             var now = new Date();
+ 
+             // Compare with current time
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php b/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php
+index c977cd6..b10c085 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php
+@@ -28,7 +28,7 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -226,7 +226,7 @@ class="btn btn--primary">{{ translate('submit') }}</button>
+                                                     <h6 class="fz-13 mb-2">{{ translate('Booking Id') }}
+                                                         #{{ $booking->nextService['readable_id'] }}
+                                                     </h6>
+-                                                    <p class="fz-12 mb-1">{{ date('d-M-Y h:ia', strtotime($booking->nextService['service_schedule'])) }}</p>
++                                                    <p class="fz-12 mb-1">{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->nextService['service_schedule'], 'd-M-Y h:ia') }}</p>
+                                                     @if($booking->nextService['is_reassign'])
+                                                         <span class="text-primary fw-semibold">
+                                                                 (
+@@ -267,7 +267,7 @@ class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                         <h6 class="fz-13 mb-2">{{ translate('Booking Id') }}
+                                                             #{{ $data['readable_id']}}
+                                                         </h6>
+-                                                        <p class="fz-12">{{ date('d-M-Y h:ia', strtotime($data['service_schedule'])) }}</p>
++                                                        <p class="fz-12">{{ \App\Support\SaudiTime::formatAppointmentSaudi($data['service_schedule'], 'd-M-Y h:ia') }}</p>
+                                                     </div>
+                                                     <div class="d-flex gap-2 justify-content-center">
+                                                         <a href="{{ route('admin.booking.single_invoice', [$data['id']]) }}" type="button"
+@@ -305,7 +305,7 @@ class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                             <span class="title-color opacity-75">({{ translate('Rescheduled') }})</span>
+                                                             @endif
+                                                         </h6>
+-                                                        <p class="fz-12 mb-1">{{ date('d-M-Y h:ia', strtotime($upComing['service_schedule'])) }}</p>
++                                                        <p class="fz-12 mb-1">{{ \App\Support\SaudiTime::formatAppointmentSaudi($upComing['service_schedule'], 'd-M-Y h:ia') }}</p>
+                                                         @if($upComing['is_reassign'])
+                                                             <span class="text-primary fw-semibold">
+                                                                 (
+@@ -372,7 +372,7 @@ class="hidden">
+                                                         @csrf
+                                                         <div class="modal-body">
+                                                             <input type="datetime-local" class="form-control h-45" name="service_schedule"
+-                                                                   value="{{$upComing['service_schedule']}}" min="<?php echo date('Y-m-d\TH:i'); ?>">
++                                                                   value="{{$upComing['service_schedule']}}" min="<?php echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>">
+                                                             <div class="pt-3 text-end">
+                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{translate('Close')}}</button>
+                                                                 <button type="submit" class="btn btn--primary">{{translate('Save changes')}}</button>
+@@ -635,7 +635,7 @@ class="rounded-circle border border-white aspect-square object-fit-cover"
+                             <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                                 <div>{{ translate('Schedule_Date') }} :</div>
+                                 <div id="service_schedule__span">
+-                                    <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                    <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                                 </div>
+                             </h5>
+                         </div>
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/status.blade.php b/Modules/BookingModule/Resources/views/admin/booking/status.blade.php
+index 8267fda..28704c2 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/status.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/status.blade.php
+@@ -23,7 +23,7 @@
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -274,7 +274,7 @@ class="small badge badge-info text-success p-1 fz-10">{{ translate('Partially pa
+ <section class="nirab-booking-execution nirab-form-panel"><h3>{{ __('admin_ui.booking_execution') }}</h3><h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                             <div>{{ translate('Schedule_Date') }} :</div>
+                                             <div id="service_schedule__span">
+-                                                <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }} <span
++                                                <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }} <span
+                                                        class="text-secondary">{{ $booking?->schedule_histories->count() > 1 ? translate('(Edited)') : '' }}</span>
+                                                 </div>
+ 
+@@ -315,7 +315,7 @@ class="{{ $booking->service_schedule == $history->schedule ? 'active' : '' }}">
+                                             <p class="timeline-title text-capitalize">{{ translate('Booking_Placed') }}
+                                             </p>
+                                             <p class="timeline-text">
+-                                                {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                                                {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                                             <p class="timeline-text">{{ translate('By') }}
+                                                 -
+                                                 {{ isset($booking->customer) ? Str::limit($booking->customer->first_name . ' ' . $booking->customer->last_name, 30) : translate('Not_Available') }}
+@@ -334,7 +334,7 @@ class="{{ $booking->service_schedule == $history->schedule ? 'active' : '' }}">
+                                                 <p class="timeline-title text-capitalize">
+                                                     {{ $status_history->booking_status }}</p>
+                                                 <p class="timeline-text">
+-                                                    {{ date('d-M-Y h:ia', strtotime($status_history->created_at)) }}</p>
++                                                    {{ \App\Support\SaudiTime::formatInstantSaudi($status_history->created_at, 'd-M-Y h:ia') }}</p>
+                                                 <p class="timeline-text">{{ translate('By') }}
+                                                     @if (isset($status_history->user->provider))
+                                                         -
+@@ -746,7 +746,7 @@ class="btn btn--primary"
+                     </div>
+                     <div class="modal-body">
+                         <input type="datetime-local" id="service_schedule" name="service_schedule" class="form-control"
+-                            value="{{ $booking->service_schedule }}">
++                            value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}">
+                     </div>
+                     <div class="p-3 d-flex justify-content-end gap-2">
+                         <button type="button" class="btn btn-secondary"
+diff --git a/Modules/BookingModule/Resources/views/admin/booking/verification-list.blade.php b/Modules/BookingModule/Resources/views/admin/booking/verification-list.blade.php
+index e815ed5..40fe9dc 100644
+--- a/Modules/BookingModule/Resources/views/admin/booking/verification-list.blade.php
++++ b/Modules/BookingModule/Resources/views/admin/booking/verification-list.blade.php
+@@ -246,10 +246,10 @@ class="badge badge badge-{{$booking->is_paid?'success':'danger'}} radius-50">
+                                             <td>
+                                                 @if($booking->is_repeated)
+                                                     <span>{{translate('Next upcoming')}}</span>
+-                                                    <div>{{ date('d-M-Y', strtotime($booking?->nextService?->service_schedule)) }}</div>
++                                                    <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking?->nextService?->service_schedule, 'd-M-Y') }}</div>
+                                                     <div>{{ format_time_by_business_settings($booking?->nextService?->service_schedule) }}</div>
+                                                 @else
+-                                                    <div>{{ date('d-M-Y', strtotime($booking->service_schedule)) }}</div>
++                                                    <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y') }}</div>
+                                                     <div>{{ format_time_by_business_settings($booking->service_schedule) }}</div>
+                                                 @endif
+                                             </td>
+diff --git a/Modules/BookingModule/Resources/views/cash/operations.blade.php b/Modules/BookingModule/Resources/views/cash/operations.blade.php
+index 8cb0fa3..d21137d 100644
+--- a/Modules/BookingModule/Resources/views/cash/operations.blade.php
++++ b/Modules/BookingModule/Resources/views/cash/operations.blade.php
+@@ -34,7 +34,7 @@
+         <tbody>@forelse($collections as $collection)
+             <tr>
+                 <td>{{ $collection->technician?->user?->first_name }} {{ $collection->technician?->user?->last_name }}<br><small>{{ $collection->booking?->readable_id ? __('operational.booking_reference', ['reference' => $collection->booking->readable_id]) : __('operational.fields.booking_id') }}</small><details><summary>{{ __('operational.reference') }}</summary><code dir="ltr">{{ $collection->booking_repeat_id ?? $collection->booking_id }}</code></details></td>
+-                <td>{{ $collection->amount }} {{ $collection->currency }}<br>{{ $collection->collected_at }}</td>
++                <td>{{ $collection->amount }} {{ $collection->currency }}<br>{{ \App\Support\SaudiTime::formatInstantSaudi($collection->collected_at) }}</td>
+                 <td>{{ app(\App\Services\OperationalPresentation::class)->value('method', $collection->method) }}<br>{{ $collection->reference }}</td>
+                 <td>{{ app(\App\Services\OperationalPresentation::class)->value('status', $collection->status) }}<br>{{ $collection->rejection_reason }}</td>
+                 <td>@if($collection->proof?->full_path)<a href="{{ $collection->proof->full_path }}" target="_blank" rel="noopener">{{ __('bookingmodule::execution.proof') }}</a>@endif</td>
+@@ -78,7 +78,7 @@
+     <div class="table-responsive nirab-cash-table"><table class="table table-bordered">
+         <thead><tr>@foreach(['technician','amount','received_amount','status','review'] as $label)<th>{{ __('bookingmodule::execution.'.$label) }}</th>@endforeach</tr></thead>
+         <tbody>@forelse($handovers as $handover)<tr>
+-            <td>{{ $handover->technician?->user?->first_name }} {{ $handover->technician?->user?->last_name }}<br>{{ $handover->created_at }}</td>
++            <td>{{ $handover->technician?->user?->first_name }} {{ $handover->technician?->user?->last_name }}<br>{{ \App\Support\SaudiTime::formatInstantSaudi($handover->created_at) }}</td>
+             <td>{{ $handover->amount }} SAR</td><td>{{ $handover->received_amount }} SAR</td>
+             <td>{{ app(\App\Services\OperationalPresentation::class)->value('status', $handover->status) }}<br>{{ $handover->note }}</td>
+             <td>
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/calendar-view.blade.php b/Modules/BookingModule/Resources/views/provider/booking/calendar-view.blade.php
+index 04ed24b..3c0a554 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/calendar-view.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/calendar-view.blade.php
+@@ -203,6 +203,12 @@ function initSingleDatePicker(selector) {
+ 
+          calendar = new FullCalendar.Calendar(calendarElNew, {
+              initialView: 'dayGridMonth',
++             // Named-zone UTC coercion: grouped events are Saudi civil components.
++             // This bundle has no named-zone plugin, so use UTC getters for its Date carriers.
++             timeZone: 'Asia/Riyadh',
++             now: () => new Intl.DateTimeFormat('sv-SE', {timeZone: 'Asia/Riyadh',
++                 year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit',
++                 minute: '2-digit', second: '2-digit', hourCycle: 'h23'}).format(new Date()).replace(' ', 'T'),
+              firstDay: 1,     // Monday start
+              allDaySlot: false,
+ 
+@@ -259,8 +265,8 @@ function initSingleDatePicker(selector) {
+                 if (viewType === 'dayGridMonth') {
+                     requestData = {
+                         mode: 'dayGridMonth',
+-                        month: currentDate.getMonth() + 1,
+-                        year: currentDate.getFullYear()
++                        month: currentDate.getUTCMonth() + 1,
++                        year: currentDate.getUTCFullYear()
+                     };
+                 }
+                 else if (viewType === 'timeGridWeek') {
+@@ -344,7 +350,7 @@ function openBookingOffcanvas(bookingIds, startDate) {
+         const offcanvasEl = document.getElementById('booking-calender_offcanvas');
+         const offcanvasTitle = offcanvasEl.querySelector('h3');
+ 
+-        const isHourly = startDate.getHours() !== 0;
++        const isHourly = startDate.getUTCHours() !== 0;
+ 
+         const { datePart, hourPart } = formatOffcanvasDateParts(startDate);
+ 
+@@ -370,9 +376,9 @@ function openBookingOffcanvas(bookingIds, startDate) {
+         offcanvas.show();
+ 
+         const localDate =
+-            startDate.getFullYear() + '-' +
+-            String(startDate.getMonth() + 1).padStart(2, '0') + '-' +
+-            String(startDate.getDate()).padStart(2, '0');
++            startDate.getUTCFullYear() + '-' +
++            String(startDate.getUTCMonth() + 1).padStart(2, '0') + '-' +
++            String(startDate.getUTCDate()).padStart(2, '0');
+ 
+         $.ajax({
+             url: "{{ route('provider.booking.calendar.events.bookings') }}",
+@@ -470,12 +476,14 @@ function renderBookings(bookings, startDate = null ) {
+ 
+     function formatOffcanvasDateParts(date) {
+         const datePart = new Intl.DateTimeFormat('en-GB', {
++            timeZone: 'UTC', // FullCalendar's Saudi civil Date carrier, not an event instant.
+             day: '2-digit',
+             month: 'short',
+             year: 'numeric'
+         }).format(date);
+ 
+         const hourPart = new Intl.DateTimeFormat('en-US', {
++            timeZone: 'UTC',
+             hour: 'numeric',
+             hour12: true
+         }).format(date);
+@@ -505,7 +513,7 @@ function formatOffcanvasDateParts(date) {
+             filterData.filter_end_date   = endDate;
+ 
+             const validEndDate = new Date(endDate);
+-            validEndDate.setDate(validEndDate.getDate() + 1);
++            validEndDate.setUTCDate(validEndDate.getUTCDate() + 1);
+ 
+             calendar.setOption('validRange', {
+                 start: startDate,
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/details.blade.php b/Modules/BookingModule/Resources/views/provider/booking/details.blade.php
+index 760ba50..8cf1383 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/details.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/details.blade.php
+@@ -31,7 +31,7 @@
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{translate('Booking_Placed')}}
+-                        : {{date('d-M-Y h:ia',strtotime($booking->created_at))}}</p>
++                        : {{\App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')}}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex gap-3">
+@@ -131,7 +131,7 @@ class="small badge badge-info text-success p-1 fz-10">{{translate('Partially pai
+                                     <h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                         <div>{{translate('Schedule_Date')}} :</div>
+                                         <div id="service_schedule__span">
+-                                            <div>{{date('d-M-Y h:ia',strtotime($booking->service_schedule))}} <span
++                                            <div>{{\App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')}} <span
+                                                     class="text-secondary">{{ $booking?->schedule_histories->count() > 1 ? translate('(Edited)') : '' }}</span>
+                                             </div>
+ 
+@@ -445,10 +445,10 @@ class="hidden">
+                                 @if(!in_array($booking->booking_status,['ongoing','completed']))
+                                     <input type="datetime-local" class="form-control service_schedule"
+                                            name="service_schedule"
+-                                           value="{{$booking->service_schedule}}"
++                                           value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
+                                            id="service_schedule"
+-                                           data-original="{{ $booking->service_schedule }}"
+-                                           min="<?php echo date('Y-m-d\TH:i'); ?>">
++                                           data-original="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
++                                           min="<?php echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>">
+                                 @endif
+                             </div>
+ 
+@@ -772,7 +772,7 @@ class="btn btn--primary"
+                 </div>
+                 <div class="modal-body">
+                     <input type="datetime-local" id="service_schedule" name="service_schedule" class="form-control"
+-                           value="{{$booking->service_schedule}}">
++                           value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}">
+                 </div>
+                 <div class="p-3 d-flex justify-content-end gap-2">
+                     <button type="button" class="btn btn-secondary"
+@@ -1253,9 +1253,8 @@ function update_component(componentId, updatedValue) {
+ 
+             } else if (componentId === 'service_schedule__submit') {
+                 $('#changeScheduleModal').modal('hide');
+-                let date = new Date(updatedValue);
+-                $('#service_schedule__span').html(date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " +
+-                    date.getHours() + ":" + date.getMinutes());
++                let date = new Date(updatedValue.replace(' ', 'T') + '+03:00');
++                $('#service_schedule__span').html(new Intl.DateTimeFormat('ar-SA', {timeZone: 'Asia/Riyadh', dateStyle: 'medium', timeStyle: 'short'}).format(date));
+ 
+             }
+         }
+@@ -1280,8 +1279,8 @@ function selectElementVisibility(componentId, visibility) {
+             }
+ 
+             // Normalize formats (replace space with 'T' for parsing)
+-            var newDate = new Date(service_schedule);
+-            var originalDate = new Date(original.replace(" ", "T"));
++            var newDate = new Date(service_schedule.replace(' ', 'T') + '+03:00');
++            var originalDate = new Date(original.replace(" ", "T") + "+03:00");
+             var now = new Date();
+ 
+             // Compare with current time
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/fullbooking-invoice.blade.php b/Modules/BookingModule/Resources/views/provider/booking/fullbooking-invoice.blade.php
+index ae72e45..ef5aeb0 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/fullbooking-invoice.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/fullbooking-invoice.blade.php
+@@ -184,7 +184,7 @@
+                     <td>
+                         <h3 class="text-uppercase fw-700">{{translate("invoice")}}</h3>
+                         <div>{{translate('Booking')}} #{{$booking->readable_id}} <img src="{{ asset('public/assets/admin-module/img/repeat.png') }}" width="15px" height="15px" alt=""></div>
+-                        <div>{{ translate('date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                        <div>{{ translate('date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                     </td>
+                     <td class="company-details">
+                         <a target="_blank" href="#">
+@@ -272,7 +272,7 @@
+ 
+                             <td class="border-left">
+                                 <h6 class="fz-12">{{translate('Service Details')}}</h6>
+-                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                                 <div class="fs-9">{{translate('Booking Type')}}
+                                     : {{ucwords($booking->repeat[0]->booking_type)}}</div>
+                                 <div class="fs-9">{{ translate('Booking Date range') }}:
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/fullbooking-single-invoice.blade.php b/Modules/BookingModule/Resources/views/provider/booking/fullbooking-single-invoice.blade.php
+index 1005990..12d0027 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/fullbooking-single-invoice.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/fullbooking-single-invoice.blade.php
+@@ -168,7 +168,7 @@
+                     <td>
+                         <h3 class="text-uppercase fw-700">{{translate("invoice")}}</h3>
+                         <div>{{translate('Booking')}} #{{$booking->readable_id}} <img src="{{ asset('public/assets/admin-module/img/repeat.png') }}" width="15px" height="15px" alt=""></div>
+-                        <div>{{ translate('date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                        <div>{{ translate('date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                     </td>
+                     <td class="company-details">
+                         <a target="_blank" href="#">
+@@ -256,8 +256,8 @@
+ 
+                             <td class="border-left">
+                                 <h6 class="fz-12">{{translate('Service Time')}}</h6>
+-                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
+-                                <div class="fs-9">{{ translate('Service Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->service_schedule))]) }}</div>
++                                <div class="fs-9">{{ translate('Request Date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
++                                <div class="fs-9">{{ translate('Service Date: :date', ['date' => \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')]) }}</div>
+                             </td>
+ 
+                             <td>
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/invoice.blade.php b/Modules/BookingModule/Resources/views/provider/booking/invoice.blade.php
+index 6af566a..7a89d04 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/invoice.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/invoice.blade.php
+@@ -136,7 +136,7 @@
+                     <div class="col">
+                         <h3 class="text-uppercase fw-700">{{translate("invoice")}}</h3>
+                         <div>{{translate('Booking')}} #{{$booking->readable_id}}</div>
+-                        <div>{{ translate('date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
++                        <div>{{ translate('date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
+                     </div>
+                     <div class="col company-details">
+                         <a target="_blank" href="#">
+@@ -227,8 +227,8 @@
+ 
+                         <div class="col border-left">
+                             <h6 class="fz-12">{{translate('Service Time')}}</h6>
+-                            <div class="fs-9">{{ translate('Request Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->created_at))]) }}</div>
+-                            <div class="fs-9">{{ translate('Service Date: :date', ['date' => date('d-M-Y h:ia',strtotime($booking->service_schedule))]) }}</div>
++                            <div class="fs-9">{{ translate('Request Date: :date', ['date' => \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')]) }}</div>
++                            <div class="fs-9">{{ translate('Service Date: :date', ['date' => \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')]) }}</div>
+                         </div>
+                     </div>
+ 
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php b/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php
+index 0cb65d2..580b62a 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php
+@@ -47,7 +47,7 @@
+ 
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -144,7 +144,7 @@ class="c1">{{ ($booking?->booking?->customer?->first_name . ' ' . $booking?->boo
+                                                 <h5 class="d-flex gap-1 flex-wrap align-items-center mt-3">
+                                                     <div>{{ translate('Re-schedule_Date') }} :</div>
+                                                     <div id="service_schedule__span">
+-                                                        <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }}</div>
++                                                        <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }}</div>
+                                                         <div class="timeline-container">
+                                                             <ul class="timeline-sessions">
+                                                                 <p class="fs-14">{{ translate('Schedule Change Log') }}</p>
+@@ -169,7 +169,7 @@ class="c1">{{ ($booking?->booking?->customer?->first_name . ' ' . $booking?->boo
+                                                 <h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                                     <div>{{ translate('Schedule_Date') }} :</div>
+                                                     <div id="service_schedule__span">
+-                                                        <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }}</div>
++                                                        <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }}</div>
+                                                         <div class="timeline-container">
+                                                             <ul class="timeline-sessions">
+                                                                 <p class="fs-14">{{ translate('Schedule Change Log') }}</p>
+@@ -432,10 +432,10 @@ class="fz-12">({{ translate('Vat_Excluded') }})</small></td>
+                                 @if (!in_array($booking->booking_status, ['ongoing', 'completed']))
+                                     <input type="datetime-local" class="form-control h-45"
+                                            name="service_schedule"
+-                                           value="{{ $booking->service_schedule }}"
++                                           value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
+                                            id="service_schedule"
+-                                           data-original="{{ $booking->service_schedule }}"
+-                                           min="<?php echo date('Y-m-d\TH:i'); ?>"
++                                           data-original="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
++                                           min="<?php echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>"
+                                            onchange="service_schedule_update()">
+                                 @endif
+                             </div>
+@@ -777,7 +777,7 @@ class="btn btn--primary"
+                         <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                             <div>{{ translate('Schedule_Date') }} :</div>
+                             <div id="service_schedule__span">
+-                                <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                             </div>
+                         </h5>
+                     </div>
+@@ -1046,8 +1046,8 @@ function service_schedule_update() {
+             }
+ 
+             // Normalize formats (replace space with 'T' for parsing)
+-            var newDate = new Date(service_schedule);
+-            var originalDate = new Date(original.replace(" ", "T"));
++            var newDate = new Date(service_schedule.replace(' ', 'T') + '+03:00');
++            var originalDate = new Date(original.replace(" ", "T") + "+03:00");
+             var now = new Date();
+ 
+             // Compare with current time
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php b/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php
+index 6e7f618..91940a8 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php
+@@ -49,7 +49,7 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -133,7 +133,7 @@ class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-
+                                     <button type="button"
+                                         class="btn btn--light border-dashed text-capitalize title-color d-flex flex-wrap gap-1">
+                                         {{ translate('Scheduled At') }}:
+-                                        <span class="opacity-75">{{ date('d-M-Y h:ia', strtotime($booking->nextService['service_schedule'])) }}</span>
++                                        <span class="opacity-75">{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->nextService['service_schedule'], 'd-M-Y h:ia') }}</span>
+                                     </button>
+                                 </div>
+                                 <div class="col-md-6">
+@@ -674,7 +674,7 @@ class="rounded-circle border border-white aspect-square object-fit-cover"
+                             <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                                 <div>{{ translate('Schedule_Date') }} :</div>
+                                 <div id="service_schedule__span">
+-                                    <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}
++                                    <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}
+                                     </div>
+                                 </div>
+                             </h5>
+@@ -823,7 +823,7 @@ class="material-symbols-outlined user-select-none">keyboard_arrow_down</span>
+                                             </td>
+                                             <td>#{{ $repeat['readable_id'] }}</td>
+                                             <td>
+-                                                <div>{{ date('d-M-Y h:ia', strtotime($booking['created_at'])) }}</div>
++                                                <div>{{ \App\Support\SaudiTime::formatInstantSaudi($booking['created_at'], 'd-M-Y h:ia') }}</div>
+                                             </td>
+                                             <td>
+                                                 <div class="d-flex align-items-center gap-1 justify-content-center">
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php b/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php
+index 3e5058f..66a89b1 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php
+@@ -30,7 +30,7 @@
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -132,7 +132,7 @@ class="text-capitalize">{{ str_replace(['_', '-'], ' ', $booking->payment_method
+                                             <h5 class="d-flex gap-1 flex-wrap align-items-center mt-3">
+                                                 <div>{{ translate('Re-schedule_Date') }} :</div>
+                                                 <div id="service_schedule__span">
+-                                                    <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }}</div>
++                                                    <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }}</div>
+                                                     <div class="timeline-container">
+                                                         <ul class="timeline-sessions">
+                                                             <p class="fs-14">{{ translate('Schedule Change Log') }}</p>
+@@ -157,7 +157,7 @@ class="text-capitalize">{{ str_replace(['_', '-'], ' ', $booking->payment_method
+                                             <h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                                 <div>{{ translate('Schedule_Date') }} :</div>
+                                                 <div id="service_schedule__span">
+-                                                    <div>{{ date('d-M-Y h:ia', strtotime($booking->service_schedule)) }}</div>
++                                                    <div>{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia') }}</div>
+                                                     <div class="timeline-container">
+                                                         <ul class="timeline-sessions">
+                                                             <p class="fs-14">{{ translate('Schedule Change Log') }}</p>
+@@ -196,7 +196,7 @@ class="text-capitalize">{{ str_replace(['_', '-'], ' ', $booking->payment_method
+                                             <p class="timeline-title text-capitalize">{{ translate('Booking_Placed') }}
+                                             </p>
+                                             <p class="timeline-text">
+-                                                {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                                                {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                                             <p class="timeline-text">By
+                                                 -
+                                                 {{ isset($booking->customer) ? Str::limit($booking->customer->first_name . ' ' . $booking->customer->last_name, 30) : translate('Not_Available') }}
+@@ -215,7 +215,7 @@ class="text-capitalize">{{ str_replace(['_', '-'], ' ', $booking->payment_method
+                                                 <p class="timeline-title text-capitalize">
+                                                     {{ $status_history->booking_status }}</p>
+                                                 <p class="timeline-text">
+-                                                    {{ date('d-M-Y h:ia', strtotime($status_history->created_at)) }}</p>
++                                                    {{ \App\Support\SaudiTime::formatInstantSaudi($status_history->created_at, 'd-M-Y h:ia') }}</p>
+                                                 <p class="timeline-text">{{ translate('By') }}
+                                                     @if (isset($status_history->user->provider))
+                                                         -
+@@ -288,10 +288,10 @@ class="text-capitalize">{{ str_replace(['_', '-'], ' ', $booking->payment_method
+                             <div class="mt-3">
+                                 @if (!in_array($booking->booking_status, ['ongoing', 'completed']))
+                                     <input type="datetime-local" class="form-control h-45" name="service_schedule"
+-                                           value="{{ $booking->service_schedule }}"
++                                           value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
+                                            id="service_schedule"
+-                                           data-original="{{ $booking->service_schedule }}"
+-                                           min="<?php echo date('Y-m-d\TH:i'); ?>"
++                                           data-original="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}"
++                                           min="<?php echo \App\Support\SaudiTime::now()->format('Y-m-d\TH:i'); ?>"
+                                            onchange="service_schedule_update()">
+                                 @endif
+                             </div>
+@@ -492,7 +492,7 @@ class="btn btn--primary"
+                         <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                             <div>{{ translate('Schedule_Date') }} :</div>
+                             <div id="service_schedule__span">
+-                                <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                             </div>
+                         </h5>
+                     </div>
+@@ -657,8 +657,8 @@ function service_schedule_update() {
+             }
+ 
+             // Normalize formats (replace space with 'T' for parsing)
+-            var newDate = new Date(service_schedule);
+-            var originalDate = new Date(original.replace(" ", "T"));
++            var newDate = new Date(service_schedule.replace(' ', 'T') + '+03:00');
++            var originalDate = new Date(original.replace(" ", "T") + "+03:00");
+             var now = new Date();
+ 
+             // Compare with current time
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php b/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php
+index f7c38fa..4cee65c 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php
+@@ -28,7 +28,7 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{ translate('Booking_Placed') }}
+-                        : {{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</p>
++                        : {{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex flex-wrap gap-3">
+@@ -74,7 +74,7 @@ class="rounded-circle repeat-icon" alt="{{ translate('repeat') }}">
+                                                 <h6 class="fz-13 mb-2">{{ translate('Booking Id') }}
+                                                     #{{ $booking->nextService['readable_id'] }}
+                                                 </h6>
+-                                                <p class="fz-12">{{ date('d-M-Y h:ia', strtotime($booking->nextService['service_schedule'])) }}</p>
++                                                <p class="fz-12">{{ \App\Support\SaudiTime::formatAppointmentSaudi($booking->nextService['service_schedule'], 'd-M-Y h:ia') }}</p>
+                                             </div>
+                                             <div class="d-flex gap-2 justify-content-center">
+                                                 <a href="{{ route('provider.booking.single_invoice', [$booking->nextService['id']]) }}" type="button" target="_blank"
+@@ -107,7 +107,7 @@ class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                         <h6 class="fz-13 mb-2">{{ translate('Booking Id') }}
+                                                             #{{ $data['readable_id']}}
+                                                         </h6>
+-                                                        <p class="fz-12">{{ date('d-M-Y h:ia', strtotime($data['service_schedule'])) }}</p>
++                                                        <p class="fz-12">{{ \App\Support\SaudiTime::formatAppointmentSaudi($data['service_schedule'], 'd-M-Y h:ia') }}</p>
+                                                     </div>
+                                                     <div class="d-flex gap-2 justify-content-center">
+                                                         <a href="{{ route('provider.booking.single_invoice', [$data['id']]) }}" type="button"
+@@ -145,7 +145,7 @@ class="action-btn btn--light-primary fw-medium text-capitalize fz-14"
+                                                             <span class="title-color opacity-75">({{ translate('Rescheduled') }})</span>
+                                                             @endif
+                                                         </h6>
+-                                                        <p class="fz-12 mb-1">{{ date('d-M-Y h:ia', strtotime($upComing['service_schedule'])) }}</p>
++                                                        <p class="fz-12 mb-1">{{ \App\Support\SaudiTime::formatAppointmentSaudi($upComing['service_schedule'], 'd-M-Y h:ia') }}</p>
+                                                         @if($upComing['is_reassign'])
+                                                             <span class="text-primary fw-semibold">
+                                                                 (
+@@ -388,7 +388,7 @@ class="rounded-circle border border-white aspect-square object-fit-cover"
+                             <h5 class="d-flex gap-1 flex-wrap align-items-center justify-content-end fw-normal mb-2">
+                                 <div>{{ translate('Schedule_Date') }} :</div>
+                                 <div id="service_schedule__span">
+-                                    <div class="fw-semibold">{{ date('d-M-Y h:ia', strtotime($booking->created_at)) }}</div>
++                                    <div class="fw-semibold">{{ \App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia') }}</div>
+                                 </div>
+                             </h5>
+                         </div>
+diff --git a/Modules/BookingModule/Resources/views/provider/booking/status.blade.php b/Modules/BookingModule/Resources/views/provider/booking/status.blade.php
+index bc0c6ce..ccfa4f1 100644
+--- a/Modules/BookingModule/Resources/views/provider/booking/status.blade.php
++++ b/Modules/BookingModule/Resources/views/provider/booking/status.blade.php
+@@ -33,7 +33,7 @@
+                         </span>
+                     </div>
+                     <p class="opacity-75 fz-12">{{translate('Booking_Placed')}}
+-                        : {{date('d-M-Y h:ia',strtotime($booking->created_at))}}</p>
++                        : {{\App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')}}</p>
+                 </div>
+                 <div class="d-flex flex-wrap flex-xxl-nowrap gap-3">
+                     <div class="d-flex gap-3">
+@@ -126,7 +126,7 @@ class="small badge badge-info text-success p-1 fz-10">{{translate('Partially pai
+                                         <h5 class="d-flex gap-1 flex-wrap align-items-center">
+                                             <div>{{translate('Schedule_Date')}} :</div>
+                                             <div id="service_schedule__span">
+-                                                <div>{{date('d-M-Y h:ia',strtotime($booking->service_schedule))}} <span
++                                                <div>{{\App\Support\SaudiTime::formatAppointmentSaudi($booking->service_schedule, 'd-M-Y h:ia')}} <span
+                                                        class="text-secondary">{{ $booking?->schedule_histories->count() > 1 ? translate('(Edited)') : '' }}</span>
+                                                 </div>
+ 
+@@ -163,7 +163,7 @@ class="timeline-time">{{ \Carbon\Carbon::parse($history->schedule)->format('h:i
+                                         </div>
+                                         <div class="timeline-info">
+                                             <p class="timeline-title text-capitalize">{{translate('Booking_Placed')}}</p>
+-                                            <p class="timeline-text">{{date('d-M-Y h:ia',strtotime($booking->created_at))}}</p>
++                                            <p class="timeline-text">{{\App\Support\SaudiTime::formatInstantSaudi($booking->created_at, 'd-M-Y h:ia')}}</p>
+                                             <p class="timeline-text">By
+                                                 - {{isset($booking->customer) ? Str::limit($booking->customer->first_name.' '.$booking->customer->last_name, 30):translate('Not_Available')}}</p>
+                                         </div>
+@@ -178,7 +178,7 @@ class="timeline-time">{{ \Carbon\Carbon::parse($history->schedule)->format('h:i
+                                             </div>
+                                             <div class="timeline-info">
+                                                 <p class="timeline-title text-capitalize">{{$status_history->booking_status}}</p>
+-                                                <p class="timeline-text">{{date('d-M-Y h:ia',strtotime($status_history->created_at))}}</p>
++                                                <p class="timeline-text">{{\App\Support\SaudiTime::formatInstantSaudi($status_history->created_at, 'd-M-Y h:ia')}}</p>
+                                                 <p class="timeline-text">{{translate('By')}}
+                                                     @if(isset($status_history->user->provider))
+                                                         - {{Str::limit($status_history?->user?->provider?->company_name, 30)}}
+@@ -368,7 +368,7 @@ class="btn btn--primary"
+                     </div>
+                     <div class="modal-body">
+                         <input type="datetime-local" class="form-control" id="service_schedule" name="service_schedule"
+-                               value="{{$booking->service_schedule}}">
++                               value="{{ $booking->service_schedule?->format('Y-m-d\TH:i') }}">
+                     </div>
+                     <div class="p-3 d-flex justify-content-end gap-2">
+                         <button type="button" class="btn btn-secondary"
+diff --git a/Modules/BookingModule/Services/AvailabilityService.php b/Modules/BookingModule/Services/AvailabilityService.php
+index 0ac0eef..101575a 100644
+--- a/Modules/BookingModule/Services/AvailabilityService.php
++++ b/Modules/BookingModule/Services/AvailabilityService.php
+@@ -16,6 +16,7 @@ class AvailabilityService
+ {
+     public function canFulfill(string $providerId, array $serviceIds, CarbonInterface $startsAt, int $durationMinutes, int $requiredTechnicians, string $executionType = 'single', ?string $ignoreBookingId = null): bool
+     {
++        $startsAt = $startsAt->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         if ($startsAt->isPast() || $durationMinutes < 1 || $requiredTechnicians < 1 || empty($serviceIds)) {
+             return false;
+         }
+@@ -65,6 +66,7 @@ public function canFulfill(string $providerId, array $serviceIds, CarbonInterfac
+ 
+     public function explain(Serviceman $serviceman, array $serviceIds, CarbonInterface $startsAt, int $durationMinutes, ?string $ignoreBookingId = null): array
+     {
++        $startsAt = $startsAt->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         $reasons = [];
+         if (!$serviceman->user?->is_active) {
+             $reasons[] = 'inactive';
+@@ -96,8 +98,8 @@ public function explain(Serviceman $serviceman, array $serviceIds, CarbonInterfa
+         $onLeave = ServicemanLeave::query()
+             ->where('serviceman_id', $serviceman->id)
+             ->where('status', 'approved')
+-            ->where('starts_at', '<', $endsAt)
+-            ->where('ends_at', '>', $startsAt)
++            ->where('starts_at', '<', $endsAt->copy()->utc())
++            ->where('ends_at', '>', $startsAt->copy()->utc())
+             ->exists();
+         if ($onLeave) {
+             $reasons[] = 'on_leave';
+@@ -112,6 +114,8 @@ public function explain(Serviceman $serviceman, array $serviceIds, CarbonInterfa
+ 
+     public function hasConflict(string $servicemanId, CarbonInterface $startsAt, CarbonInterface $endsAt, ?string $ignoreBookingId = null): bool
+     {
++        $startsAt = $startsAt->copy()->setTimezone(\App\Support\SaudiTime::timezone());
++        $endsAt = $endsAt->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         $buffer = config('nirab_dispatch.travel_buffer_minutes');
+         $windowStart = $startsAt->copy()->subMinutes($buffer);
+         $windowEnd = $endsAt->copy()->addMinutes($buffer);
+@@ -145,6 +149,7 @@ public function slots(string $providerId, array $serviceIds, CarbonInterface $da
+     {
+         $servicemen = Serviceman::withoutGlobalScopes()->with('user')->where('provider_id', $providerId)->get();
+         $slots = [];
++        $day = $day->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         $cursor = $day->copy()->startOfDay();
+         $end = $day->copy()->endOfDay();
+ 
+@@ -183,7 +188,7 @@ public function configuredWindow(\Modules\ProviderManagement\Entities\Provider $
+         $shifts = ServicemanShift::where('is_active', true)->whereHas('serviceman', fn ($q) => $q->withoutGlobalScopes()->whereNull('deleted_at')->where('provider_id', $branch->id))
+             ->orderBy('starts_at')->get();
+         for ($offset = 1; $offset <= 7; $offset++) {
+-            $day = now()->setTimezone(config('app.timezone'))->startOfDay()->addDays($offset);
++            $day = now()->setTimezone(\App\Support\SaudiTime::timezone())->startOfDay()->addDays($offset);
+             $hours = $settings['weekly'][$day->dayOfWeek] ?? $settings;
+             $times = $shifts->where('day_of_week', $day->dayOfWeek)->pluck('starts_at')->map(fn ($time) => max(substr($time, 0, 5), $hours['start_time'] ?? '00:00'))
+                 ->merge(array_column($hours['breaks'] ?? [], 'end_time'))->unique()->sort()->take(12);
+diff --git a/Modules/BookingModule/Services/BookingAmendmentService.php b/Modules/BookingModule/Services/BookingAmendmentService.php
+index a921324..818557b 100644
+--- a/Modules/BookingModule/Services/BookingAmendmentService.php
++++ b/Modules/BookingModule/Services/BookingAmendmentService.php
+@@ -119,7 +119,7 @@ private function apply(Model $booking, Booking $parent, array $items): void
+         abort_unless(app(DirectServicePolicy::class)->allAvailable($context['provider_id'], $requirements['service_ids'], $context['area_id'], false), 409, 'service_not_available_for_branch');
+         $start = Carbon::parse($booking->service_schedule);
+         // In-progress work reserves its remaining window from now; completed work cannot be edited.
+-        $window = $start->isPast() ? now()->addSeconds(5) : $start;
++        $window = $start->isPast() ? \App\Support\SaudiTime::now()->addSeconds(5) : $start;
+         $availability = app(AvailabilityService::class);
+         abort_unless($availability->canFulfill($context['provider_id'], $requirements['service_ids'], $window,
+             $requirements['duration_minutes'], $requirements['required_technicians'], $requirements['execution_type'], $parent->id), 409, 'booking_amendment_capacity_conflict');
+diff --git a/Modules/BookingModule/Services/BookingSchedule.php b/Modules/BookingModule/Services/BookingSchedule.php
+index 9affb8b..4d24d24 100644
+--- a/Modules/BookingModule/Services/BookingSchedule.php
++++ b/Modules/BookingModule/Services/BookingSchedule.php
+@@ -2,21 +2,19 @@
+ 
+ namespace Modules\BookingModule\Services;
+ 
++use App\Support\SaudiTime;
+ use Illuminate\Support\Carbon;
+ 
+-/** The slot API and existing database schedules use app.timezone wall time. */
++/** Compatibility entry point shared by checkout, visits and dispatch. */
+ final class BookingSchedule
+ {
+     public static function parse(string $value): Carbon
+     {
+-        $timezone = config('app.timezone');
+-        // Explicit offsets identify an instant. Legacy offset-free inputs keep
+-        // their existing operational wall time, independent of PHP's timezone.
+-        return Carbon::parse($value, $timezone)->setTimezone($timezone);
++        return SaudiTime::parseCustomerAppointment($value);
+     }
+ 
+     public static function forStorage(string $value): string
+     {
+-        return self::parse($value)->format('Y-m-d H:i:s');
++        return SaudiTime::forAppointmentStorage($value);
+     }
+ }
+diff --git a/Modules/BookingModule/Services/DirectBookingReservationGuard.php b/Modules/BookingModule/Services/DirectBookingReservationGuard.php
+index 4922b27..a012eee 100644
+--- a/Modules/BookingModule/Services/DirectBookingReservationGuard.php
++++ b/Modules/BookingModule/Services/DirectBookingReservationGuard.php
+@@ -55,7 +55,7 @@ private function validateVisit(Model $booking, Booking $parent): void
+         }
+         if ($start->isPast()) {
+             abort_if($booking->isDirty('service_schedule'), 422, 'schedule_must_be_future');
+-            $start = now()->addSeconds(5);
++            $start = \App\Support\SaudiTime::now()->addSeconds(5);
+         }
+         $availability = app(AvailabilityService::class);
+         abort_unless($availability->canFulfill($booking->provider_id, $serviceIds, $start, $duration, $crew,
+diff --git a/Modules/BookingModule/Services/TrackingService.php b/Modules/BookingModule/Services/TrackingService.php
+index b3fa2b6..e360b08 100644
+--- a/Modules/BookingModule/Services/TrackingService.php
++++ b/Modules/BookingModule/Services/TrackingService.php
+@@ -18,6 +18,7 @@ public function __construct(private readonly EtaProvider $eta)
+ 
+     public function updateLocation(string $servicemanId, string $bookingId, float $latitude, float $longitude, ?float $accuracy, Carbon $capturedAt): ServicemanLastLocation
+     {
++        $capturedAt = $capturedAt->copy()->utc();
+         return DB::transaction(function () use ($servicemanId, $bookingId, $latitude, $longitude, $accuracy, $capturedAt): ServicemanLastLocation {
+             $booking = Booking::withoutGlobalScopes()->with('service_address')->whereKey($bookingId)->lockForUpdate()->firstOrFail();
+             $assigned = BookingAssignment::query()->where('booking_id', $bookingId)->where('serviceman_id', $servicemanId)->where('status', 'accepted')->exists();
+diff --git a/Modules/CustomerSubscriptionModule/Services/VisitPackageService.php b/Modules/CustomerSubscriptionModule/Services/VisitPackageService.php
+index 8d1bc7a..ac44009 100644
+--- a/Modules/CustomerSubscriptionModule/Services/VisitPackageService.php
++++ b/Modules/CustomerSubscriptionModule/Services/VisitPackageService.php
+@@ -65,7 +65,7 @@ public function previewBooking(User $actor, string $packageId, array $input): ar
+             'variant_key' => $variation->variant_key, 'quantity' => (int) $input['quantity'],
+             'service_address_id' => $address->id, 'address' => $address->address,
+             'provider_id' => $branch->id, 'branch_name' => $branch->company_name,
+-            'service_schedule' => $schedule->format('Y-m-d H:i:s'), 'timezone' => config('app.timezone'),
++            'service_schedule' => $schedule->format('Y-m-d H:i:s'), 'service_schedule_at' => $schedule->toIso8601String(), 'timezone' => \App\Support\SaudiTime::timezone(),
+             'remaining_before' => $context['package']->remaining_visits,
+             'remaining_after' => $context['package']->remaining_visits - 1,
+             'visits_required' => 1, 'amount_due' => 0, 'currency' => $context['package']->currency,
+@@ -161,7 +161,7 @@ private function resolveVisit(User $actor, VisitPackage $package, array $input,
+         abort_unless($zone && $zone === $address->zone_id, 422, 'service_address_zone_mismatch');
+         $variation = app(\Modules\ServiceManagement\Services\ServicePriceResolver::class)
+             ->resolve($service->id, $input['variant_key'], $zone);
+-        // Parse exactly like regular checkout. Offset-free values are app-timezone wall time;
++        // Parse exactly like regular checkout. Offset-free values are Saudi business wall time;
+         // explicit offsets retain the instant returned by the availability API.
+         $schedule = BookingSchedule::parse($input['service_schedule']);
+         $branches = app(\Modules\ProviderManagement\Services\BranchAssignmentService::class);
+diff --git a/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/TimeScheduleController.php b/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/TimeScheduleController.php
+index b3d5586..a6acd11 100644
+--- a/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/TimeScheduleController.php
++++ b/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/TimeScheduleController.php
+@@ -14,7 +14,7 @@ public function getAvailableTimeSchedule(Request $request): JsonResponse
+         if ($data['time_schedule'] === []) $data['time_schedule'] = null;
+         return response()->json(response_formatter(DEFAULT_200, $data + [
+             'service_availability' => (int) $provider->service_availability,
+-            'intake_enabled' => $provider->getAttribute('intake_enabled'), 'timezone' => config('app.timezone'),
++            'intake_enabled' => $provider->getAttribute('intake_enabled'), 'timezone' => \App\Support\SaudiTime::timezone(),
+         ]));
+     }
+     public function setAvailableTimeSchedule(Request $request): JsonResponse
+diff --git a/Modules/ProviderManagement/Services/BranchCapacityPolicy.php b/Modules/ProviderManagement/Services/BranchCapacityPolicy.php
+index d2a6bee..c82d998 100644
+--- a/Modules/ProviderManagement/Services/BranchCapacityPolicy.php
++++ b/Modules/ProviderManagement/Services/BranchCapacityPolicy.php
+@@ -18,7 +18,7 @@ public function limit(Provider $branch): int
+     /** Active visits per operational calendar day; a repeat parent is never counted. */
+     public function dailyLoad(string $branchId, CarbonInterface $at, ?string $ignoreBookingId = null, ?string $ignoreRepeatId = null): int
+     {
+-        $day = $at->copy()->setTimezone(config('app.timezone'))->toDateString();
++        $day = $at->copy()->setTimezone(\App\Support\SaudiTime::timezone())->toDateString();
+         $regular = Booking::withoutGlobalScopes()->where('provider_id', $branchId)
+             ->when($ignoreBookingId, fn ($q) => $q->where('id', '!=', $ignoreBookingId))
+             ->where(fn ($q) => $q->whereNull('is_repeated')->orWhere('is_repeated', 0))
+diff --git a/Modules/ProviderManagement/Services/BranchScheduleService.php b/Modules/ProviderManagement/Services/BranchScheduleService.php
+index 780023a..3168257 100644
+--- a/Modules/ProviderManagement/Services/BranchScheduleService.php
++++ b/Modules/ProviderManagement/Services/BranchScheduleService.php
+@@ -31,7 +31,7 @@ public function configured(Provider $branch): bool
+     public function contains(Provider $branch, CarbonInterface $start, int $duration = 0): bool
+     {
+         $data = $this->read($branch->id);
+-        $start = $start->copy()->setTimezone(config('app.timezone'));
++        $start = $start->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         $end = $start->copy()->addMinutes($duration);
+         if (!$start->isSameDay($end) || in_array(strtolower($start->englishDayOfWeek), array_map('strtolower', $data['weekends']), true)) return false;
+         $hours = $data['time_schedule'];
+diff --git a/Modules/ProviderManagement/Services/BranchZoneChangeService.php b/Modules/ProviderManagement/Services/BranchZoneChangeService.php
+index 19cc324..035b150 100644
+--- a/Modules/ProviderManagement/Services/BranchZoneChangeService.php
++++ b/Modules/ProviderManagement/Services/BranchZoneChangeService.php
+@@ -33,7 +33,7 @@ public function preview(Provider $branch, string $zone): array
+         $data = ['branch_id' => $branch->id, 'old_zone_id' => $branch->zone_id, 'new_zone_id' => $zone, 'areas' => $areas,
+             'services_for_review' => $permissions, 'prices_missing' => $missing, 'branch_location_fits' => $fits,
+             'future_bookings' => Booking::withoutGlobalScopes()->where('provider_id', $branch->id)->whereNotIn('booking_status', ['completed', 'canceled'])
+-                ->where(fn ($q) => $q->where('service_schedule', '>', now())->orWhereHas('repeat', fn ($r) => $r->where('service_schedule', '>', now())->whereNotIn('booking_status', ['completed', 'canceled'])))
++                ->where(fn ($q) => $q->where('service_schedule', '>', \App\Support\SaudiTime::now())->orWhereHas('repeat', fn ($r) => $r->where('service_schedule', '>', \App\Support\SaudiTime::now())->whereNotIn('booking_status', ['completed', 'canceled'])))
+                 ->orderBy('id')->get(['id', 'readable_id', 'zone_id'])->toArray()];
+         $data['confirmation_hash'] = hash_hmac('sha256', json_encode($data, JSON_THROW_ON_ERROR), config('app.key'));
+         return $data;
+diff --git a/Modules/ServiceManagement/Entities/PricingRule.php b/Modules/ServiceManagement/Entities/PricingRule.php
+index a27a039..cf20b21 100644
+--- a/Modules/ServiceManagement/Entities/PricingRule.php
++++ b/Modules/ServiceManagement/Entities/PricingRule.php
+@@ -28,8 +28,8 @@ public function scopeApplicable(Builder $query, string $serviceId, string $zoneI
+             ->where(fn (Builder $q) => $q->whereNull('zone_id')->orWhere('zone_id', $zoneId))
+             ->where(fn (Builder $q) => $q->whereNull('provider_id')->orWhere('provider_id', $providerId))
+             ->where(fn (Builder $q) => $q->whereNull('branch_service_area_id')->orWhere('branch_service_area_id', $areaId))
+-            ->where(fn (Builder $q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', $at))
+-            ->where(fn (Builder $q) => $q->whereNull('ends_at')->orWhere('ends_at', '>=', $at))
++            ->where(fn (Builder $q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', $at->copy()->utc()))
++            ->where(fn (Builder $q) => $q->whereNull('ends_at')->orWhere('ends_at', '>=', $at->copy()->utc()))
+             ->orderBy('priority')
+             ->orderBy('created_at')->orderBy('id');
+     }
+@@ -40,6 +40,7 @@ public function appliesAt(CarbonInterface $at): bool
+             return true;
+         }
+ 
++        $at = $at->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         $days = array_map('strtolower', $this->days_of_week ?? []);
+         if ($days && !in_array(strtolower($at->englishDayOfWeek), $days, true)) {
+             return false;
+diff --git a/Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/PricingRuleController.php b/Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/PricingRuleController.php
+index dde8eff..1d2310b 100644
+--- a/Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/PricingRuleController.php
++++ b/Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/PricingRuleController.php
+@@ -34,7 +34,7 @@ public function index(Request $request): JsonResponse
+         $rules->setCollection($rules->getCollection()->map(function ($rule) {
+             $payload = $rule->toArray();
+             foreach (['starts_at', 'ends_at'] as $key) {
+-                $payload[$key] = $rule->$key?->setTimezone(config('app.timezone'))->toIso8601String();
++                $payload[$key] = $rule->$key?->setTimezone(\App\Support\SaudiTime::timezone())->toIso8601String();
+             }
+             return $payload;
+         }));
+@@ -50,10 +50,10 @@ public function effective(Request $request): JsonResponse
+         if ($area && !BranchServiceArea::where('provider_id', $provider->id)->whereKey($area)->exists()) {
+             throw ValidationException::withMessages(['branch_service_area_id' => __('operations.service_area_must_belong_to_branch')]);
+         }
+-        $at = Carbon::parse($data['at'], config('app.timezone'))->setTimezone(config('app.timezone'));
++        $at = Carbon::parse($data['at'], \App\Support\SaudiTime::timezone())->setTimezone(\App\Support\SaudiTime::timezone());
+         $rules = PricingRule::applicable($data['service_id'], $provider->zone_id, $provider->id, $area, $at)->get()->filter(fn ($rule) => $rule->appliesAt($at));
+         return response()->json(response_formatter(DEFAULT_200, [
+-            'timezone' => config('app.timezone'), 'at' => $at->toIso8601String(),
++            'timezone' => \App\Support\SaudiTime::timezone(), 'at' => $at->toIso8601String(),
+             'rules' => collect(['branch', 'neighborhood', 'peak'])->flatMap(fn ($scope) => $rules->where('scope', $scope)->values())->values(),
+         ]));
+     }
+@@ -121,7 +121,7 @@ private function persist(Request $request, ?string $id = null): JsonResponse
+         }
+         $this->access->authorizeBranch($request->user(), 'pricing.manage', $data['provider_id'] ?? null);
+         foreach (['starts_at', 'ends_at'] as $key) {
+-            if (!empty($data[$key])) $data[$key] = Carbon::parse($data[$key], config('app.timezone'))->setTimezone(config('app.timezone'));
++            if (!empty($data[$key])) $data[$key] = Carbon::parse($data[$key], \App\Support\SaudiTime::timezone())->utc();
+         }
+         $rule = DB::transaction(function () use ($request, $data, $id) {
+             $rule = $id ? $this->rules($request)->lockForUpdate()->findOrFail($id) : new PricingRule();
+diff --git a/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/PricingController.php b/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/PricingController.php
+index 17accba..864bc42 100644
+--- a/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/PricingController.php
++++ b/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/PricingController.php
+@@ -30,7 +30,7 @@ public function quote(Request $request, PricingEngine $engine, BranchServiceAvai
+         abort_unless($zoneId, 422, 'service_booking_unavailable_at_location');
+         config(['zone_id' => $zoneId]);
+         $service = app(\Modules\ServiceManagement\Services\DirectServicePolicy::class)->catalog($zoneId)->findOrFail($request->service_id);
+-        $at = Carbon::parse($request->schedule_at)->setTimezone(config('app.timezone'));
++        $at = \App\Support\SaudiTime::parseCustomerAppointment($request->schedule_at);
+         $requirements = app(\Modules\ServiceManagement\Services\ServiceItemRequirements::class)->evaluate([[
+             'service_id' => $service->id, 'variant_key' => $request->variant_key, 'quantity' => $request->integer('quantity', 1), 'field_answers' => $request->input('field_answers', []),
+         ]], $zoneId);
+diff --git a/Modules/ServiceManagement/Http/Controllers/Web/Admin/OperationsController.php b/Modules/ServiceManagement/Http/Controllers/Web/Admin/OperationsController.php
+index ad69c25..3cac073 100644
+--- a/Modules/ServiceManagement/Http/Controllers/Web/Admin/OperationsController.php
++++ b/Modules/ServiceManagement/Http/Controllers/Web/Admin/OperationsController.php
+@@ -41,7 +41,7 @@ public function index(Request $request)
+             'areas' => BranchServiceArea::whereIn('provider_id', $branches->pluck('id'))->orderBy('name')->get(['id', 'name', 'provider_id']),
+             'services' => Service::query()->orderBy('name')->get(['id', 'name']),
+             'fieldTypes' => ServiceFieldController::TYPES,
+-            'timezone' => config('app.timezone'),
++            'timezone' => \App\Support\SaudiTime::timezone(),
+             'users' => $actor->user_type === 'super-admin' ? User::with('roles')->whereIn('user_type', ['admin-employee', 'provider-admin', 'provider-employee'])->orderBy('first_name')->get() : collect(),
+             'scopes' => $actor->user_type === 'super-admin' ? OperationalScope::all() : collect(),
+             'scopePermissions' => QualityAdministrationController::PERMISSIONS,
+diff --git a/Modules/ServiceManagement/Services/PricingEngine.php b/Modules/ServiceManagement/Services/PricingEngine.php
+index 204f100..31a89da 100644
+--- a/Modules/ServiceManagement/Services/PricingEngine.php
++++ b/Modules/ServiceManagement/Services/PricingEngine.php
+@@ -22,6 +22,7 @@ public function calculate(
+         float $discount = 0,
+         array $fieldAnswers = [],
+     ): PricingBreakdown {
++        $at = $at->copy()->setTimezone(\App\Support\SaudiTime::timezone());
+         if ($service->pricing_type !== 'fixed') {
+             throw ValidationException::withMessages(['service_id' => 'service_requires_quotation']);
+         }
+diff --git a/app/Console/Commands/QualityReminders.php b/app/Console/Commands/QualityReminders.php
+index 4bef8e1..a3951c1 100644
+--- a/app/Console/Commands/QualityReminders.php
++++ b/app/Console/Commands/QualityReminders.php
+@@ -16,27 +16,27 @@ class QualityReminders extends Command
+     protected $description = 'Record appointment, quotation and package renewal reminders';
+     public function handle(CommunicationService $communications): int
+     {
+-        Booking::withoutGlobalScopes()->with(['customer', 'provider.owner'])->where('is_repeated', 0)->whereNotIn('booking_status', ['completed', 'canceled'])->whereBetween('service_schedule', [now(), now()->addDay()])->chunkById(100, function ($bookings) use ($communications): void {
++        Booking::withoutGlobalScopes()->with(['customer', 'provider.owner'])->where('is_repeated', 0)->whereNotIn('booking_status', ['completed', 'canceled'])->whereBetween('service_schedule', [\App\Support\SaudiTime::now(), \App\Support\SaudiTime::now()->addDay()])->chunkById(100, function ($bookings) use ($communications): void {
+             foreach ($bookings as $booking) {
+-                $key = 'appointment:' . $booking->id . ':' . $booking->service_schedule->format('U');
++                $key = 'appointment:' . $booking->id . ':' . \App\Support\SaudiTime::appointmentIdentity($booking->service_schedule);
+                 if ($booking->customer) {
+                     $communications->record($booking->customer, 'appointment_reminder', $key, $booking->id);
+                 }
+                 $communications->whatsapp($booking, 'appointment_reminder', $key, [$booking->readable_id, $booking->service_schedule->toIso8601String()]);
+             }
+         });
+-        \Modules\BookingModule\Entities\BookingRepeat::withoutGlobalScopes()->with(['booking.customer'])->whereNotIn('booking_status', ['completed', 'canceled'])->whereBetween('service_schedule', [now(), now()->addDay()])->chunkById(100, function ($visits) use ($communications): void {
++        \Modules\BookingModule\Entities\BookingRepeat::withoutGlobalScopes()->with(['booking.customer'])->whereNotIn('booking_status', ['completed', 'canceled'])->whereBetween('service_schedule', [\App\Support\SaudiTime::now(), \App\Support\SaudiTime::now()->addDay()])->chunkById(100, function ($visits) use ($communications): void {
+             foreach ($visits as $visit) {
+                 $booking = $visit->booking;
+                 if (!$booking?->customer) {
+                     continue;
+                 }
+-                $key = 'appointment:' . $visit->id . ':' . $visit->service_schedule->format('U');
++                $key = 'appointment:' . $visit->id . ':' . \App\Support\SaudiTime::appointmentIdentity($visit->service_schedule);
+                 $communications->record($booking->customer, 'appointment_reminder', $key, $booking->id);
+                 $communications->whatsapp($booking, 'appointment_reminder', $key, [$booking->readable_id, $visit->service_schedule->toIso8601String()]);
+             }
+         });
+-        PostBid::with('post.customer')->where('status', 'ready')->whereBetween('expires_at', [now(), now()->addDay()])->chunkById(100, function ($quotes) use ($communications): void {
++        PostBid::with('post.customer')->where('status', 'ready')->whereBetween('expires_at', [\App\Support\SaudiTime::now(), \App\Support\SaudiTime::now()->addDay()])->chunkById(100, function ($quotes) use ($communications): void {
+             foreach ($quotes as $quote) {
+                 if ($quote->post?->customer) {
+                     $communications->record($quote->post->customer, 'quote_expiring', 'quote-expiring:' . $quote->id . ':' . $quote->revision, $quote->booking_id);
+diff --git a/app/Console/Kernel.php b/app/Console/Kernel.php
+index 31f6e76..4f4939b 100644
+--- a/app/Console/Kernel.php
++++ b/app/Console/Kernel.php
+@@ -20,7 +20,7 @@ protected function schedule(Schedule $schedule): void
+         $schedule->command('nirab:communications-drain')->everyMinute()->withoutOverlapping();
+         $schedule->command('nirab:quality-reminders')->hourly()->withoutOverlapping();
+         $schedule->command('customer-subscription:expiry-check')->hourly()->withoutOverlapping()->onOneServer();
+-        $schedule->command('nirab:personal-data-prune')->dailyAt('03:00')->timezone('Asia/Riyadh')->withoutOverlapping();
++        $schedule->command('nirab:personal-data-prune')->dailyAt('03:00')->timezone(\App\Support\SaudiTime::timezone())->withoutOverlapping();
+         if (config('nirab_quality.backup.enabled')) {
+             $schedule->command('database:backup')->dailyAt(config('nirab_quality.backup.time'))
+                 ->timezone(config('nirab_quality.backup.timezone'))->withoutOverlapping()->onOneServer();
+diff --git a/app/Http/Controllers/BranchOnboardingController.php b/app/Http/Controllers/BranchOnboardingController.php
+index 4f78d36..3f821ae 100644
+--- a/app/Http/Controllers/BranchOnboardingController.php
++++ b/app/Http/Controllers/BranchOnboardingController.php
+@@ -282,7 +282,7 @@ private function workforce(Request $request, Provider $branch): array
+                 $leaves = $member->leaves()->where('status', 'approved')->where('ends_at', '>', now())->limit(101)->get();
+                 abort_if($leaves->count() > 100, 422, 'diagnostic_candidate_limit');
+                 foreach ($leaves as $leave) {
+-                    $first = $leave->starts_at->copy()->setTimezone(config('app.timezone'))->startOfDay()->max(now()->startOfDay());
++                    $first = $leave->starts_at->copy()->setTimezone(\App\Support\SaudiTime::timezone())->startOfDay()->max(\App\Support\SaudiTime::now()->startOfDay());
+                     // Eight consecutive dates cover a weekly template even if its first occurrence already ended.
+                     for ($offset = 0; $offset < 8; $offset++) {
+                         $day = $first->copy()->addDays($offset);
+diff --git a/app/Http/Controllers/BranchWorkspaceController.php b/app/Http/Controllers/BranchWorkspaceController.php
+index a889d65..9f8bf4a 100644
+--- a/app/Http/Controllers/BranchWorkspaceController.php
++++ b/app/Http/Controllers/BranchWorkspaceController.php
+@@ -193,9 +193,9 @@ public function bookingAction(Request $request, string $kind, string $id, string
+         abort_unless(in_array($action, ['status', 'schedule'], true), 404);
+         $data = $request->validate(['reason' => 'required|string|max:2000', 'service_schedule' => 'required_if:action,schedule|nullable|date', 'booking_status' => 'nullable|in:' . implode(',', BranchReportService::STATUSES)]);
+         if ($action === 'schedule') {
+-            $request->validate(['service_schedule' => 'required|date|after:now']);
+-            $request->merge(['service_schedule' => \Carbon\Carbon::parse($request->service_schedule, config('nirab_execution.settlement_timezone'))->utc()->toDateTimeString()]);
+-            $request->validate(['service_schedule' => 'required|date|after:now']);
++            $schedule = \App\Support\SaudiTime::parseCustomerAppointment($request->service_schedule);
++            abort_unless($schedule->isFuture(), 422, 'selected_time_past');
++            $request->merge(['service_schedule' => \App\Support\SaudiTime::forAppointmentStorage($schedule)]);
+         }
+         return DB::transaction(function () use ($subject, $request, $controller, $action, $id, $data) {
+             $subject = $subject->newQueryWithoutScopes()->whereKey($id)->where('provider_id', $request->branch_id)->lockForUpdate()->firstOrFail();
+@@ -203,7 +203,7 @@ public function bookingAction(Request $request, string $kind, string $id, string
+             $response = app($controller)->{$action === 'status' ? 'statusUpdate' : 'scheduleUpdate'}($id, $request);
+             $fresh = $subject->fresh();
+             $applied = $action === 'status' ? $fresh->booking_status === $request->booking_status
+-                : \Carbon\Carbon::parse($fresh->service_schedule)->equalTo(\Carbon\Carbon::parse($request->service_schedule));
++                : \App\Support\SaudiTime::parseCustomerAppointment($fresh->service_schedule)->equalTo(\App\Support\SaudiTime::parseCustomerAppointment($request->service_schedule));
+             abort_unless($applied, 422, $response->getData(true)['message'] ?? __('branch.failed'));
+             app(AuditService::class)->record('branch.booking.' . $action, $subject, $old, $subject->fresh()->only(['booking_status', 'service_schedule']) + ['reason' => $data['reason']], $request->user());
+             return $response;
+diff --git a/app/Lib/Helpers.php b/app/Lib/Helpers.php
+index cbda201..476eb5a 100644
+--- a/app/Lib/Helpers.php
++++ b/app/Lib/Helpers.php
+@@ -223,7 +223,9 @@ function format_time_by_business_settings($dateTime, string $dateFormat = '', st
+         }
+ 
+         try {
+-            $dateTime = $dateTime instanceof Carbon ? $dateTime : Carbon::parse($dateTime);
++            $dateTime = $dateTime instanceof \DateTimeInterface
++                ? \App\Support\SaudiTime::parseCustomerAppointment($dateTime)
++                : Carbon::parse($dateTime, \App\Support\SaudiTime::timezone())->setTimezone(\App\Support\SaudiTime::timezone());
+             $timeFormat = get_business_time_format() === '12' ? 'g:i A' : 'H:i';
+ 
+             if ($dateFormat === '') {
+diff --git a/app/Observers/QualityCommunicationObserver.php b/app/Observers/QualityCommunicationObserver.php
+index 506b8ce..84668d0 100644
+--- a/app/Observers/QualityCommunicationObserver.php
++++ b/app/Observers/QualityCommunicationObserver.php
+@@ -53,7 +53,7 @@ public function saved(Model $model): void
+                 app(VisitPackageService::class)->settle($model);
+             }
+             if (!$model->wasRecentlyCreated && $model->wasChanged('service_schedule')) {
+-                $comms->bookingEvent($model, 'schedule_changed', 'schedule:' . $model->id . ':' . $model->service_schedule->format('U'));
++                $comms->bookingEvent($model, 'schedule_changed', 'schedule:' . $model->id . ':' . \App\Support\SaudiTime::appointmentIdentity($model->service_schedule));
+             }
+             if (!$model->wasRecentlyCreated && $model->wasChanged('serviceman_id') && $model->serviceman_id && !$model->assignments()->exists()) {
+                 $comms->bookingEvent($model, $model->getOriginal('serviceman_id') ? 'reassigned' : 'assigned', 'legacy-assignment:' . $model->id . ':' . $model->updated_at?->format('U.u'));
+diff --git a/app/Services/BranchPeriod.php b/app/Services/BranchPeriod.php
+index 2d13f21..1ffc588 100644
+--- a/app/Services/BranchPeriod.php
++++ b/app/Services/BranchPeriod.php
+@@ -10,7 +10,7 @@ class BranchPeriod
+ {
+     public static function dates(string $period, ?string $from = null, ?string $to = null): array
+     {
+-        $zone = config('nirab_execution.settlement_timezone', 'Asia/Riyadh');
++        $zone = \App\Support\SaudiTime::timezone();
+         $today = CarbonImmutable::now($zone);
+         [$start, $end] = match ($period) {
+             'today' => [$today, $today],
+@@ -44,6 +44,10 @@ public static function filters(Request $request): array
+ 
+     public static function apply($query, string $column, array $filters)
+     {
+-        return $query->where($column, '>=', $filters['start'])->where($column, '<', $filters['end']);
++        // Appointment columns contain Saudi wall time; all other timestamp columns contain UTC.
++        $appointment = str_ends_with($column, 'service_schedule');
++        $start = $appointment ? CarbonImmutable::parse($filters['start'], 'UTC')->setTimezone(\App\Support\SaudiTime::timezone())->toDateTimeString() : $filters['start'];
++        $end = $appointment ? CarbonImmutable::parse($filters['end'], 'UTC')->setTimezone(\App\Support\SaudiTime::timezone())->toDateTimeString() : $filters['end'];
++        return $query->where($column, '>=', $start)->where($column, '<', $end);
+     }
+ }
+diff --git a/app/Services/BranchReportService.php b/app/Services/BranchReportService.php
+index 21e8d80..df2dced 100644
+--- a/app/Services/BranchReportService.php
++++ b/app/Services/BranchReportService.php
+@@ -49,7 +49,7 @@ public function queue($query, ?string $queue)
+             'pending' => $query->where('booking_status', 'pending'),
+             'unassigned' => $query->where('booking_status', 'accepted')->whereNull('serviceman_id')->whereNotExists(fn ($q) => $q->selectRaw('1')->from('booking_assignments')->whereColumn('booking_assignments.booking_id', 'jobs.booking_id')->whereIn('status', ['offered', 'accepted'])),
+             'in_progress' => $query->whereIn('booking_status', ['on_the_way', 'arrived', 'ongoing', 'work_finished']),
+-            'overdue' => $query->whereIn('booking_status', ['pending', 'accepted', 'assigned', 'on_the_way'])->where('service_schedule', '<', now('UTC')->subMinutes(config('nirab_branch.late_minutes', 15))),
++            'overdue' => $query->whereIn('booking_status', ['pending', 'accepted', 'assigned', 'on_the_way'])->where('service_schedule', '<', \App\Support\SaudiTime::now()->subMinutes(config('nirab_branch.late_minutes', 15))),
+             'completed_unpaid' => $query->where('booking_status', 'completed')->where('is_paid', 0),
+             default => $query,
+         };
+diff --git a/app/Services/GeoService.php b/app/Services/GeoService.php
+index 2d356fb..c75596f 100644
+--- a/app/Services/GeoService.php
++++ b/app/Services/GeoService.php
+@@ -18,13 +18,21 @@ public function containing(Builder $query, string $column, float $latitude, floa
+             default => throw new \LogicException('Unsupported spatial database driver'),
+         };
+     }
+-    public function secondsBetween(string $start, string $end): string
++    public function secondsBetween(string $start, string $end, bool $startIsSaudiAppointment = false): string
+     {
+         foreach ([$start, $end] as $column) {
+             if (!preg_match('/^[a-z_.]+$/', $column)) {
+                 throw new \InvalidArgumentException('Invalid timestamp column');
+             }
+         }
++        // Convert the business wall clock to an instant only inside this metric.
++        if ($startIsSaudiAppointment) {
++            $start = match (DB::connection()->getDriverName()) {
++                'pgsql' => "({$start} - INTERVAL '3 hours')",
++                'sqlite' => "datetime({$start}, '-3 hours')",
++                default => "DATE_SUB({$start}, INTERVAL 3 HOUR)",
++            };
++        }
+         return match (DB::connection()->getDriverName()) {
+             'pgsql' => 'EXTRACT(EPOCH FROM (' . $end . ' - ' . $start . '))',
+             'sqlite' => "(julianday({$end}) - julianday({$start})) * 86400",
+diff --git a/app/Services/OperationalAnalytics.php b/app/Services/OperationalAnalytics.php
+index d678651..af6c0f1 100644
+--- a/app/Services/OperationalAnalytics.php
++++ b/app/Services/OperationalAnalytics.php
+@@ -43,10 +43,10 @@ public function report(User $actor, array $filters): array
+         $custody = $this->access->scope(\Modules\BookingModule\Entities\TechnicianCustodyEntry::query(), $actor, 'analytics.read')->when($filters['branch_id'] ?? null, fn($q, $v) => $q->where('provider_id', $v))->sum('amount');
+         $assignment = DB::table('booking_assignment_histories')->select('booking_id')->selectRaw('MIN(created_at) AS first_assigned_at')->where('event', 'offered')->groupBy('booking_id');
+         $travel = DB::table('booking_status_histories')->selectRaw('COALESCE(booking_repeat_id, booking_id) AS subject_id, MIN(created_at) AS departed_at')->where('booking_status', 'on_the_way')->groupByRaw('COALESCE(booking_repeat_id, booking_id)');
+-        $timing = (clone $base)->leftJoinSub($assignment, 'first_assignment', 'first_assignment.booking_id', '=', 'jobs.booking_id')->leftJoinSub($travel, 'travel', 'travel.subject_id', '=', 'jobs.subject_id')->selectRaw('AVG(' . $this->geo->secondsBetween('jobs.created_at', 'first_assignment.first_assigned_at') . ') AS average_assignment_seconds, AVG(' . $this->geo->secondsBetween('travel.departed_at', 'jobs.arrived_at') . ') AS average_arrival_seconds, AVG(' . $this->geo->secondsBetween('jobs.service_schedule', 'jobs.arrived_at') . ') AS average_arrival_schedule_difference_seconds')->first();
++        $timing = (clone $base)->leftJoinSub($assignment, 'first_assignment', 'first_assignment.booking_id', '=', 'jobs.booking_id')->leftJoinSub($travel, 'travel', 'travel.subject_id', '=', 'jobs.subject_id')->selectRaw('AVG(' . $this->geo->secondsBetween('jobs.created_at', 'first_assignment.first_assigned_at') . ') AS average_assignment_seconds, AVG(' . $this->geo->secondsBetween('travel.departed_at', 'jobs.arrived_at') . ') AS average_arrival_seconds, AVG(' . $this->geo->secondsBetween('jobs.service_schedule', 'jobs.arrived_at', true) . ') AS average_arrival_schedule_difference_seconds')->first();
+         $ratings = DB::table('reviews')->where('target_type', 'technician')->where('is_active', 1)->select('serviceman_id')->selectRaw('AVG(review_rating) AS rating')->groupBy('serviceman_id');
+         $technicians = (clone $base)->join('booking_assignments AS assignments', 'assignments.booking_id', '=', 'jobs.booking_id')->where('assignments.status', 'accepted')->leftJoinSub($ratings, 'ratings', 'ratings.serviceman_id', '=', 'assignments.serviceman_id')->select('assignments.serviceman_id', 'assignments.team_id')->selectRaw("COUNT(DISTINCT jobs.subject_id) AS jobs, SUM(CASE WHEN jobs.booking_status = 'completed' THEN 1 ELSE 0 END) AS completed, AVG(jobs.actual_duration_seconds) AS average_service_seconds, MAX(ratings.rating) AS rating")->groupBy('assignments.serviceman_id', 'assignments.team_id')->orderBy('assignments.serviceman_id')->paginate(25, ['*'], 'technician_page', $filters['technician_page'] ?? null);
+-        $quotes = $this->access->scope(\Modules\BidModule\Entities\PostBid::query(), $actor, 'analytics.read')->whereBetween('created_at', [$filters['from'], $filters['to']])->when($filters['branch_id'] ?? null, fn($q, $v) => $q->where('provider_id', $v))->selectRaw("COUNT(*) AS total, SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) AS converted")->toBase()->first();
++        $quotes = $this->access->scope(\Modules\BidModule\Entities\PostBid::query(), $actor, 'analytics.read')->where('created_at', '>=', $filters['start'] ?? $filters['from'])->where('created_at', '<', $filters['end'] ?? $filters['to'])->when($filters['branch_id'] ?? null, fn($q, $v) => $q->where('provider_id', $v))->selectRaw("COUNT(*) AS total, SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) AS converted")->toBase()->first();
+         $summary['repeat_customers'] = DB::query()->fromSub((clone $base)->where('booking_status', 'completed')->whereNotNull('customer_id')->select('customer_id')->groupBy('customer_id')->havingRaw('COUNT(*) > 1'), 'repeat_customers')->count();
+         $summary['cash_custody_exposure'] = (float) $custody;
+         $summary['quote_conversion'] = $quotes->total ? round((float) $quotes->converted / (float) $quotes->total, 4) : 0;
+@@ -77,7 +77,7 @@ public function report(User $actor, array $filters): array
+         $summary['prepaid_visit_value'] = (float) $prepaid->sum();
+         $hq = $actor->user_type === 'super-admin' || $actor->user_type === 'admin-employee' && \App\Models\OperationalScope::where('user_id', $actor->id)->where('all_branches', true)->exists();
+         if ($hq && empty($filters['branch_id'])) {
+-            $sales = DB::table('customer_visit_packages')->whereBetween('created_at', [$filters['from'], $filters['to']])->selectRaw('COUNT(*) AS package_sales, SUM(price) AS package_revenue')->first();
++            $sales = DB::table('customer_visit_packages')->where('created_at', '>=', $filters['start'] ?? $filters['from'])->where('created_at', '<', $filters['end'] ?? $filters['to'])->selectRaw('COUNT(*) AS package_sales, SUM(price) AS package_revenue')->first();
+             $summary = array_merge($summary, (array) $sales);
+         }
+         return compact('summary', 'branches', 'services', 'areas', 'neighborhoods', 'payments', 'collections', 'technicians');
+diff --git a/app/Services/OperationalPresentation.php b/app/Services/OperationalPresentation.php
+index f3387bb..91d891a 100644
+--- a/app/Services/OperationalPresentation.php
++++ b/app/Services/OperationalPresentation.php
+@@ -65,19 +65,19 @@ public function value(string $field, mixed $value, array $references = []): stri
+         }
+         if (isset($references[$field][(string) $value])) return $references[$field][(string) $value];
+         if (isset(self::ENUM_FIELDS[$field])) return $this->label(self::ENUM_FIELDS[$field], (string) $value);
+-        if (str_ends_with($field, '_at') || in_array($field, ['service_schedule', 'scheduled_at'], true)) return $this->date((string) $value);
++        if (str_ends_with($field, '_at') || in_array($field, ['service_schedule', 'scheduled_at'], true)) return $this->date((string) $value, in_array($field, ['service_schedule', 'scheduled_at'], true));
+         if (str_ends_with($field, '_id') || str_ends_with($field, '_by') || in_array($field, ['id', 'branch_ids', 'assigned_to'], true)) {
+             return $this->label('fields', $field, 'unknown_entity');
+         }
+         return (string) $value;
+     }
+ 
+-    public function date(?string $value): string
++    public function date(?string $value, bool $appointment = false): string
+     {
+         if (!$value) return __('operational.empty');
+         try {
+-            $timezone = config('nirab_execution.settlement_timezone', config('app.timezone', 'UTC'));
+-            return CarbonImmutable::parse($value, 'UTC')->timezone($timezone)
++            $timezone = \App\Support\SaudiTime::timezone();
++            return CarbonImmutable::parse($value, $appointment ? $timezone : 'UTC')->timezone($timezone)
+                 ->locale(app('translator')->getLocale())->isoFormat('D MMMM YYYY — h:mm A') . ' (' . $timezone . ')';
+         } catch (\Exception) {
+             return __('operational.unknown_value');
+diff --git a/config/app.php b/config/app.php
+index d9f0ebf..bb9cbf6 100644
+--- a/config/app.php
++++ b/config/app.php
+@@ -65,6 +65,8 @@
+     |
+     */
+ 
++    // Technical ORM timestamps, queues and external events stay UTC.
++    // Appointments use nirab_time.business_timezone explicitly.
+     'timezone' => 'UTC',
+ 
+     /*
+diff --git a/config/nirab_execution.php b/config/nirab_execution.php
+index 191f1f7..91e8c30 100644
+--- a/config/nirab_execution.php
++++ b/config/nirab_execution.php
+@@ -1,3 +1,3 @@
+ <?php
+ 
+-return ['enabled' => (bool) env('NIRAB_EXECUTION_ENABLED', true), 'require_geo_check_in' => (bool) env('NIRAB_REQUIRE_GEO_CHECK_IN', true), 'require_geo_check_out' => (bool) env('NIRAB_REQUIRE_GEO_CHECK_OUT', true), 'check_in_radius_meters' => (float) env('NIRAB_CHECK_IN_RADIUS_METERS', 0), 'before_photo_minimum' => (int) env('NIRAB_BEFORE_PHOTO_MINIMUM', 1), 'after_photo_minimum' => (int) env('NIRAB_AFTER_PHOTO_MINIMUM', 1), 'require_customer_otp' => (bool) env('NIRAB_REQUIRE_CUSTOMER_OTP', true), 'override_requires_evidence' => (bool) env('NIRAB_OVERRIDE_REQUIRES_EVIDENCE', false), 'technician_cash_custody_limit' => (float) env('NIRAB_TECHNICIAN_CASH_CUSTODY_LIMIT', 3000), 'handover_overdue_hours' => (int) env('NIRAB_HANDOVER_OVERDUE_HOURS', 24), 'settlement_timezone' => env('NIRAB_SETTLEMENT_TIMEZONE', 'Asia/Riyadh')];
++return ['enabled' => (bool) env('NIRAB_EXECUTION_ENABLED', true), 'require_geo_check_in' => (bool) env('NIRAB_REQUIRE_GEO_CHECK_IN', true), 'require_geo_check_out' => (bool) env('NIRAB_REQUIRE_GEO_CHECK_OUT', true), 'check_in_radius_meters' => (float) env('NIRAB_CHECK_IN_RADIUS_METERS', 0), 'before_photo_minimum' => (int) env('NIRAB_BEFORE_PHOTO_MINIMUM', 1), 'after_photo_minimum' => (int) env('NIRAB_AFTER_PHOTO_MINIMUM', 1), 'require_customer_otp' => (bool) env('NIRAB_REQUIRE_CUSTOMER_OTP', true), 'override_requires_evidence' => (bool) env('NIRAB_OVERRIDE_REQUIRES_EVIDENCE', false), 'technician_cash_custody_limit' => (float) env('NIRAB_TECHNICIAN_CASH_CUSTODY_LIMIT', 3000), 'handover_overdue_hours' => (int) env('NIRAB_HANDOVER_OVERDUE_HOURS', 24), 'settlement_timezone' => env('NIRAB_BUSINESS_TIMEZONE', 'Asia/Riyadh')];
+diff --git a/public/assets/common/js/nirab-branch.js b/public/assets/common/js/nirab-branch.js
+index ff863a2..1cc1b13 100644
+--- a/public/assets/common/js/nirab-branch.js
++++ b/public/assets/common/js/nirab-branch.js
+@@ -38,13 +38,24 @@
+     document.querySelectorAll('.branch-action').forEach(form => submit(form, async data => { await api(form.dataset.endpoint, data, 'POST'); window.location.reload(); }));
+     // Prevent accidental double submissions while the server enforces idempotency and state locks.
+     document.querySelectorAll('.nirab-branch form[method="post"]').forEach(form => form.addEventListener('submit', () => setTimeout(() => form.querySelectorAll('button').forEach(button => button.disabled = true), 0)));
++    const saudiDate = (key, value) => {
++        if (value == null || value === '') return '—';
++        if (!key.endsWith('_at') && key !== 'service_schedule') return value;
++        const raw = String(value).trim().replace(' ', 'T');
++        const zoned = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw);
++        const appointment = ['service_schedule', 'scheduled_at'].includes(key);
++        const parsed = new Date(zoned ? raw : raw + (appointment ? '+03:00' : 'Z'));
++        return Number.isNaN(parsed.getTime()) ? '—' : new Intl.DateTimeFormat(document.documentElement.lang || 'ar', {
++            timeZone: 'Asia/Riyadh', dateStyle: 'medium', timeStyle: 'short'
++        }).format(parsed);
++    };
+     const table = (host, rows, columns, action) => {
+         host.replaceChildren(); const el = document.createElement('table'); el.className = 'table';
+         const header = el.createTHead().insertRow();
+         for (const [key, label] of columns) { const th = document.createElement('th'); th.scope = 'col'; th.textContent = text(label || key); header.append(th); }
+         if (action) { const th = document.createElement('th'); th.textContent = text('actions'); header.append(th); }
+         const body = el.createTBody();
+-        for (const record of rows) { const row = body.insertRow(); for (const [key] of columns) row.insertCell().textContent = record[key] ?? '—'; if (action) action(row.insertCell(), record); }
++        for (const record of rows) { const row = body.insertRow(); for (const [key] of columns) row.insertCell().textContent = saudiDate(key, record[key]); if (action) action(row.insertCell(), record); }
+         if (!rows.length) { const cell = body.insertRow().insertCell(); cell.colSpan = columns.length + (action ? 1 : 0); cell.textContent = text('empty'); }
+         host.append(el);
+     };
+diff --git a/resources/views/branch/bookings.blade.php b/resources/views/branch/bookings.blade.php
+index d7ae262..10b8ae5 100644
+--- a/resources/views/branch/bookings.blade.php
++++ b/resources/views/branch/bookings.blade.php
+@@ -1,7 +1,7 @@
+ <div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','status','payment','invoice_status','schedule','technician','amount','actions'] as $column)<th scope="col">{{ __('branch.'.$column) }}</th>@endforeach</tr></thead><tbody>
+ @forelse($rows as $row)
+     @php($invoice = $invoicesBySubject->get($row->subject_id))
+-    <tr><td>{{ $row->readable_id }} @if($row->booking_repeat_id)<small>{{ __('branch.visit') }} · {{ $row->subject_id }}</small>@endif</td><td>{{ __('branch.'.$row->booking_status) }}</td><td>{{ __('branch.'.($row->is_paid ? 'paid' : 'unpaid')) }}</td><td>{{ $invoice ? __('branch.'.$invoice->status) : __('branch.invoice_pending') }}</td><td>{{ \Carbon\Carbon::parse($row->service_schedule, 'UTC')->setTimezone($filters['timezone'])->format('Y-m-d H:i') }}</td><td>{{ optional($technicians->firstWhere('id', $row->serviceman_id))->user?->first_name ?? '—' }}</td><td>{{ with_currency_symbol($row->total_booking_amount) }}</td>
++    <tr><td>{{ $row->readable_id }} @if($row->booking_repeat_id)<small>{{ __('branch.visit') }} · {{ $row->subject_id }}</small>@endif</td><td>{{ __('branch.'.$row->booking_status) }}</td><td>{{ __('branch.'.($row->is_paid ? 'paid' : 'unpaid')) }}</td><td>{{ $invoice ? __('branch.'.$invoice->status) : __('branch.invoice_pending') }}</td><td>{{ \App\Support\SaudiTime::formatAppointmentSaudi($row->service_schedule, 'Y-m-d H:i') }}</td><td>{{ optional($technicians->firstWhere('id', $row->serviceman_id))->user?->first_name ?? '—' }}</td><td>{{ with_currency_symbol($row->total_booking_amount) }}</td>
+     <td><a class="btn btn-sm btn-outline-primary" href="{{ route($prefix.'.booking.'.($row->booking_repeat_id ? 'repeat_single_details' : 'details'), \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $row->subject_id, $filters)) }}">{{ __('branch.details') }}</a>
+     @if(app(\App\Services\OperationalAccess::class)->allows(auth()->user(), 'dispatch.manage', $branchId))
+     <details class="mt-2"><summary>{{ __('branch.actions') }}</summary>
+diff --git a/resources/views/branch/finance.blade.php b/resources/views/branch/finance.blade.php
+index 6ab0300..cd641d4 100644
+--- a/resources/views/branch/finance.blade.php
++++ b/resources/views/branch/finance.blade.php
+@@ -3,13 +3,13 @@
+ <div class="branch-cards mb-4">@foreach(['booking_value','allocated','outstanding'] as $metric)<div class="card card-body"><span>{{ __('branch.'.$metric) }}</span><strong>{{ with_currency_symbol($totals->$metric ?? 0) }}</strong></div>@endforeach</div>
+ <a class="btn btn-primary mb-3" href="{{ route($prefix.'.cash.index', ['branch_id' => $branchId, 'date' => $filters['to']]) }}">{{ __('branch.cash_actions') }}</a>
+ <h2>{{ __('branch.payments') }}</h2><p>{{ __('branch.payment_ledger_help') }}</p>
+-<div class="card card-body table-responsive mb-3"><table class="table"><thead><tr>@foreach(['booking','date','payment','credit','debit'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($payments as $movement)<tr><td>{{ $movement->readable_id }}<small>{{ $movement->subject_id }}</small></td><td>{{ $movement->created_at }}</td><td>{{ app(\App\Services\OperationalPresentation::class)->value('payment_method', $movement->payment_method) }}</td><td>{{ $movement->credit }}</td><td>{{ $movement->debit }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $payments->links() }}</div>
++<div class="card card-body table-responsive mb-3"><table class="table"><thead><tr>@foreach(['booking','date','payment','credit','debit'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($payments as $movement)<tr><td>{{ $movement->readable_id }}<small>{{ $movement->subject_id }}</small></td><td>{{ \App\Support\SaudiTime::formatInstantSaudi($movement->created_at) }}</td><td>{{ app(\App\Services\OperationalPresentation::class)->value('payment_method', $movement->payment_method) }}</td><td>{{ $movement->credit }}</td><td>{{ $movement->debit }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $payments->links() }}</div>
+ <div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','status','booking_value','allocated','outstanding'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($balances as $row)<tr><td><a href="{{ route($prefix.'.booking.'.($row->booking_repeat_id ? 'repeat_single_details' : 'details'), \App\Services\BranchWorkspaceNavigation::detailParameters(request(), $row->subject_id, $filters)) }}">{{ $row->readable_id }}</a><small>{{ $row->subject_id }}</small></td><td>{{ app(\App\Services\OperationalPresentation::class)->value('booking_status', $row->booking_status) }}</td><td>{{ $row->total_booking_amount }}</td><td>{{ $row->allocated }}</td><td>{{ $row->outstanding }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $balances->links() }}</div>
+ <h2 class="mt-4">{{ __('branch.custody') }}</h2><p>{{ __('branch.custody_definition') }}</p><div class="branch-cards mb-3">@foreach($custody as $key => $value)<div class="card card-body"><span>{{ __('branch.'.$key) }}</span><strong>{{ with_currency_symbol($value) }}</strong></div>@endforeach</div>
+-<div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['date','technician','event','amount','reason'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($entries as $entry)<tr><td>{{ $entry->occurred_at }}</td><td>{{ $entry->technician?->user?->first_name }} {{ $entry->technician?->user?->last_name }}<details><summary>{{ __('operational.reference') }}</summary><code dir="ltr">{{ $entry->technician_id }}</code></details></td><td>{{ app(\App\Services\OperationalPresentation::class)->value('type', $entry->type) }}<details><summary>{{ __('operational.reference') }}</summary><code dir="ltr">{{ $entry->source_type }} / {{ $entry->source_id }}</code></details></td><td>{{ $entry->amount }}</td><td>{{ $entry->reason }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $entries->links() }}</div>
+-<h2 class="mt-4">{{ __('branch.collections') }}</h2><p>{{ __('branch.collection_definition') }}</p><div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','technician','date','amount','status'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($collections as $collection)<tr><td>{{ $collection->booking_repeat_id ?? $collection->booking_id }}</td><td>{{ $collection->technician?->user?->first_name }}</td><td>{{ $collection->collected_at }}</td><td>{{ $collection->amount }}</td><td>{{ app(\App\Services\OperationalPresentation::class)->value('status', $collection->status) }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $collections->links() }}</div>
++<div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['date','technician','event','amount','reason'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($entries as $entry)<tr><td>{{ \App\Support\SaudiTime::formatInstantSaudi($entry->occurred_at) }}</td><td>{{ $entry->technician?->user?->first_name }} {{ $entry->technician?->user?->last_name }}<details><summary>{{ __('operational.reference') }}</summary><code dir="ltr">{{ $entry->technician_id }}</code></details></td><td>{{ app(\App\Services\OperationalPresentation::class)->value('type', $entry->type) }}<details><summary>{{ __('operational.reference') }}</summary><code dir="ltr">{{ $entry->source_type }} / {{ $entry->source_id }}</code></details></td><td>{{ $entry->amount }}</td><td>{{ $entry->reason }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $entries->links() }}</div>
++<h2 class="mt-4">{{ __('branch.collections') }}</h2><p>{{ __('branch.collection_definition') }}</p><div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','technician','date','amount','status'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($collections as $collection)<tr><td>{{ $collection->booking_repeat_id ?? $collection->booking_id }}</td><td>{{ $collection->technician?->user?->first_name }}</td><td>{{ \App\Support\SaudiTime::formatInstantSaudi($collection->collected_at) }}</td><td>{{ $collection->amount }}</td><td>{{ app(\App\Services\OperationalPresentation::class)->value('status', $collection->status) }}</td></tr>@empty<tr><td colspan="5">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $collections->links() }}</div>
+ <h2 class="mt-4">{{ __('branch.refunds') }}</h2><div class="branch-cards mb-3">@foreach($refundTotals as $state => $amount)<div class="card card-body"><span>{{ app(\App\Services\OperationalPresentation::class)->value('status', $state) }}</span><strong>{{ with_currency_symbol($amount) }}</strong></div>@endforeach</div>
+-<div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','date','amount','status','reason','actions'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($refunds as $refund)<tr><td>{{ $refund->booking_repeat_id ?? $refund->booking_id }}</td><td>{{ $refund->created_at }}</td><td>{{ $refund->amount }}</td><td>{{ app(\App\Services\OperationalPresentation::class)->value('status', $refund->status) }}</td><td>{{ $refund->reason }}</td><td>@if($refund->status === 'requires_attention' && app(\App\Services\NirabFinanceAccess::class)->allows(auth()->user(), 'refund', $branchId))<form method="post" action="{{ $base.'/refunds/'.$refund->id.'/retry?branch_id='.$branchId }}">@csrf<label>{{ __('branch.reason') }}<input name="reason" class="form-control" required maxlength="2000"></label><button class="btn btn-outline-primary">{{ __('branch.retry') }}</button></form>@endif</td></tr>@empty<tr><td colspan="6">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $refunds->links() }}</div>
++<div class="card card-body table-responsive"><table class="table"><thead><tr>@foreach(['booking','date','amount','status','reason','actions'] as $c)<th>{{ __('branch.'.$c) }}</th>@endforeach</tr></thead><tbody>@forelse($refunds as $refund)<tr><td>{{ $refund->booking_repeat_id ?? $refund->booking_id }}</td><td>{{ \App\Support\SaudiTime::formatInstantSaudi($refund->created_at) }}</td><td>{{ $refund->amount }}</td><td>{{ app(\App\Services\OperationalPresentation::class)->value('status', $refund->status) }}</td><td>{{ $refund->reason }}</td><td>@if($refund->status === 'requires_attention' && app(\App\Services\NirabFinanceAccess::class)->allows(auth()->user(), 'refund', $branchId))<form method="post" action="{{ $base.'/refunds/'.$refund->id.'/retry?branch_id='.$branchId }}">@csrf<label>{{ __('branch.reason') }}<input name="reason" class="form-control" required maxlength="2000"></label><button class="btn btn-outline-primary">{{ __('branch.retry') }}</button></form>@endif</td></tr>@empty<tr><td colspan="6">{{ __('branch.empty') }}</td></tr>@endforelse</tbody></table>{{ $refunds->links() }}</div>
+ @if(app(\App\Services\NirabFinanceAccess::class)->allows(auth()->user(), 'refund', $branchId))
+ <details class="card card-body mt-3"><summary>{{ __('branch.request_refund') }}</summary><form method="post" action="{{ $base.'/refunds?branch_id='.$branchId }}" class="branch-filters mt-3">@csrf<input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', (string) \Illuminate\Support\Str::uuid()) }}"><label>{{ __('branch.kind') }}<select name="kind" class="form-control"><option value="booking">{{ __('branch.booking') }}</option><option value="booking_repeat">{{ __('branch.visit') }}</option></select></label><label>{{ __('branch.entity') }}<input class="form-control" name="booking_id" required></label><label>{{ __('branch.amount') }}<input class="form-control" type="number" min="0.01" step="0.01" name="amount" required></label><label>{{ __('branch.destination') }}<select class="form-control" name="destination"><option value="wallet">{{ __('branch.wallet') }}</option><option value="original">{{ __('branch.original') }}</option></select></label><label>{{ __('branch.payment_reference') }}<input class="form-control" name="payment_request_id"></label><label>{{ __('branch.reason') }}<input class="form-control" name="reason" required maxlength="2000"></label><button class="btn btn-primary">{{ __('branch.request_refund') }}</button></form></details>
+ @endif
+diff --git a/resources/views/branch/workspace.blade.php b/resources/views/branch/workspace.blade.php
+index 5608460..8dee2df 100644
+--- a/resources/views/branch/workspace.blade.php
++++ b/resources/views/branch/workspace.blade.php
+@@ -5,6 +5,7 @@
+ <main class="container-fluid p-4 nirab-branch">
+     @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
+     @foreach($errors->all() as $error)<div class="alert alert-danger" role="alert">{{ $error }}</div>@endforeach
++    <p class="text-muted">توقيت السعودية (Asia/Riyadh)</p>
+     <div id="branch-message" role="status" aria-live="polite"></div>
+     @if(!in_array($tab, ['quotes','settings'])) @include('branch.filters') @endif
+     @if(isset($summary))
+diff --git a/tests/Unit/BranchWorkspaceTest.php b/tests/Unit/BranchWorkspaceTest.php
+index ef33d99..200a9d3 100644
+--- a/tests/Unit/BranchWorkspaceTest.php
++++ b/tests/Unit/BranchWorkspaceTest.php
+@@ -141,8 +141,8 @@ public function testMonthBoundariesIncludeYearAndLocalMidnight(): void
+         $this->assertSame('2026-09-30 21:00:00', $period['start']);
+         $this->assertSame('2026-10-31 21:00:00', $period['end']);
+         $this->booking('old', ['service_schedule' => '2025-10-08 08:00:00']);
+-        $this->booking('boundary', ['service_schedule' => $period['start']]);
+-        $this->booking('outside', ['service_schedule' => $period['end']]);
++        $this->booking('boundary', ['service_schedule' => '2026-10-01 00:00:00']);
++        $this->booking('outside', ['service_schedule' => '2026-11-01 00:00:00']);
+         $this->assertSame(['boundary'], $this->reports->subjects($this->actor(), $this->filters())->pluck('subject_id')->all());
+         CarbonImmutable::setTestNow('2026-01-10 00:00:00');
+         $this->assertSame('2025-12-01', BranchPeriod::dates('last_month')['from']);
+@@ -403,7 +403,7 @@ public function testNonOwnerEmployeeCanUseRealProviderScheduleActionThroughWorks
+         $employee = new User(); $employee->forceFill(['id' => 'user', 'user_type' => 'provider-employee', 'provider_id' => 'a', 'is_active' => 1]);
+         $this->assertNull($employee->provider);
+         $this->grant('nirab_operational_scopes', ['dispatch.manage']);
+-        $this->booking('own', ['service_schedule' => '2026-10-09 08:00:00']);
++        $this->booking('own', ['service_schedule' => '2026-10-09 11:00:00']);
+         $request = \Illuminate\Http\Request::create('/provider/branch-workspace/bookings/booking/own/schedule', 'POST', ['branch_id' => 'a', 'reason' => 'Keep confirmed appointment', 'service_schedule' => '2026-10-09T11:00']);
+         $request->setUserResolver(fn () => $employee); $this->container->instance('request', $request);
+         $legacy = (new \ReflectionClass(\Modules\BookingModule\Http\Controllers\Web\Provider\BookingController::class))->newInstanceWithoutConstructor();
+@@ -421,6 +421,7 @@ public function testNonOwnerEmployeeCanUseRealProviderScheduleActionThroughWorks
+         $this->assertSame(NO_CHANGES_FOUND['response_code'], $response->getData(true)['response_code']);
+         $this->assertNull($employee->provider);
+         $this->assertSame('a', DB::table('bookings')->where('id', 'own')->value('provider_id'));
++        $this->assertSame('2026-10-09 11:00:00', DB::table('bookings')->where('id', 'own')->value('service_schedule'));
+     }
+ 
+     public function testVisitDetailPageDefaultsAndRejectsUnknownPages(): void
+diff --git a/tests/Unit/SlotTimezoneTest.php b/tests/Unit/SlotTimezoneTest.php
+index dd83c35..b7559f9 100644
+--- a/tests/Unit/SlotTimezoneTest.php
++++ b/tests/Unit/SlotTimezoneTest.php
+@@ -54,7 +54,7 @@ public function getLocale(): string { return 'en'; }
+         $this->container->instance(ResponseFactory::class, $response);
+ 
+         $requirements = Mockery::mock(ServiceItemRequirements::class);
+-        $requirements->shouldReceive('evaluate')->andReturn(['service_ids' => ['service'], 'duration_minutes' => 60, 'required_technicians' => 1, 'execution_type' => 'single']);
++        $requirements->shouldReceive('evaluate')->andReturn(['service_ids' => ['service'], 'duration_minutes' => 60, 'required_technicians' => 1, 'execution_type' => 'single', 'items' => []]);
+         $this->container->instance(ServiceItemRequirements::class, $requirements);
+         $area = Mockery::mock(BranchServiceAreaRepository::class);
+         $area->shouldReceive('resolveAreaId')->andReturn('area');
+@@ -73,8 +73,26 @@ public function getLocale(): string { return 'en'; }
+         $this->container->instance(BranchAssignmentService::class, $branches);
+         $availability = Mockery::mock(AvailabilityService::class);
+         $availability->shouldReceive('canFulfill')->andReturnUsing(fn ($branch, $ids, CarbonInterface $start) =>
+-            !$this->reserved && !$start->isPast() && $start->format('H:i:s') === '08:00:00');
++            !$this->reserved && !$start->isPast() && $start->format('H:i:s') === '11:00:00');
+         $this->container->instance(AvailabilityService::class, $availability);
++        $this->container->instance(\Modules\ProviderManagement\Services\BranchScheduleService::class, new class {
++            public function contains(...$args): bool { return true; }
++        });
++        $this->container->instance(\Modules\ProviderManagement\Services\BranchCapacityPolicy::class, new class {
++            public function dailyLoad(...$args): int { return 0; }
++            public function available(...$args): bool { return true; }
++        });
++        $this->container->instance(\Modules\ServiceManagement\Services\DirectServicePolicy::class, new class {
++            public function catalog(...$args): object { return new class {
++                public function findOrFail($id): object { return (object) ['id' => $id]; }
++            }; }
++        });
++        $this->container->instance(\Modules\ServiceManagement\Services\ServicePriceResolver::class, new class {
++            public function resolve(...$args): object { return (object) []; }
++        });
++        $this->container->instance(\Modules\ServiceManagement\Services\PricingEngine::class, new class {
++            public function calculate(...$args): void { }
++        });
+         $this->controller = new DispatchController($branches, $availability, Mockery::mock(TrackingService::class));
+ 
+         // Eloquent builds its normal query; only the provider SELECT is mocked.
+@@ -100,7 +118,7 @@ protected function tearDown(): void
+ 
+     private function availability(?string $start = null, string $date = '2026-10-15'): array
+     {
+-        $request = Request::create('/slots', 'GET', ['zone_id' => self::ZONE, 'items' => [['service_id' => 'service']], 'date' => $date, 'starts_at' => $start]);
++        $request = Request::create('/slots', 'GET', ['zone_id' => self::ZONE, 'items' => [['service_id' => 'service', 'variant_key' => 'standard', 'quantity' => 1]], 'date' => $date, 'starts_at' => $start, 'latitude' => 24.0, 'longitude' => 46.0]);
+         return $this->controller->availability($request)->getData(true)['content'];
+     }
+ 
+@@ -117,21 +135,21 @@ public function testListedSlotRevalidatesAndCheckoutUsesSameStoredInstant(): voi
+     {
+         $listed = $this->availability()['slots'];
+         self::assertCount(1, $listed);
+-        self::assertSame('2026-10-15T08:00:00+00:00', $listed[0]['starts_at']);
++        self::assertSame('2026-10-15T11:00:00+03:00', $listed[0]['starts_at']);
+         foreach ([$listed[0]['starts_at'], '2026-10-15T08:00:00Z', '2026-10-15T08:00:00.000Z', '2026-10-15T11:00:00+03:00', '2026-10-15T04:00:00-04:00', '2026-10-14T23:00:00-09:00'] as $start) {
+             self::assertTrue($this->availability($start)['requested_slot_available']);
+             self::assertSame(self::BRANCH, $this->availability($start)['provider_id']);
+-            self::assertSame('2026-10-15 08:00:00', BookingSchedule::forStorage($start));
++            self::assertSame('2026-10-15 11:00:00', BookingSchedule::forStorage($start));
+             self::assertTrue($this->checkoutAvailable($start));
+         }
+     }
+ 
+     public function testLegacyWallTimeKeepsOperationalMeaningDespitePhpTimezone(): void
+     {
+-        foreach (['2026-10-15T08:00:00.000', '2026-10-15 08:00:00'] as $start) {
++        foreach (['2026-10-15T11:00:00.000', '2026-10-15 11:00:00'] as $start) {
+             self::assertTrue($this->availability($start)['requested_slot_available']);
+             self::assertTrue($this->checkoutAvailable($start));
+-            self::assertSame('2026-10-15T08:00:00+00:00', BookingSchedule::parse($start)->toIso8601String());
++            self::assertSame('2026-10-15T11:00:00+03:00', BookingSchedule::parse($start)->toIso8601String());
+         }
+         $this->container['config']->set('app.timezone', 'Asia/Riyadh');
+         self::assertSame('2026-10-15T08:00:00+03:00', BookingSchedule::parse('2026-10-15 08:00:00')->toIso8601String());
+diff --git a/app/Casts/SaudiAppointment.php b/app/Casts/SaudiAppointment.php
+new file mode 100644
+index 0000000..72cacc6
+--- /dev/null
++++ b/app/Casts/SaudiAppointment.php
+@@ -0,0 +1,29 @@
++<?php
++
++namespace App\Casts;
++
++use App\Support\SaudiTime;
++use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
++use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
++use Illuminate\Database\Eloquent\Model;
++
++/** No historical row mutation. Preserve the legacy wall-clock API field. */
++final class SaudiAppointment implements CastsAttributes, SerializesCastableAttributes
++{
++    public bool $withoutObjectCaching = true;
++
++    public function get(Model $model, string $key, mixed $value, array $attributes): mixed
++    {
++        return $value === null ? null : SaudiTime::parseCustomerAppointment($value);
++    }
++
++    public function set(Model $model, string $key, mixed $value, array $attributes): mixed
++    {
++        return $value === null ? null : SaudiTime::forAppointmentStorage($value);
++    }
++
++    public function serialize(Model $model, string $key, mixed $value, array $attributes): mixed
++    {
++        return $value === null ? null : SaudiTime::forAppointmentStorage($value);
++    }
++}
+diff --git a/app/Support/SaudiTime.php b/app/Support/SaudiTime.php
+new file mode 100644
+index 0000000..d19d49d
+--- /dev/null
++++ b/app/Support/SaudiTime.php
+@@ -0,0 +1,61 @@
++<?php
++
++namespace App\Support;
++
++use DateTimeInterface;
++use Illuminate\Support\Carbon;
++
++/** App/ORM/job timestamps stay UTC. Only business wall clocks use this zone. */
++final class SaudiTime
++{
++    public static function timezone(): string
++    {
++        return config('nirab_time.business_timezone', 'Asia/Riyadh');
++    }
++
++    public static function now(): Carbon
++    {
++        return Carbon::now(self::timezone());
++    }
++
++    /** Unzoned inputs are Saudi civil time; zoned inputs identify an instant. */
++    public static function parseCustomerAppointment(string|DateTimeInterface $value): Carbon
++    {
++        return ($value instanceof DateTimeInterface ? Carbon::instance($value) : Carbon::parse($value, self::timezone()))
++            ->setTimezone(self::timezone());
++    }
++
++    public static function forAppointmentStorage(string|DateTimeInterface $value): string
++    {
++        return self::parseCustomerAppointment($value)->format('Y-m-d H:i:s');
++    }
++
++    public static function appointmentForApi(string|DateTimeInterface $value): string
++    {
++        return self::parseCustomerAppointment($value)->toIso8601String();
++    }
++
++    public static function formatAppointmentSaudi(string|DateTimeInterface $value, string $format = 'd-M-Y h:i A'): string
++    {
++        return self::parseCustomerAppointment($value)->format($format);
++    }
++
++    /** Preserve pre-existing reminder/event keys derived from the legacy SQL clock.
++     * This identity token is deliberately not the appointment's actual UTC instant.
++     */
++    public static function appointmentIdentity(string|DateTimeInterface $value): string
++    {
++        return Carbon::parse(self::forAppointmentStorage($value), 'UTC')->format('U');
++    }
++
++    public static function formatUtcInstantForApi(string|DateTimeInterface $value): string
++    {
++        return ($value instanceof DateTimeInterface ? Carbon::instance($value) : Carbon::parse($value, 'UTC'))
++            ->utc()->toIso8601String();
++    }
++
++    public static function formatInstantSaudi(string|DateTimeInterface $value, string $format = 'd-M-Y h:i A'): string
++    {
++        return Carbon::parse(self::formatUtcInstantForApi($value))->setTimezone(self::timezone())->format($format);
++    }
++}
+diff --git a/app/Traits/HasSaudiAppointment.php b/app/Traits/HasSaudiAppointment.php
+new file mode 100644
+index 0000000..e4eb7d6
+--- /dev/null
++++ b/app/Traits/HasSaudiAppointment.php
+@@ -0,0 +1,18 @@
++<?php
++
++namespace App\Traits;
++
++use App\Support\SaudiTime;
++
++trait HasSaudiAppointment
++{
++    public function getServiceScheduleAtAttribute(): ?string
++    {
++        return $this->service_schedule === null ? null : SaudiTime::appointmentForApi($this->service_schedule);
++    }
++
++    public function getTimezoneAttribute(): string
++    {
++        return SaudiTime::timezone();
++    }
++}
+diff --git a/config/nirab_time.php b/config/nirab_time.php
+new file mode 100644
+index 0000000..92de1c9
+--- /dev/null
++++ b/config/nirab_time.php
+@@ -0,0 +1,6 @@
++<?php
++
++return [
++    // Appointment SQL values are Saudi civil time; technical SQL timestamps are UTC.
++    'business_timezone' => env('NIRAB_BUSINESS_TIMEZONE', 'Asia/Riyadh'),
++];
+diff --git a/tests/Unit/SaudiTimeContractTest.php b/tests/Unit/SaudiTimeContractTest.php
+new file mode 100644
+index 0000000..32905df
+--- /dev/null
++++ b/tests/Unit/SaudiTimeContractTest.php
+@@ -0,0 +1,113 @@
++<?php
++
++namespace Tests\Unit;
++
++use App\Casts\SaudiAppointment;
++use App\Services\BranchPeriod;
++use App\Support\SaudiTime;
++use App\Traits\HasSaudiAppointment;
++use Illuminate\Config\Repository;
++use Illuminate\Container\Container;
++use Illuminate\Database\Eloquent\Model;
++use PHPUnit\Framework\TestCase;
++
++/** Pure date/cast/query-contract checks; no Laravel boot or database connection. */
++class SaudiTimeContractTest extends TestCase
++{
++    private string $originalTimezone;
++
++    protected function setUp(): void
++    {
++        $this->originalTimezone = date_default_timezone_get();
++        $container = new Container();
++        $container->instance('config', new Repository(['app' => ['timezone' => 'UTC'], 'nirab_time' => ['business_timezone' => 'Asia/Riyadh']]));
++        Container::setInstance($container);
++    }
++
++    protected function tearDown(): void
++    {
++        date_default_timezone_set($this->originalTimezone);
++        Container::setInstance(null);
++    }
++
++    public function testAppointmentsIgnoreServerTimezoneAndPreserveLegacyHour(): void
++    {
++        foreach (['UTC', 'Europe/London', 'America/New_York', 'Asia/Riyadh'] as $zone) {
++            date_default_timezone_set($zone);
++            foreach (['2026-10-26 11:00:00', '2026-10-26T11:00:00+03:00', '2026-10-26T08:00:00Z', '2026-10-26T04:00:00-04:00'] as $value) {
++                self::assertSame('2026-10-26 11:00:00', SaudiTime::forAppointmentStorage($value));
++                self::assertSame('2026-10-26T11:00:00+03:00', SaudiTime::appointmentForApi($value));
++            }
++        }
++    }
++
++    public function testCastKeepsSqlAndLegacyApiWhileExposingCanonicalAppointment(): void
++    {
++        date_default_timezone_set('UTC');
++        $model = new SaudiTimeTestModel();
++        $model->setRawAttributes(['service_schedule' => '2026-10-26 11:00:00', 'created_at' => '2026-10-26 08:00:00'], true);
++        self::assertSame('Asia/Riyadh', $model->service_schedule->timezoneName);
++        self::assertSame('2026-10-26 11:00:00', $model->toArray()['service_schedule']);
++        self::assertSame('2026-10-26T11:00:00+03:00', $model->toArray()['service_schedule_at']);
++        self::assertSame('Asia/Riyadh', $model->toArray()['timezone']);
++        self::assertSame('2026-10-26T08:00:00.000000Z', $model->toArray()['created_at']);
++        $model->service_schedule = '2026-10-26T08:00:00Z';
++        self::assertFalse($model->isDirty('service_schedule'));
++        $model->service_schedule = '2026-10-26T09:00:00Z';
++        self::assertSame('2026-10-26 12:00:00', $model->getAttributes()['service_schedule']);
++    }
++
++    public function testExistingReminderKeysDoNotChangeWhenTheScheduleCastChanges(): void
++    {
++        $legacyKey = \Carbon\Carbon::parse('2026-10-26 11:00:00', 'UTC')->format('U');
++        self::assertSame($legacyKey, SaudiTime::appointmentIdentity('2026-10-26 11:00:00'));
++        self::assertSame($legacyKey, SaudiTime::appointmentIdentity('2026-10-26T08:00:00Z'));
++    }
++
++    public function testDayBoundaryAndTechnicalInstantRemainDistinct(): void
++    {
++        self::assertSame('2026-10-26T23:30:00+03:00', SaudiTime::appointmentForApi('2026-10-26T20:30:00Z'));
++        self::assertSame('2026-10-27T00:30:00+03:00', SaudiTime::appointmentForApi('2026-10-26T21:30:00Z'));
++        self::assertSame('2026-10-26T08:00:00+00:00', SaudiTime::formatUtcInstantForApi('2026-10-26 08:00:00'));
++        self::assertSame('2026-10-26 11:00:00', SaudiTime::formatInstantSaudi('2026-10-26T08:00:00Z', 'Y-m-d H:i:s'));
++    }
++
++    public function testSaudiReportDaysUseWallBoundariesForAppointmentsAndUtcForEvents(): void
++    {
++        $filters = BranchPeriod::dates('custom', '2026-10-26', '2026-10-26');
++        self::assertSame('2026-10-25 21:00:00', $filters['start']);
++        self::assertSame('2026-10-26 21:00:00', $filters['end']);
++        $query = new class {
++            public array $calls = [];
++            public function where(...$args): self { $this->calls[] = $args; return $this; }
++        };
++        BranchPeriod::apply($query, 'bookings.service_schedule', $filters);
++        self::assertSame([['bookings.service_schedule', '>=', '2026-10-26 00:00:00'], ['bookings.service_schedule', '<', '2026-10-27 00:00:00']], $query->calls);
++        $query->calls = [];
++        // Analytics requests expose from/to as UTC datetimes; boundaries still come from start/end.
++        BranchPeriod::apply($query, 'bookings.service_schedule', array_merge($filters, ['from' => $filters['start'], 'to' => $filters['end']]));
++        self::assertSame('2026-10-26 00:00:00', $query->calls[0][2]);
++        self::assertSame('2026-10-27 00:00:00', $query->calls[1][2]);
++        $query->calls = [];
++        BranchPeriod::apply($query, 'created_at', $filters);
++        self::assertSame([['created_at', '>=', '2026-10-25 21:00:00'], ['created_at', '<', '2026-10-26 21:00:00']], $query->calls);
++    }
++
++    public function testWeeklyAndMonthlyIntervalsUseExactSaudiInstants(): void
++    {
++        $weekly = SaudiTime::parseCustomerAppointment('2026-10-26 11:00:00');
++        self::assertTrue($weekly->copy()->addDays(7)->gt(SaudiTime::parseCustomerAppointment('2026-10-28 11:00:00')));
++        self::assertTrue($weekly->copy()->addDays(7)->lte(SaudiTime::parseCustomerAppointment('2026-11-03 11:00:00')));
++        $monthly = SaudiTime::parseCustomerAppointment('2026-10-27T11:00:00+03:00');
++        self::assertSame('2026-11-26T11:00:00+03:00', $monthly->copy()->addDays(30)->toIso8601String());
++        self::assertSame(30 * 24 * 3600, $monthly->copy()->addDays(30)->timestamp - $monthly->timestamp);
++    }
++}
++
++class SaudiTimeTestModel extends Model
++{
++    use HasSaudiAppointment;
++    protected $dateFormat = 'Y-m-d H:i:s';
++    protected $casts = ['service_schedule' => SaudiAppointment::class];
++    protected $appends = ['service_schedule_at', 'timezone'];
++}
+diff --git a/tools/saudi-time-baseline.php b/tools/saudi-time-baseline.php
+new file mode 100644
+index 0000000..06e9be2
+--- /dev/null
++++ b/tools/saudi-time-baseline.php
+@@ -0,0 +1,42 @@
++<?php
++
++/** User-operated SELECT-only evidence collection. The agent does not run this. */
++require dirname(__DIR__) . '/vendor/autoload.php';
++$app = require dirname(__DIR__) . '/bootstrap/app.php';
++$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
++
++use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Facades\Schema;
++
++$report = [
++    'app_timezone' => config('app.timezone'),
++    'business_timezone' => config('nirab_time.business_timezone', 'Asia/Riyadh'),
++    'warning' => 'Raw service_schedule values are Saudi business wall clocks; provenance still requires reconciliation.',
++    'database' => DB::selectOne('SELECT @@session.time_zone AS session_zone, @@global.time_zone AS global_zone, NOW() AS db_now, UTC_TIMESTAMP() AS db_utc'),
++    'bookings' => [],
++];
++foreach ([100005, 100007, 100008, 100009] as $id) {
++    $row = DB::table('bookings')->where('readable_id', $id)->first(['id', 'readable_id', 'service_schedule', 'booking_status', 'created_at']);
++    if (!$row) {
++        $report['bookings'][] = ['readable_id' => $id, 'status' => 'not_found'];
++        continue;
++    }
++    $entry = ['raw' => $row, 'reconciliation' => 'pending_original_UI_or_request_evidence'];
++    if (Schema::hasTable('booking_schedule_histories')) {
++        $entry['schedule_history'] = DB::table('booking_schedule_histories')->where('booking_id', $row->id)
++            ->orderBy('created_at')->limit(100)->get(['schedule', 'created_at']);
++    }
++    if (Schema::hasTable('audit_logs')) {
++        $entry['audit'] = DB::table('audit_logs')->where('entity_id', $row->id)->orderBy('created_at')->limit(100)
++            ->get(['event', 'created_at', 'old_values', 'new_values'])->map(function ($audit) {
++                foreach (['old_values', 'new_values'] as $key) {
++                    $values = json_decode($audit->$key ?? '{}', true) ?: [];
++                    // Retain only time provenance, without personal/payment data.
++                    $audit->$key = array_intersect_key($values, array_flip(['service_schedule', 'scheduled_at', 'starts_at', 'timezone', 'source', 'reason']));
++                }
++                return $audit;
++            });
++    }
++    $report['bookings'][] = $entry;
++}
++echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . PHP_EOL;

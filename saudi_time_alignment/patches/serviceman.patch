@@ -1,0 +1,494 @@
+diff --git a/lib/feature/booking_details/controller/booking_edit_controller.dart b/lib/feature/booking_details/controller/booking_edit_controller.dart
+index 8b4cdb6..1e59119 100644
+--- a/lib/feature/booking_details/controller/booking_edit_controller.dart
++++ b/lib/feature/booking_details/controller/booking_edit_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_serviceman/helper/saudi_time.dart';
+ import 'dart:convert';
+ import 'package:demandium_serviceman/utils/core_export.dart';
+ import 'package:get/get.dart';
+@@ -66,10 +67,10 @@ class BookingEditController extends GetxController implements GetxService {
+ 
+   List<BookingPriceItem>? bookingPriceList;
+ 
+-  DateTime _selectedDate = DateTime.now();
++  DateTime _selectedDate = SaudiTime.now();
+   DateTime get selectedDate => _selectedDate;
+ 
+-  TimeOfDay _selectedTimeOfDay = TimeOfDay.now();
++  TimeOfDay _selectedTimeOfDay = TimeOfDay.fromDateTime(SaudiTime.now());
+   TimeOfDay get selectedTimeOfDay => _selectedTimeOfDay;
+ 
+   void initializedControllerValue(
+@@ -393,7 +394,7 @@ class BookingEditController extends GetxController implements GetxService {
+   Future<void> selectDate() async {
+     final DateTime? picked = await showDatePicker(
+       context: Get.context!,
+-      initialDate: DateTime.now(),
++      initialDate: SaudiTime.now(),
+       initialEntryMode: DatePickerEntryMode.calendarOnly,
+       builder: (context, child) {
+         return Theme(
+@@ -409,7 +410,7 @@ class BookingEditController extends GetxController implements GetxService {
+           child: child!,
+         );
+       },
+-      firstDate: DateTime.now(),
++      firstDate: SaudiTime.now(),
+       lastDate: DateTime(2101),
+     );
+     if (picked != null) {
+@@ -422,15 +423,15 @@ class BookingEditController extends GetxController implements GetxService {
+   Future<void> selectTimeOfDay() async {
+     final TimeOfDay? pickedTime = await showTimePicker(
+       context: Get.context!,
+-      initialTime: TimeOfDay.now(),
++      initialTime: TimeOfDay.fromDateTime(SaudiTime.now()),
+     );
+ 
+     if (pickedTime != null) {
+       _selectedTimeOfDay = pickedTime;
+ 
+-      if (DateTime.tryParse(
++      if (SaudiTime.tryAppointment(
+         "${DateConverter.dateTimeStringToDate(_selectedDate.toString())} ${DateConverter.timeToTimeString(_selectedTimeOfDay)}",
+-      )!.isBefore(DateTime.now())) {
++      )!.isBefore(SaudiTime.now())) {
+         showCustomSnackBar(
+           "schedule_time_must_be_after_current_time".tr,
+           type: ToasterMessageType.info,
+diff --git a/lib/feature/booking_details/controller/invoice_controller.dart b/lib/feature/booking_details/controller/invoice_controller.dart
+index da5661c..5a541c2 100644
+--- a/lib/feature/booking_details/controller/invoice_controller.dart
++++ b/lib/feature/booking_details/controller/invoice_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_serviceman/helper/saudi_time.dart';
+ import 'dart:io';
+ 
+ import 'package:demandium_serviceman/helper/date_converter.dart';
+@@ -37,7 +38,7 @@ class PdfInvoiceApi {
+       }
+     }
+ 
+-    final date = DateTime.now();
++    final date = SaudiTime.now();
+ 
+     var invoice = Invoice(
+       provider: provider.Provider(
+diff --git a/lib/feature/booking_details/model/booking_details_model.dart b/lib/feature/booking_details/model/booking_details_model.dart
+index de34b65..d497778 100644
+--- a/lib/feature/booking_details/model/booking_details_model.dart
++++ b/lib/feature/booking_details/model/booking_details_model.dart
+@@ -175,7 +175,7 @@ class BookingDetailsContent {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+@@ -808,8 +808,12 @@ class Coordinates {
+   Coordinates.fromJson(dynamic json) {
+     if (json == null) return;
+     if (json is Map) {
+-      lat = double.tryParse((json['latitude'] ?? json['lat'])?.toString() ?? '');
+-      lng = double.tryParse((json['longitude'] ?? json['lng'] ?? json['lon'])?.toString() ?? '');
++      lat = double.tryParse(
++        (json['latitude'] ?? json['lat'])?.toString() ?? '',
++      );
++      lng = double.tryParse(
++        (json['longitude'] ?? json['lng'] ?? json['lon'])?.toString() ?? '',
++      );
+     } else if (json is List && json.length >= 2) {
+       lat = double.tryParse(json[0]?.toString() ?? '');
+       lng = double.tryParse(json[1]?.toString() ?? '');
+@@ -817,8 +821,14 @@ class Coordinates {
+       try {
+         final decoded = jsonDecode(json);
+         if (decoded is Map) {
+-          lat = double.tryParse((decoded['latitude'] ?? decoded['lat'])?.toString() ?? '');
+-          lng = double.tryParse((decoded['longitude'] ?? decoded['lng'] ?? decoded['lon'])?.toString() ?? '');
++          lat = double.tryParse(
++            (decoded['latitude'] ?? decoded['lat'])?.toString() ?? '',
++          );
++          lng = double.tryParse(
++            (decoded['longitude'] ?? decoded['lng'] ?? decoded['lon'])
++                    ?.toString() ??
++                '',
++          );
+         } else if (decoded is List && decoded.length >= 2) {
+           lat = double.tryParse(decoded[0]?.toString() ?? '');
+           lng = double.tryParse(decoded[1]?.toString() ?? '');
+diff --git a/lib/feature/booking_details/widget/booking_display.dart b/lib/feature/booking_details/widget/booking_display.dart
+index 4c82141..d72ef44 100644
+--- a/lib/feature/booking_details/widget/booking_display.dart
++++ b/lib/feature/booking_details/widget/booking_display.dart
+@@ -1,3 +1,4 @@
++import 'package:demandium_serviceman/helper/saudi_time.dart';
+ import 'package:demandium_serviceman/helper/extension_helper.dart';
+ import 'package:demandium_serviceman/theme/saudi_riyal.dart';
+ import 'package:demandium_serviceman/utils/core_export.dart';
+@@ -58,23 +59,10 @@ abstract final class BookingDisplay {
+ 
+   static String date(BuildContext context, String? raw, {required bool utc}) {
+     final value = raw?.trim() ?? '';
+-    final parsed = DateTime.tryParse(value);
+-    if (parsed == null) return 'booking_value_unavailable'.tr;
+-    // Creation timestamps are UTC; unzoned service schedules are local wall time.
+-    final hasZone = RegExp(
+-      r'(Z|[+-]\d{2}:?\d{2})$',
+-      caseSensitive: false,
+-    ).hasMatch(value);
+-    final date = utc && !hasZone
+-        ? DateTime.utc(
+-            parsed.year,
+-            parsed.month,
+-            parsed.day,
+-            parsed.hour,
+-            parsed.minute,
+-            parsed.second,
+-          ).toLocal()
+-        : parsed.toLocal();
++    final date = utc
++        ? SaudiTime.tryInstant(value)
++        : SaudiTime.tryAppointment(value);
++    if (date == null) return 'booking_value_unavailable'.tr;
+     final locale = Localizations.localeOf(context).languageCode;
+     final timeFormat =
+         Get.find<SplashController>().configModel?.content?.timeFormat == '24'
+diff --git a/lib/feature/booking_request/model/booking_request_model.dart b/lib/feature/booking_request/model/booking_request_model.dart
+index cd8df5f..228d1f9 100644
+--- a/lib/feature/booking_request/model/booking_request_model.dart
++++ b/lib/feature/booking_request/model/booking_request_model.dart
+@@ -78,7 +78,7 @@ class BookingRequestModel {
+     );
+     isGuest = int.tryParse(json['is_guest'].toString());
+     isRepeatBooking = int.tryParse(json['is_repeated'].toString());
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     if (json['repeats'] != null) {
+       repeatBookingList = <RepeatBooking>[];
+       json['repeats'].forEach((v) {
+@@ -206,7 +206,7 @@ class RepeatBooking {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/dashboard/model/dashboard_model.dart b/lib/feature/dashboard/model/dashboard_model.dart
+index bf6634a..6f22223 100644
+--- a/lib/feature/dashboard/model/dashboard_model.dart
++++ b/lib/feature/dashboard/model/dashboard_model.dart
+@@ -185,7 +185,7 @@ class DashboardBooking {
+     totalBookingAmount = json['total_booking_amount'];
+     totalTaxAmount = json['total_tax_amount'];
+     totalDiscountAmount = json['total_discount_amount'];
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/helper/date_converter.dart b/lib/helper/date_converter.dart
+index 6c2c591..f9db7ce 100644
+--- a/lib/helper/date_converter.dart
++++ b/lib/helper/date_converter.dart
+@@ -1,66 +1,83 @@
++import 'package:demandium_serviceman/helper/saudi_time.dart';
+ import 'package:demandium_serviceman/utils/core_export.dart';
+ import 'package:get/get.dart';
+ import 'package:intl/intl.dart';
+ 
+ class DateConverter {
+-  static String dateToDateAndTime(DateTime ? dateTime) {
+-    return DateFormat('yyyy-MM-dd ${_timeFormatter()}').format(dateTime!);
++  static String dateToDateAndTime(DateTime? dateTime) {
++    return DateFormat(
++      'yyyy-MM-dd ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static String convertStringTimeToDate(DateTime time) {
+-    return DateFormat(_timeFormatter()).format(time);
++    return DateFormat(_timeFormatter()).format(SaudiTime.forDisplay(time));
+   }
+ 
+-  static String convertStringTimeToDateTime (DateTime time){
+-    return DateFormat('EEE \'at\' ${_timeFormatter()}').format(time.toLocal());
++  static String convertStringTimeToDateTime(DateTime time) {
++    return DateFormat(
++      'EEE \'at\' ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(time));
+   }
+ 
+-  static String dateMonthYearTime(DateTime ? dateTime) {
+-    return DateFormat('d MMM,y, ${_timeFormatter()}').format(dateTime!);
++  static String dateMonthYearTime(DateTime? dateTime) {
++    return DateFormat(
++      'd MMM,y, ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+-  static String dateStringMonthYear(DateTime ? dateTime) {
+-    return DateFormat('d MMM,y').format(dateTime!);
++  static String dateStringMonthYear(DateTime? dateTime) {
++    return DateFormat('d MMM,y').format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static String dateTimeStringToDate(String dateTime) {
+-    return DateFormat('yyyy-MM-dd').format(DateFormat('yyyy-MM-dd').parse(dateTime));
++    return DateFormat('yyyy-MM-dd').format(SaudiTime.appointment(dateTime));
+   }
+ 
+   static String timeToTimeString(TimeOfDay time) {
+     DateTime dateTime = DateTime(2000, 01, 01, time.hour, time.minute);
+-    return DateFormat('HH:mm:ss').format(dateTime);
++    return DateFormat('HH:mm:ss').format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+-  static int countDays(DateTime ? dateTime) {
++  static int countDays(DateTime? dateTime) {
+     final startDate = dateTime!;
+-    final endDate = DateTime.now();
++    final endDate = SaudiTime.now();
+     final difference = endDate.difference(startDate).inDays;
+     return difference;
+   }
+ 
+-  static String stringYear(DateTime ? dateTime) {
+-    return DateFormat('y').format(dateTime!);
++  static String stringYear(DateTime? dateTime) {
++    return DateFormat('y').format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static DateTime isoUtcStringToLocalDate(String dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime, true).toLocal();
++    return SaudiTime.instant(dateTime);
+   }
+ 
+   static String isoStringToLocalDateAndTime(String dateTime) {
+-    return DateFormat('dd MMM yyyy \'at\' ${_timeFormatter()}').format(isoUtcStringToLocalDate(dateTime));
++    return DateFormat(
++      'dd MMM yyyy \'at\' ${_timeFormatter()}',
++    ).format(isoUtcStringToLocalDate(dateTime));
+   }
+ 
+-  static String convert24HourTimeTo12HourTimeWithDay(DateTime time, bool isToday) {
+-    if(isToday){
+-      return DateFormat('\'Today at\' ${_timeFormatter()}').format(time);
+-    }else{
+-      return DateFormat('\'Yesterday at\' ${_timeFormatter()}').format(time);
++  static String convert24HourTimeTo12HourTimeWithDay(
++    DateTime time,
++    bool isToday,
++  ) {
++    if (isToday) {
++      return DateFormat(
++        '\'Today at\' ${_timeFormatter()}',
++      ).format(SaudiTime.forDisplay(time));
++    } else {
++      return DateFormat(
++        '\'Yesterday at\' ${_timeFormatter()}',
++      ).format(SaudiTime.forDisplay(time));
+     }
+   }
+ 
+   static String _timeFormatter() {
+-    return Get.find<SplashController>().configModel?.content?.timeFormat == '24' ? 'HH:mm' : 'hh:mm a';
++    return Get.find<SplashController>().configModel?.content?.timeFormat == '24'
++        ? 'HH:mm'
++        : 'hh:mm a';
+   }
+-
+ }
+diff --git a/pubspec.lock b/pubspec.lock
+index c3e26f8..6f4c770 100644
+--- a/pubspec.lock
++++ b/pubspec.lock
+@@ -1259,7 +1259,7 @@ packages:
+     source: hosted
+     version: "0.7.10"
+   timezone:
+-    dependency: transitive
++    dependency: "direct main"
+     description:
+       name: timezone
+       sha256: "981d1020d6ef8fe1e7b3de5054e5b25579ae7c403d7734adc508ffc47668e9cb"
+diff --git a/pubspec.yaml b/pubspec.yaml
+index 17850ea..414e0f4 100644
+--- a/pubspec.yaml
++++ b/pubspec.yaml
+@@ -9,6 +9,7 @@ environment:
+   sdk: ^3.9.2
+ 
+ dependencies:
++  timezone: ^0.11.1
+   flutter:
+     sdk: flutter
+ 
+diff --git a/lib/helper/saudi_time.dart b/lib/helper/saudi_time.dart
+new file mode 100644
+index 0000000..c53402a
+--- /dev/null
++++ b/lib/helper/saudi_time.dart
+@@ -0,0 +1,80 @@
++import 'package:timezone/data/latest.dart' as tzdata;
++import 'package:timezone/timezone.dart' as tz;
++
++/// Saudi appointments are civil wall time; technical timestamps are UTC instants.
++/// Never use the device timezone to interpret a business appointment.
++abstract final class SaudiTime {
++  static const timezone = 'Asia/Riyadh';
++  static final tz.Location _riyadh = _location();
++
++  static tz.Location _location() {
++    tzdata.initializeTimeZones();
++    return tz.getLocation(timezone);
++  }
++
++  static bool _hasZone(String value) =>
++      RegExp(r'(Z|[+-]\d{2}:?\d{2})$', caseSensitive: false).hasMatch(value);
++
++  static DateTime now() => tz.TZDateTime.now(_riyadh);
++
++  /// Legacy unzoned appointments keep their Saudi hour without any +3 shift.
++  static DateTime appointment(String value) {
++    final raw = value.trim();
++    final civil = raw.contains(RegExp('[T ]')) ? raw : '${raw}T00:00:00';
++    return tz.TZDateTime.from(
++      DateTime.parse(_hasZone(raw) ? raw : '$civil+03:00'),
++      _riyadh,
++    );
++  }
++
++  static DateTime? tryAppointment(String? value) {
++    try {
++      return value == null ? null : appointment(value);
++    } on FormatException {
++      return null;
++    }
++  }
++
++  /// Unzoned creation, expiry and event timestamps are UTC, unlike appointments.
++  static DateTime instant(String value) {
++    final raw = value.trim();
++    final civil = raw.contains(RegExp('[T ]')) ? raw : '${raw}T00:00:00';
++    return tz.TZDateTime.from(
++      DateTime.parse(_hasZone(raw) ? raw : '${civil}Z'),
++      _riyadh,
++    );
++  }
++
++  static DateTime? tryInstant(String? value) {
++    try {
++      return value == null ? null : instant(value);
++    } on FormatException {
++      return null;
++    }
++  }
++
++  /// Picker values hold civil components, not a device-local instant.
++  static DateTime wall(DateTime value) => tz.TZDateTime(
++    _riyadh,
++    value.year,
++    value.month,
++    value.day,
++    value.hour,
++    value.minute,
++    value.second,
++    value.millisecond,
++    value.microsecond,
++  );
++
++  static DateTime forDisplay(DateTime value) =>
++      value is tz.TZDateTime || value.isUtc
++      ? tz.TZDateTime.from(value, _riyadh)
++      : wall(value);
++
++  static String appointmentToken(DateTime value) {
++    final date = forDisplay(value);
++    String two(int n) => n.toString().padLeft(2, '0');
++    return '${date.year.toString().padLeft(4, '0')}-${two(date.month)}-${two(date.day)}'
++        'T${two(date.hour)}:${two(date.minute)}:${two(date.second)}+03:00';
++  }
++}
+diff --git a/test/unit/saudi_time_contract_check.dart b/test/unit/saudi_time_contract_check.dart
+new file mode 100644
+index 0000000..c082ed5
+--- /dev/null
++++ b/test/unit/saudi_time_contract_check.dart
+@@ -0,0 +1,71 @@
++import 'package:timezone/timezone.dart' as tz;
++import 'package:demandium_serviceman/helper/saudi_time.dart';
++
++// Run with dart run; no Flutter binding, device, widgets or application startup.
++void main() {
++  var checks = 0;
++  void check(bool value, String label) {
++    checks++;
++    if (!value) throw StateError(label);
++  }
++
++  const canonical = '2026-10-26T11:00:00+03:00';
++  for (final value in [
++    canonical,
++    '2026-10-26 11:00:00',
++    '2026-10-26T08:00:00Z',
++    '2026-10-26T04:00:00-04:00',
++  ]) {
++    final date = SaudiTime.appointment(value);
++    check(date.hour == 11 && date.day == 26, 'appointment $value');
++    check(SaudiTime.appointmentToken(date) == canonical, 'canonical $value');
++  }
++  for (final zone in [
++    'UTC',
++    'Europe/London',
++    'America/New_York',
++    'Asia/Riyadh',
++  ]) {
++    final device = tz.TZDateTime.from(
++      DateTime.parse('2026-10-26T08:00:00Z'),
++      zone == 'UTC' ? tz.UTC : tz.getLocation(zone),
++    );
++    check(SaudiTime.forDisplay(device).hour == 11, 'display from $zone');
++  }
++  check(SaudiTime.instant('2026-10-26 08:00:00').hour == 11, 'naive UTC event');
++  check(
++    SaudiTime.instant('2026-10-26T11:00:00+03:00').hour == 11,
++    'zoned event',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26T20:30:00Z').day == 26,
++    '23:30 Saudi day',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26T21:30:00Z').day == 27,
++    '00:30 Saudi day',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26').hour == 0,
++    'Saudi date-only midnight',
++  );
++  check(
++    SaudiTime.instant('2026-10-26').hour == 3,
++    'date-only UTC legacy event',
++  );
++  check(SaudiTime.tryAppointment('invalid') == null, 'invalid appointment');
++  check(SaudiTime.tryInstant(null) == null, 'missing event');
++  check(
++    SaudiTime.appointmentToken(DateTime(2026, 10, 26, 11)) == canonical,
++    'picker civil value',
++  );
++  final monthly = SaudiTime.appointment(
++    '2026-10-27 11:00:00',
++  ).add(const Duration(days: 30));
++  check(
++    monthly.day == 26 && monthly.month == 11 && monthly.hour == 11,
++    'monthly boundary',
++  );
++  // ignore: avoid_print
++  print('Saudi time contract: $checks checks passed');
++}

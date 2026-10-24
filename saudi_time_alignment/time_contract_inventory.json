@@ -1,0 +1,4856 @@
+{
+  "business_appointments": [
+    "bookings.service_schedule",
+    "booking_repeats.service_schedule",
+    "booking_schedule_histories.schedule",
+    "posts.booking_schedule",
+    "posts.requested_window_start/end",
+    "quote_inspections.scheduled_at"
+  ],
+  "utc_instants": [
+    "created_at",
+    "updated_at",
+    "expires_at",
+    "renewal_at",
+    "arrived_at",
+    "work_started_at",
+    "work_finished_at",
+    "assignment_due_at",
+    "estimated_arrival_at",
+    "leaves.starts_at/ends_at",
+    "pricing_rules.starts_at/ends_at",
+    "captured_at"
+  ],
+  "saudi_clock_only": [
+    "serviceman_shifts.starts_at/ends_at",
+    "provider_settings.time_schedule",
+    "pricing_rules.start_time/end_time"
+  ],
+  "app_timezone": "UTC",
+  "business_timezone": "Asia/Riyadh",
+  "code_inventory": {
+    "Admin Panel/app/Casts/SaudiAppointment.php": {
+      "date_parser": [
+        5,
+        17,
+        22,
+        27
+      ]
+    },
+    "Admin Panel/app/Console/Kernel.php": {
+      "date_parser": [
+        23
+      ],
+      "zone_conversion": [
+        23,
+        26
+      ]
+    },
+    "Admin Panel/app/Lib/Constant.php": {
+      "appointment": [
+        3829,
+        3861,
+        3887
+      ]
+    },
+    "Admin Panel/app/Lib/Helpers.php": {
+      "appointment": [
+        673
+      ],
+      "date_parser": [
+        227,
+        228,
+        899,
+        900,
+        1388
+      ],
+      "current_time": [
+        377,
+        403,
+        568,
+        569,
+        966,
+        967,
+        985,
+        986,
+        1179,
+        1235,
+        1276,
+        1317,
+        1389
+      ],
+      "zone_conversion": [
+        228
+      ]
+    },
+    "Admin Panel/app/Lib/Response.php": {
+      "appointment": [
+        586,
+        587
+      ]
+    },
+    "Admin Panel/app/Observers/QualityCommunicationObserver.php": {
+      "appointment": [
+        26,
+        51,
+        55,
+        56
+      ],
+      "date_parser": [
+        56
+      ],
+      "zone_conversion": [
+        51
+      ]
+    },
+    "Admin Panel/app/Providers/QualityServiceProvider.php": {
+      "current_time": [
+        59
+      ]
+    },
+    "Admin Panel/app/Services/AuditPresentation.php": {
+      "zone_conversion": [
+        82
+      ]
+    },
+    "Admin Panel/app/Services/BranchPeriod.php": {
+      "appointment": [
+        48
+      ],
+      "date_parser": [
+        13,
+        49,
+        50
+      ],
+      "current_time": [
+        14
+      ],
+      "zone_conversion": [
+        13,
+        49,
+        50
+      ]
+    },
+    "Admin Panel/app/Services/BranchReportService.php": {
+      "appointment": [
+        20,
+        30,
+        32,
+        52
+      ],
+      "date_parser": [
+        52
+      ],
+      "current_time": [
+        52
+      ]
+    },
+    "Admin Panel/app/Services/DatabaseBackupService.php": {
+      "current_time": [
+        100,
+        114
+      ]
+    },
+    "Admin Panel/app/Services/DirectServiceTransfer.php": {
+      "current_time": [
+        226,
+        228,
+        237,
+        260,
+        264,
+        279
+      ],
+      "zone_conversion": [
+        264,
+        279
+      ]
+    },
+    "Admin Panel/app/Services/OperationalAnalytics.php": {
+      "appointment": [
+        46
+      ]
+    },
+    "Admin Panel/app/Services/OperationalPresentation.php": {
+      "appointment": [
+        68
+      ],
+      "date_parser": [
+        79
+      ],
+      "zone_conversion": [
+        79,
+        80
+      ]
+    },
+    "Admin Panel/app/Support/SaudiTime.php": {
+      "date_parser": [
+        9,
+        24,
+        48,
+        53,
+        59
+      ],
+      "current_time": [
+        16,
+        18
+      ],
+      "zone_conversion": [
+        11,
+        18,
+        24,
+        25,
+        35,
+        54,
+        59
+      ]
+    },
+    "Admin Panel/app/Traits/HasSaudiAppointment.php": {
+      "appointment": [
+        11
+      ],
+      "date_parser": [
+        5,
+        11,
+        16
+      ],
+      "zone_conversion": [
+        16
+      ]
+    },
+    "Admin Panel/app/Traits/MaintenanceModeTrait.php": {
+      "date_parser": [
+        28,
+        29
+      ],
+      "current_time": [
+        30
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/BranchFinanceController.php": {
+      "current_time": [
+        56
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/BranchOnboardingController.php": {
+      "slot": [
+        199,
+        273,
+        276,
+        278,
+        282,
+        285,
+        289,
+        291,
+        292,
+        293,
+        303,
+        338
+      ],
+      "date_parser": [
+        285
+      ],
+      "current_time": [
+        199,
+        278,
+        282,
+        285
+      ],
+      "zone_conversion": [
+        285,
+        293
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/BranchWorkspaceController.php": {
+      "appointment": [
+        60,
+        93,
+        130,
+        133,
+        194,
+        196,
+        198,
+        202,
+        206,
+        208
+      ],
+      "date_parser": [
+        196,
+        198,
+        206
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/InstallController.php": {
+      "current_time": [
+        153,
+        154
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/OperationalAnalyticsController.php": {
+      "date_parser": [
+        21,
+        22
+      ],
+      "current_time": [
+        18
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/PrivateBookingExportController.php": {
+      "current_time": [
+        36
+      ]
+    },
+    "Admin Panel/app/Http/Controllers/QualityAdministrationController.php": {
+      "appointment": [
+        63,
+        64
+      ]
+    },
+    "Admin Panel/app/Http/Middleware/MaintenanceMode.php": {
+      "date_parser": [
+        33,
+        34
+      ],
+      "current_time": [
+        35
+      ]
+    },
+    "Admin Panel/app/Http/Middleware/SubscriptionModalMiddleware.php": {
+      "date_parser": [
+        46
+      ],
+      "current_time": [
+        47
+      ]
+    },
+    "Admin Panel/app/Console/Commands/CustomerSubscriptionExpiry.php": {
+      "current_time": [
+        55,
+        56,
+        62,
+        77
+      ]
+    },
+    "Admin Panel/app/Console/Commands/DatabaseBackup.php": {
+      "current_time": [
+        31
+      ]
+    },
+    "Admin Panel/app/Console/Commands/DirectServicesContract.php": {
+      "current_time": [
+        36,
+        45
+      ]
+    },
+    "Admin Panel/app/Console/Commands/ExpireQuotations.php": {
+      "current_time": [
+        18,
+        24
+      ]
+    },
+    "Admin Panel/app/Console/Commands/FreeTrialEnd.php": {
+      "current_time": [
+        41
+      ]
+    },
+    "Admin Panel/app/Console/Commands/MaintenanceModeEnd.php": {
+      "date_parser": [
+        53,
+        54
+      ],
+      "current_time": [
+        55
+      ]
+    },
+    "Admin Panel/app/Console/Commands/ProcessCommunications.php": {
+      "current_time": [
+        18
+      ]
+    },
+    "Admin Panel/app/Console/Commands/ProcessDispatch.php": {
+      "current_time": [
+        24,
+        36,
+        44
+      ]
+    },
+    "Admin Panel/app/Console/Commands/PrunePersonalData.php": {
+      "current_time": [
+        20,
+        24,
+        33,
+        60
+      ]
+    },
+    "Admin Panel/app/Console/Commands/QualityReminders.php": {
+      "appointment": [
+        19,
+        21,
+        25,
+        28,
+        34,
+        36
+      ],
+      "date_parser": [
+        19,
+        21,
+        28,
+        34,
+        39
+      ],
+      "current_time": [
+        19,
+        28,
+        39,
+        46,
+        56,
+        60
+      ],
+      "zone_conversion": [
+        25,
+        36
+      ]
+    },
+    "Admin Panel/app/Console/Commands/SendRenewalReminderEmail.php": {
+      "current_time": [
+        41
+      ]
+    },
+    "Admin Panel/app/Console/Commands/SubscriptionTimeEnd.php": {
+      "current_time": [
+        41
+      ]
+    },
+    "Admin Panel/Modules/UserManagement/Entities/User.php": {
+      "current_time": [
+        139
+      ]
+    },
+    "Admin Panel/Modules/UserManagement/Http/Controllers/Api/V1/OTPVerificationController.php": {
+      "date_parser": [
+        81,
+        82,
+        181,
+        182,
+        214,
+        215,
+        222,
+        235,
+        245,
+        284,
+        285,
+        320,
+        321,
+        328,
+        341,
+        351
+      ],
+      "current_time": [
+        100,
+        178,
+        242,
+        348
+      ]
+    },
+    "Admin Panel/Modules/UserManagement/Http/Controllers/Api/V1/PasswordResetController.php": {
+      "date_parser": [
+        54,
+        55,
+        140,
+        141,
+        155,
+        156,
+        163,
+        176,
+        186
+      ],
+      "current_time": [
+        72,
+        183,
+        238
+      ]
+    },
+    "Admin Panel/Modules/TransactionModule/Entities/Transaction.php": {
+      "date_parser": [
+        47
+      ],
+      "current_time": [
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+      ]
+    },
+    "Admin Panel/Modules/TransactionModule/Lib/Transaction.php": {
+      "date_parser": [
+        2689,
+        2690
+      ],
+      "current_time": [
+        2688
+      ]
+    },
+    "Admin Panel/Modules/TransactionModule/Resources/views/admin/withdraw/request/list.blade.php": {
+      "date_parser": [
+        192
+      ]
+    },
+    "Admin Panel/Modules/TransactionModule/Http/Controllers/Web/Admin/TransactionController.php": {
+      "date_parser": [
+        183
+      ]
+    },
+    "Admin Panel/Modules/TransactionModule/Http/Controllers/Web/Admin/WithdrawRequestController.php": {
+      "date_parser": [
+        133
+      ]
+    },
+    "Admin Panel/Modules/SMSModule/Jobs/DeliverCommunication.php": {
+      "current_time": [
+        40,
+        69
+      ]
+    },
+    "Admin Panel/Modules/SMSModule/Services/CommunicationService.php": {
+      "current_time": [
+        13
+      ]
+    },
+    "Admin Panel/Modules/SMSModule/Http/Controllers/CommunicationController.php": {
+      "current_time": [
+        28
+      ]
+    },
+    "Admin Panel/Modules/ServicemanModule/Entities/ServicemanLeave.php": {
+      "slot": [
+        13
+      ]
+    },
+    "Admin Panel/Modules/ServicemanModule/Services/TechnicianApplicationService.php": {
+      "current_time": [
+        138,
+        159
+      ],
+      "zone_conversion": [
+        97,
+        98
+      ]
+    },
+    "Admin Panel/Modules/ServicemanModule/Http/Controllers/Web/Provider/ServicemanController.php": {
+      "date_parser": [
+        208,
+        209,
+        210,
+        542
+      ],
+      "current_time": [
+        241,
+        244,
+        247,
+        250,
+        251,
+        254,
+        257,
+        260,
+        263,
+        266,
+        269,
+        272,
+        275,
+        311,
+        313,
+        315,
+        335,
+        336,
+        338,
+        339,
+        546,
+        549,
+        552,
+        555,
+        556,
+        558,
+        561,
+        564,
+        567,
+        570,
+        573,
+        576,
+        579
+      ]
+    },
+    "Admin Panel/Modules/ServicemanModule/Http/Controllers/Api/V1/Serviceman/ServicemanController.php": {
+      "current_time": [
+        130,
+        342,
+        343,
+        423
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Entities/PricingRule.php": {
+      "slot": [
+        18,
+        19,
+        31,
+        32
+      ],
+      "date_parser": [
+        43
+      ],
+      "zone_conversion": [
+        43
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Entities/Service.php": {
+      "current_time": [
+        113,
+        114,
+        126,
+        127
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Services/PricingEngine.php": {
+      "date_parser": [
+        25
+      ],
+      "zone_conversion": [
+        25
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Resources/views/admin/operations-workforce.blade.php": {
+      "slot": [
+        32,
+        33
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Resources/views/admin/operations.blade.php": {
+      "slot": [
+        94,
+        95
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Http/Controllers/Web/Admin/OperationsController.php": {
+      "date_parser": [
+        44
+      ],
+      "zone_conversion": [
+        44
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Http/Controllers/Web/Admin/ServiceController.php": {
+      "date_parser": [
+        760
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Http/Controllers/Web/Provider/ServiceController.php": {
+      "date_parser": [
+        333
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/PricingRuleController.php": {
+      "slot": [
+        36,
+        99,
+        123
+      ],
+      "date_parser": [
+        37,
+        53,
+        56,
+        124
+      ],
+      "zone_conversion": [
+        37,
+        53,
+        56,
+        124
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/PricingController.php": {
+      "date_parser": [
+        33
+      ]
+    },
+    "Admin Panel/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/ServiceController.php": {
+      "current_time": [
+        73,
+        421,
+        428,
+        763
+      ]
+    },
+    "Admin Panel/Modules/ReviewModule/Services/QualityService.php": {
+      "appointment": [
+        80
+      ],
+      "date_parser": [
+        71
+      ],
+      "current_time": [
+        50,
+        80
+      ]
+    },
+    "Admin Panel/Modules/ReviewModule/Http/Controllers/QualityController.php": {
+      "appointment": [
+        127
+      ],
+      "current_time": [
+        56,
+        76,
+        105,
+        108,
+        111
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Services/BranchCapacityPolicy.php": {
+      "appointment": [
+        25,
+        29
+      ],
+      "date_parser": [
+        21
+      ],
+      "zone_conversion": [
+        21
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Services/BranchReadinessService.php": {
+      "slot": [
+        63,
+        90
+      ],
+      "date_parser": [
+        90
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Services/BranchScheduleService.php": {
+      "appointment": [
+        16,
+        71
+      ],
+      "date_parser": [
+        34
+      ],
+      "zone_conversion": [
+        34
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Services/BranchZoneChangeService.php": {
+      "appointment": [
+        36
+      ],
+      "date_parser": [
+        36
+      ],
+      "current_time": [
+        36
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Traits/ProviderVerificationTrait.php": {
+      "current_time": [
+        68,
+        93
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/provider/account/withdraw.blade.php": {
+      "date_parser": [
+        86
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/provider/partials/_notifications.blade.php": {
+      "current_time": [
+        14
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/layouts/partials/subscription-modal.blade.php": {
+      "date_parser": [
+        53
+      ],
+      "current_time": [
+        289
+      ],
+      "zone_conversion": [
+        17
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/layouts/partials/_aside.blade.php": {
+      "current_time": [
+        98
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/admin/provider/detail/bookings.blade.php": {
+      "appointment": [
+        130
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/admin/provider/detail/subscription.blade.php": {
+      "date_parser": [
+        64
+      ],
+      "current_time": [
+        156
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Resources/views/admin/partials/details/subscription-modal.blade.php": {
+      "date_parser": [
+        17
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Admin/ProviderController.php": {
+      "date_parser": [
+        557,
+        558,
+        1624
+      ],
+      "current_time": [
+        1294,
+        1360
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Admin/SubscriptionController.php": {
+      "date_parser": [
+        298,
+        299
+      ],
+      "current_time": [
+        300
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Provider/ProviderController.php": {
+      "date_parser": [
+        863
+      ],
+      "current_time": [
+        134,
+        302,
+        303,
+        317,
+        371,
+        1001,
+        1002
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Provider/WithdrawController.php": {
+      "date_parser": [
+        241
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Provider/Report/BookingReportController.php": {
+      "date_parser": [
+        135,
+        136,
+        137,
+        362
+      ],
+      "current_time": [
+        214,
+        216,
+        218,
+        244,
+        245,
+        247,
+        248,
+        368,
+        372,
+        376,
+        380,
+        384,
+        388,
+        392,
+        396,
+        400,
+        404,
+        408,
+        412
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Provider/Report/Business/EarningReportController.php": {
+      "date_parser": [
+        95,
+        96,
+        97,
+        350
+      ],
+      "current_time": [
+        171,
+        173,
+        175,
+        200,
+        201,
+        203,
+        204,
+        356,
+        360,
+        364,
+        368,
+        372,
+        376,
+        380,
+        384,
+        388,
+        392,
+        396,
+        400
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Provider/Report/Business/ExpenseReportController.php": {
+      "date_parser": [
+        95,
+        96,
+        97,
+        367
+      ],
+      "current_time": [
+        213,
+        215,
+        217,
+        252,
+        253,
+        255,
+        256,
+        373,
+        377,
+        381,
+        385,
+        389,
+        393,
+        397,
+        401,
+        405,
+        409,
+        413,
+        417
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Web/Provider/Report/Business/OverviewReportController.php": {
+      "date_parser": [
+        94,
+        95,
+        96,
+        263,
+        264,
+        265,
+        358
+      ],
+      "current_time": [
+        179,
+        181,
+        183,
+        210,
+        211,
+        213,
+        214,
+        364,
+        368,
+        372,
+        376,
+        380,
+        384,
+        388,
+        392,
+        396,
+        400,
+        404,
+        408
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Customer/ProviderController.php": {
+      "appointment": [
+        154,
+        155
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/ProviderController.php": {
+      "current_time": [
+        230,
+        281,
+        630,
+        631,
+        714
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/TimeScheduleController.php": {
+      "date_parser": [
+        17
+      ],
+      "zone_conversion": [
+        17
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/Report/BookingReportController.php": {
+      "date_parser": [
+        164,
+        165,
+        166,
+        384
+      ],
+      "current_time": [
+        243,
+        245,
+        247,
+        273,
+        274,
+        276,
+        277,
+        390,
+        394,
+        398,
+        402,
+        406,
+        410,
+        414,
+        418,
+        422,
+        426,
+        430,
+        434
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/Report/BusinessReportController.php": {
+      "date_parser": [
+        108,
+        109,
+        110,
+        317,
+        318,
+        319,
+        529,
+        530,
+        531,
+        742
+      ],
+      "current_time": [
+        191,
+        193,
+        195,
+        222,
+        223,
+        225,
+        226,
+        393,
+        395,
+        397,
+        422,
+        423,
+        425,
+        426,
+        638,
+        640,
+        642,
+        677,
+        678,
+        680,
+        681,
+        748,
+        752,
+        756,
+        760,
+        764,
+        768,
+        772,
+        776,
+        780,
+        784,
+        788,
+        792
+      ]
+    },
+    "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/Report/TransactionReportController.php": {
+      "date_parser": [
+        107
+      ],
+      "current_time": [
+        113,
+        117,
+        121,
+        125,
+        129,
+        133,
+        137,
+        141,
+        145,
+        149,
+        153,
+        157,
+        223,
+        227,
+        231,
+        235,
+        239,
+        243,
+        247,
+        251,
+        255,
+        259,
+        263,
+        267
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Entities/Advertisement.php": {
+      "date_parser": [
+        68,
+        73
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Entities/Campaign.php": {
+      "current_time": [
+        88,
+        89
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Entities/Coupon.php": {
+      "current_time": [
+        42,
+        43
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/provider/advertisements/ads-list.blade.php": {
+      "date_parser": [
+        180,
+        689
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/provider/advertisements/details.blade.php": {
+      "date_parser": [
+        180
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/admin/advertisements/ads-list.blade.php": {
+      "date_parser": [
+        242,
+        767
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/admin/advertisements/details.blade.php": {
+      "date_parser": [
+        188
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/admin/advertisements/new-ads-request.blade.php": {
+      "date_parser": [
+        130
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/admin/campaigns/create.blade.php": {
+      "current_time": [
+        223,
+        236,
+        297
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/admin/coupons/create.blade.php": {
+      "current_time": [
+        271,
+        284
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Resources/views/admin/discounts/create.blade.php": {
+      "current_time": [
+        170,
+        183
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Web/Admin/AdvertisementsController.php": {
+      "current_time": [
+        84,
+        1109,
+        1154
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Web/Admin/CampaignController.php": {
+      "current_time": [
+        169,
+        170,
+        282,
+        283
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Web/Admin/CouponController.php": {
+      "current_time": [
+        176,
+        177,
+        190,
+        191,
+        332,
+        333,
+        347,
+        348
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Web/Admin/DiscountController.php": {
+      "current_time": [
+        147,
+        148,
+        245,
+        246
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Web/Provider/AdvertisementsController.php": {
+      "current_time": [
+        72,
+        540,
+        830
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Api/V1/Admin/CampaignController.php": {
+      "current_time": [
+        122,
+        123,
+        215,
+        216
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Api/V1/Admin/CouponController.php": {
+      "current_time": [
+        133,
+        134,
+        220,
+        221
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Api/V1/Admin/DiscountController.php": {
+      "current_time": [
+        109,
+        110,
+        188,
+        189
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Api/V1/Customer/CampaignController.php": {
+      "current_time": [
+        43,
+        73,
+        74
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Api/V1/Customer/CouponController.php": {
+      "current_time": [
+        69,
+        70,
+        120,
+        154,
+        155,
+        233,
+        331,
+        351
+      ]
+    },
+    "Admin Panel/Modules/PromotionManagement/Http/Controllers/Api/V1/Provider/AdvertisementsController.php": {
+      "date_parser": [
+        131,
+        132,
+        348,
+        349,
+        559,
+        560
+      ],
+      "current_time": [
+        506
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Jobs/ProcessRefund.php": {
+      "current_time": [
+        38,
+        61,
+        79,
+        96
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Lib/PaymentResponse.php": {
+      "appointment": [
+        40,
+        70,
+        79
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Services/GatewayPaymentService.php": {
+      "current_time": [
+        69,
+        77,
+        102,
+        162,
+        164,
+        167,
+        169
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Services/PaymentPrincipal.php": {
+      "current_time": [
+        26,
+        38,
+        51
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Services/RefundService.php": {
+      "current_time": [
+        37,
+        93,
+        99
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Traits/PaymentHelperTrait.php": {
+      "appointment": [
+        106
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Traits/Processor.php": {
+      "current_time": [
+        75
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Traits/SubscriptionTrait.php": {
+      "date_parser": [
+        180,
+        296,
+        391,
+        392
+      ],
+      "current_time": [
+        42,
+        43,
+        159,
+        160,
+        275,
+        276,
+        298,
+        393,
+        422,
+        423,
+        528,
+        529
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Resources/views/admin/bonus/create.blade.php": {
+      "current_time": [
+        232,
+        245
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Http/Controllers/PaymentController.php": {
+      "appointment": [
+        85
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Http/Controllers/PaymentSessionController.php": {
+      "appointment": [
+        42
+      ],
+      "current_time": [
+        51,
+        67,
+        86
+      ]
+    },
+    "Admin Panel/Modules/PaymentModule/Http/Controllers/Api/V1/Customer/BonusController.php": {
+      "current_time": [
+        36
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Console/DrainFinanceOutbox.php": {
+      "current_time": [
+        29,
+        32,
+        36
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Jobs/SyncOutbox.php": {
+      "current_time": [
+        41,
+        50,
+        57
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Services/AccountingEvents.php": {
+      "appointment": [
+        108
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Services/InvoiceService.php": {
+      "current_time": [
+        45
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Services/OutboxService.php": {
+      "current_time": [
+        13,
+        21
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Http/Controllers/FinanceController.php": {
+      "current_time": [
+        108
+      ]
+    },
+    "Admin Panel/Modules/OdooIntegration/Http/Controllers/InvoiceController.php": {
+      "current_time": [
+        32,
+        52,
+        68
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Entities/CustomerSubscription.php": {
+      "current_time": [
+        61
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Lib/CustomerSubscriptionHook.php": {
+      "current_time": [
+        67,
+        68,
+        77
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Lib/CustomerSubscriptionService.php": {
+      "current_time": [
+        34,
+        39,
+        42,
+        43
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Services/VisitPackageService.php": {
+      "appointment": [
+        68,
+        81,
+        102,
+        144,
+        166,
+        212,
+        230
+      ],
+      "date_parser": [
+        68,
+        166
+      ],
+      "current_time": [
+        37,
+        107,
+        129,
+        285,
+        288,
+        295
+      ],
+      "zone_conversion": [
+        68
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Resources/views/admin/subscriber/index.blade.php": {
+      "current_time": [
+        203
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Http/Controllers/VisitPackageController.php": {
+      "appointment": [
+        69
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Http/Middleware/ProMemberFeatureMiddleware.php": {
+      "current_time": [
+        42
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Http/Controllers/Web/Admin/PlanController.php": {
+      "current_time": [
+        42,
+        159
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Http/Controllers/Web/Admin/SubscriberController.php": {
+      "current_time": [
+        55,
+        212,
+        216,
+        230,
+        232,
+        236,
+        238
+      ]
+    },
+    "Admin Panel/Modules/CustomerSubscriptionModule/Http/Controllers/Api/V1/Customer/SubscriptionController.php": {
+      "current_time": [
+        48,
+        227,
+        304,
+        329
+      ]
+    },
+    "Admin Panel/Modules/CustomerModule/Resources/views/admin/detail/bookings.blade.php": {
+      "appointment": [
+        96
+      ]
+    },
+    "Admin Panel/Modules/CustomerModule/Resources/views/admin/detail/subscription.blade.php": {
+      "current_time": [
+        7,
+        8
+      ]
+    },
+    "Admin Panel/Modules/CustomerModule/Http/Controllers/Web/Admin/CustomerController.php": {
+      "current_time": [
+        215
+      ]
+    },
+    "Admin Panel/Modules/CustomerModule/Http/Controllers/Web/Admin/LoyaltyPointController.php": {
+      "date_parser": [
+        155
+      ],
+      "current_time": [
+        161,
+        165,
+        169,
+        173,
+        177,
+        181,
+        185,
+        189,
+        193,
+        197,
+        201,
+        205
+      ]
+    },
+    "Admin Panel/Modules/CustomerModule/Http/Controllers/Web/Admin/WalletController.php": {
+      "date_parser": [
+        219
+      ],
+      "current_time": [
+        223,
+        225,
+        227,
+        229,
+        231,
+        233,
+        235,
+        237,
+        239,
+        241,
+        243,
+        245
+      ]
+    },
+    "Admin Panel/Modules/CustomerModule/Http/Controllers/Api/V1/Customer/CustomerController.php": {
+      "current_time": [
+        78
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Traits/ChattingTrait.php": {
+      "current_time": [
+        29,
+        30,
+        36,
+        37
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Resources/views/provider/partials/_conversation-messages-only.blade.php": {
+      "date_parser": [
+        35,
+        58
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Resources/views/provider/partials/_conversations.blade.php": {
+      "date_parser": [
+        68,
+        92
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Resources/views/admin/partials/_conversation-messages-only.blade.php": {
+      "date_parser": [
+        35,
+        58
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Resources/views/admin/partials/_conversations.blade.php": {
+      "date_parser": [
+        77,
+        99
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Web/Admin/ChattingController.php": {
+      "current_time": [
+        179,
+        180,
+        186,
+        187,
+        237
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Web/Provider/ChattingController.php": {
+      "current_time": [
+        183,
+        184,
+        190,
+        191,
+        234
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Api/V1/GlobalChattingController.php": {
+      "current_time": [
+        126,
+        127,
+        133,
+        134,
+        163
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Api/V1/Admin/ChattingController.php": {
+      "current_time": [
+        121,
+        122,
+        128,
+        129,
+        158
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Api/V1/Customer/ChattingController.php": {
+      "current_time": [
+        210,
+        211,
+        217,
+        218,
+        247
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Api/V1/Provider/ChattingController.php": {
+      "current_time": [
+        194,
+        195,
+        201,
+        202,
+        231
+      ]
+    },
+    "Admin Panel/Modules/ChattingModule/Http/Controllers/Api/V1/Serviceman/ChattingController.php": {
+      "current_time": [
+        197,
+        198,
+        204,
+        205,
+        234
+      ]
+    },
+    "Admin Panel/Modules/CartModule/Entities/CartServiceInfo.php": {
+      "appointment": [
+        14
+      ]
+    },
+    "Admin Panel/Modules/CartModule/Services/CartPricingService.php": {
+      "current_time": [
+        32
+      ]
+    },
+    "Admin Panel/Modules/CartModule/Traits/CartTrait.php": {
+      "current_time": [
+        34,
+        38,
+        83
+      ]
+    },
+    "Admin Panel/Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php": {
+      "appointment": [
+        170,
+        171,
+        258,
+        259
+      ],
+      "current_time": [
+        94,
+        98
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/translation-page.blade.php": {
+      "current_time": [
+        284
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/provider/subscription-package/details.blade.php": {
+      "date_parser": [
+        42,
+        95,
+        204
+      ],
+      "current_time": [
+        153
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/provider/subscription-package/invoice.blade.php": {
+      "date_parser": [
+        154,
+        226,
+        227,
+        262
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/provider/subscription-package/transaction.blade.php": {
+      "date_parser": [
+        128,
+        129
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/seo-pages/seo-404-logs.blade.php": {
+      "date_parser": [
+        100
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscriber/details.blade.php": {
+      "date_parser": [
+        113,
+        230
+      ],
+      "current_time": [
+        207
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscriber/invoice.blade.php": {
+      "date_parser": [
+        156,
+        227,
+        228,
+        251
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscriber/list.blade.php": {
+      "date_parser": [
+        210
+      ],
+      "current_time": [
+        49,
+        57,
+        227
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscriber/transaction.blade.php": {
+      "date_parser": [
+        156,
+        157
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscription-package/details.blade.php": {
+      "current_time": [
+        59,
+        67
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscription-package/invoice.blade.php": {
+      "date_parser": [
+        156,
+        226,
+        227,
+        250
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Resources/views/admin/subscription-package/transactions.blade.php": {
+      "date_parser": [
+        127,
+        128
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Admin/BusinessInformationController.php": {
+      "current_time": [
+        152,
+        1252
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Admin/LanguageController.php": {
+      "current_time": [
+        329,
+        375
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Admin/SubscriberController.php": {
+      "date_parser": [
+        81,
+        159,
+        160,
+        304,
+        356,
+        357,
+        375
+      ],
+      "current_time": [
+        57,
+        58,
+        69,
+        71,
+        73,
+        78,
+        82,
+        109,
+        111,
+        113,
+        297
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Admin/SubscriptionPackageController.php": {
+      "date_parser": [
+        234,
+        500,
+        501,
+        683,
+        684,
+        742,
+        743,
+        755,
+        756,
+        770
+      ],
+      "current_time": [
+        102,
+        120,
+        122,
+        124,
+        215,
+        224,
+        226,
+        228,
+        240,
+        451,
+        502,
+        677,
+        679,
+        681,
+        736,
+        738,
+        740
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Admin/SubscriptionSettingsController.php": {
+      "current_time": [
+        50
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Provider/BusinessInformationController.php": {
+      "appointment": [
+        77,
+        79,
+        212,
+        224
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Web/Provider/SubscriptionPackageController.php": {
+      "date_parser": [
+        70,
+        71,
+        77,
+        97,
+        98,
+        349,
+        350,
+        484,
+        485,
+        547,
+        548
+      ],
+      "current_time": [
+        351,
+        445,
+        447,
+        449
+      ]
+    },
+    "Admin Panel/Modules/BusinessSettingsModule/Http/Controllers/Api/V1/Provider/SubscriptionPackageController.php": {
+      "date_parser": [
+        192,
+        193,
+        270,
+        271
+      ],
+      "current_time": [
+        194
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Entities/Booking.php": {
+      "appointment": [
+        80,
+        98,
+        131,
+        684,
+        687,
+        693,
+        699
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Entities/BookingEvidence.php": {
+      "current_time": [
+        20
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Entities/BookingRepeat.php": {
+      "appointment": [
+        34,
+        74,
+        96,
+        446,
+        449,
+        455,
+        461
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Routes/web.php": {
+      "appointment": [
+        27,
+        78
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/AvailabilityService.php": {
+      "appointment": [
+        33,
+        34,
+        41,
+        42,
+        52,
+        55,
+        56,
+        129,
+        130,
+        143,
+        144
+      ],
+      "slot": [
+        89,
+        90,
+        94,
+        101,
+        102,
+        161,
+        189,
+        193
+      ],
+      "date_parser": [
+        19,
+        69,
+        117,
+        118,
+        152,
+        191
+      ],
+      "current_time": [
+        191
+      ],
+      "zone_conversion": [
+        19,
+        69,
+        117,
+        118,
+        152,
+        161,
+        191
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/BookingAmendmentService.php": {
+      "appointment": [
+        51,
+        52,
+        120,
+        247,
+        248
+      ],
+      "date_parser": [
+        120,
+        122
+      ],
+      "current_time": [
+        122
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/BookingAssignmentService.php": {
+      "current_time": [
+        52,
+        109,
+        134
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/BookingExecutionService.php": {
+      "date_parser": [
+        193
+      ],
+      "current_time": [
+        82,
+        165,
+        186,
+        189,
+        193,
+        197,
+        225,
+        240,
+        298,
+        311
+      ],
+      "zone_conversion": [
+        225,
+        311
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/BookingSchedule.php": {
+      "date_parser": [
+        5,
+        13,
+        18
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/BookingWorkflowService.php": {
+      "current_time": [
+        31
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/BranchCheckoutService.php": {
+      "appointment": [
+        54,
+        129,
+        152,
+        175,
+        189,
+        216,
+        227,
+        334,
+        406
+      ],
+      "date_parser": [
+        219,
+        239,
+        269,
+        355,
+        367
+      ],
+      "current_time": [
+        29,
+        136,
+        247
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/CheckoutBranchGroupingService.php": {
+      "date_parser": [
+        30,
+        53,
+        54
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/DirectBookingReservationGuard.php": {
+      "appointment": [
+        16,
+        50,
+        51,
+        57,
+        73,
+        74
+      ],
+      "date_parser": [
+        50,
+        58
+      ],
+      "current_time": [
+        58
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/DirectServiceReport.php": {
+      "date_parser": [
+        75
+      ],
+      "current_time": [
+        73
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/DispatchEngine.php": {
+      "appointment": [
+        30,
+        83,
+        87
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/OfflineTransferService.php": {
+      "current_time": [
+        219,
+        357
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/TechnicianCashService.php": {
+      "date_parser": [
+        73,
+        197
+      ],
+      "current_time": [
+        89,
+        92,
+        101,
+        144,
+        158,
+        181,
+        222
+      ],
+      "zone_conversion": [
+        222
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Services/TrackingService.php": {
+      "current_time": [
+        28,
+        42,
+        57,
+        80
+      ],
+      "zone_conversion": [
+        77,
+        80
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/cash/operations.blade.php": {
+      "date_parser": [
+        37,
+        81
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/mail-templates/booking-request-sent.blade.php": {
+      "date_parser": [
+        233,
+        235
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/details.blade.php": {
+      "appointment": [
+        133,
+        134,
+        142,
+        446,
+        447,
+        448,
+        449,
+        450,
+        774,
+        775,
+        781,
+        1042,
+        1043,
+        1044,
+        1046,
+        1254,
+        1257,
+        1271,
+        1272,
+        1273,
+        1276,
+        1282,
+        1300,
+        1302
+      ],
+      "date_parser": [
+        34,
+        134,
+        147,
+        149,
+        451
+      ],
+      "current_time": [
+        451
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/fullbooking-invoice.blade.php": {
+      "appointment": [
+        279,
+        280,
+        286,
+        303
+      ],
+      "date_parser": [
+        187,
+        275,
+        279,
+        280,
+        288,
+        303
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/fullbooking-single-invoice.blade.php": {
+      "appointment": [
+        260
+      ],
+      "date_parser": [
+        171,
+        259,
+        260
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/invoice.blade.php": {
+      "appointment": [
+        231
+      ],
+      "date_parser": [
+        139,
+        230,
+        231
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/list.blade.php": {
+      "appointment": [
+        280,
+        281,
+        284,
+        285,
+        288,
+        289
+      ],
+      "date_parser": [
+        280,
+        284,
+        288
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php": {
+      "appointment": [
+        146,
+        147,
+        152,
+        171,
+        172,
+        177,
+        434,
+        435,
+        436,
+        437,
+        439,
+        779,
+        1038,
+        1039,
+        1040,
+        1043,
+        1049,
+        1066,
+        1068
+      ],
+      "date_parser": [
+        50,
+        147,
+        157,
+        160,
+        172,
+        182,
+        185,
+        438,
+        780
+      ],
+      "current_time": [
+        438
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php": {
+      "appointment": [
+        136,
+        676,
+        979,
+        980,
+        981,
+        982,
+        984,
+        985,
+        1016
+      ],
+      "date_parser": [
+        52,
+        136,
+        677,
+        826
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php": {
+      "appointment": [
+        134,
+        135,
+        140,
+        159,
+        160,
+        165,
+        290,
+        291,
+        292,
+        293,
+        295,
+        494,
+        649,
+        650,
+        651,
+        654,
+        660,
+        677,
+        678,
+        680,
+        681,
+        710
+      ],
+      "date_parser": [
+        33,
+        135,
+        145,
+        148,
+        160,
+        170,
+        173,
+        199,
+        218,
+        294,
+        495
+      ],
+      "current_time": [
+        294
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php": {
+      "appointment": [
+        77,
+        110,
+        148,
+        215,
+        218,
+        390,
+        562,
+        563,
+        564,
+        565,
+        567,
+        568,
+        599
+      ],
+      "date_parser": [
+        31,
+        77,
+        110,
+        148,
+        391
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/status.blade.php": {
+      "appointment": [
+        128,
+        129,
+        137,
+        370,
+        371
+      ],
+      "date_parser": [
+        36,
+        129,
+        142,
+        144,
+        166,
+        181
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/details.blade.php": {
+      "appointment": [
+        301,
+        302,
+        311,
+        604,
+        605,
+        606,
+        607,
+        1224,
+        1225,
+        1226,
+        1229,
+        1235,
+        1253,
+        1255,
+        1290
+      ],
+      "date_parser": [
+        30,
+        302,
+        316,
+        319,
+        606
+      ],
+      "current_time": [
+        606
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/fullbooking-invoice.blade.php": {
+      "appointment": [
+        280,
+        281,
+        287,
+        304
+      ],
+      "date_parser": [
+        188,
+        276,
+        280,
+        281,
+        289,
+        304
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/fullbooking-single-invoice.blade.php": {
+      "appointment": [
+        262
+      ],
+      "date_parser": [
+        173,
+        261,
+        262
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/invoice.blade.php": {
+      "appointment": [
+        269
+      ],
+      "date_parser": [
+        173,
+        268,
+        269
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/list.blade.php": {
+      "appointment": [
+        289,
+        290,
+        293,
+        294,
+        297,
+        298
+      ],
+      "date_parser": [
+        268,
+        289,
+        293,
+        297
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/offline-payment-list.blade.php": {
+      "appointment": [
+        151
+      ],
+      "date_parser": [
+        151,
+        152
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php": {
+      "appointment": [
+        271,
+        272,
+        277,
+        296,
+        297,
+        302,
+        556,
+        557,
+        558,
+        559,
+        561,
+        1144,
+        1303,
+        1304,
+        1305,
+        1308,
+        1314,
+        1332,
+        1334,
+        1363
+      ],
+      "date_parser": [
+        34,
+        272,
+        282,
+        285,
+        297,
+        307,
+        310,
+        560,
+        1145
+      ],
+      "current_time": [
+        560
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php": {
+      "appointment": [
+        241,
+        883,
+        1166,
+        1167,
+        1168,
+        1169,
+        1171,
+        1172,
+        1203
+      ],
+      "date_parser": [
+        35,
+        241,
+        884,
+        1030
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php": {
+      "appointment": [
+        178,
+        179,
+        188,
+        313,
+        314,
+        315,
+        316,
+        318,
+        660,
+        978,
+        979,
+        980,
+        983,
+        989,
+        1007,
+        1009,
+        1038
+      ],
+      "date_parser": [
+        26,
+        179,
+        193,
+        196,
+        220,
+        239,
+        317,
+        661
+      ],
+      "current_time": [
+        317
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php": {
+      "appointment": [
+        229,
+        270,
+        308,
+        371,
+        374,
+        375,
+        637,
+        810,
+        811,
+        812,
+        813,
+        815,
+        816,
+        847
+      ],
+      "date_parser": [
+        31,
+        229,
+        270,
+        308,
+        375,
+        638
+      ],
+      "current_time": [
+        375
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/status.blade.php": {
+      "appointment": [
+        276,
+        277,
+        286,
+        748,
+        749
+      ],
+      "date_parser": [
+        26,
+        277,
+        291,
+        294,
+        318,
+        337
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/verification-list.blade.php": {
+      "appointment": [
+        249,
+        250,
+        252,
+        253
+      ],
+      "date_parser": [
+        249,
+        252,
+        258
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Traits/BookingScopes.php": {
+      "date_parser": [
+        67,
+        70
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Traits/BookingTrait.php": {
+      "current_time": [
+        416
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Traits/RebookingTrait.php": {
+      "current_time": [
+        56
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Web/CashOperationsController.php": {
+      "date_parser": [
+        41
+      ],
+      "current_time": [
+        72
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php": {
+      "appointment": [
+        674,
+        693,
+        694,
+        695,
+        703,
+        1176,
+        1183,
+        1188,
+        1190,
+        1199,
+        1204,
+        1207,
+        1229,
+        1235,
+        1240,
+        1243,
+        1523,
+        1525,
+        1598,
+        1846,
+        1848,
+        2310
+      ],
+      "date_parser": [
+        294,
+        296,
+        401,
+        403,
+        675,
+        705,
+        1183,
+        1199,
+        1235,
+        1531,
+        1533,
+        1576,
+        1578,
+        1598,
+        1599,
+        1846,
+        1848,
+        2285,
+        2287,
+        2327,
+        2328
+      ],
+      "current_time": [
+        2081,
+        2178
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php": {
+      "appointment": [
+        331,
+        349,
+        350,
+        351,
+        359,
+        931,
+        941,
+        946,
+        948,
+        956,
+        961,
+        964,
+        1130,
+        1136,
+        1141,
+        1144,
+        1292,
+        1294,
+        1386,
+        1388,
+        1682,
+        1689,
+        1716,
+        1722,
+        1733,
+        1734,
+        1749,
+        1831,
+        1842,
+        1848,
+        1853,
+        1855,
+        1856,
+        1858,
+        1860,
+        1864,
+        1871,
+        1872
+      ],
+      "date_parser": [
+        114,
+        332,
+        361,
+        941,
+        956,
+        1136,
+        1220,
+        1305,
+        1306,
+        1386,
+        1388,
+        1652,
+        1653,
+        1662,
+        1663,
+        1666,
+        1667,
+        1722,
+        1749,
+        1842,
+        1871,
+        1872
+      ],
+      "current_time": [
+        115,
+        1221,
+        1493,
+        1588
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/CashOperationsController.php": {
+      "date_parser": [
+        55
+      ],
+      "current_time": [
+        70,
+        108
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Admin/BookingController.php": {
+      "appointment": [
+        26,
+        28,
+        32,
+        120,
+        212,
+        214,
+        215,
+        216,
+        217,
+        219,
+        221
+      ],
+      "date_parser": [
+        118,
+        120
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php": {
+      "appointment": [
+        80,
+        191,
+        225,
+        501,
+        502,
+        503,
+        509
+      ],
+      "date_parser": [
+        68,
+        511
+      ],
+      "zone_conversion": [
+        68,
+        69
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php": {
+      "slot": [
+        32,
+        99,
+        109
+      ],
+      "date_parser": [
+        30,
+        36,
+        99,
+        115
+      ],
+      "current_time": [
+        30
+      ],
+      "zone_conversion": [
+        36,
+        109,
+        115
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php": {
+      "appointment": [
+        254,
+        261,
+        281,
+        285,
+        293,
+        295,
+        296,
+        303,
+        307,
+        348,
+        349,
+        350,
+        449,
+        455,
+        486,
+        490,
+        505,
+        506,
+        517,
+        574,
+        575,
+        659,
+        729,
+        730,
+        731,
+        737,
+        1259,
+        1356,
+        1358,
+        1400
+      ],
+      "date_parser": [
+        226,
+        227,
+        238,
+        239,
+        243,
+        244,
+        307,
+        417,
+        418,
+        429,
+        430,
+        434,
+        435,
+        490,
+        517,
+        574,
+        575,
+        576,
+        657,
+        659,
+        739,
+        1356,
+        1358
+      ],
+      "zone_conversion": [
+        576
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Provider/DispatchController.php": {
+      "appointment": [
+        104
+      ],
+      "slot": [
+        66,
+        67,
+        197,
+        203,
+        206,
+        207,
+        234,
+        236,
+        237,
+        243,
+        244
+      ],
+      "date_parser": [
+        45,
+        66,
+        67,
+        236,
+        237
+      ],
+      "current_time": [
+        332
+      ],
+      "zone_conversion": [
+        45,
+        66,
+        67,
+        236,
+        237
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Serviceman/BookingController.php": {
+      "appointment": [
+        473,
+        475,
+        517
+      ],
+      "date_parser": [
+        473,
+        475
+      ]
+    },
+    "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Serviceman/DispatchController.php": {
+      "date_parser": [
+        39
+      ]
+    },
+    "Admin Panel/Modules/BlogManagement/Lib/BlogStorage.php": {
+      "current_time": [
+        24
+      ]
+    },
+    "Admin Panel/Modules/BlogManagement/Resources/views/web/frontend/details.blade.php": {
+      "zone_conversion": [
+        29,
+        30,
+        57,
+        60
+      ]
+    },
+    "Admin Panel/Modules/BlogManagement/Http/Controllers/Web/Frontend/BlogController.php": {
+      "current_time": [
+        71,
+        328
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Entities/Post.php": {
+      "appointment": [
+        27,
+        28,
+        29
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Entities/QuoteInspection.php": {
+      "appointment": [
+        16
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Resources/views/admin/customize-list.blade.php": {
+      "appointment": [
+        284,
+        285
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Resources/views/admin/details.blade.php": {
+      "appointment": [
+        86
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Resources/views/provider/customize-list.blade.php": {
+      "appointment": [
+        402,
+        403
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Resources/views/provider/details.blade.php": {
+      "appointment": [
+        78
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/Web/Admin/PostController.php": {
+      "appointment": [
+        191
+      ],
+      "date_parser": [
+        190,
+        191
+      ],
+      "current_time": [
+        107,
+        110,
+        176,
+        179
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/Web/Provider/PostController.php": {
+      "appointment": [
+        211
+      ],
+      "date_parser": [
+        210,
+        211
+      ],
+      "current_time": [
+        77,
+        130,
+        133,
+        198
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Customer/PostBidController.php": {
+      "appointment": [
+        115,
+        195
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Customer/PostController.php": {
+      "appointment": [
+        142,
+        158,
+        184
+      ],
+      "current_time": [
+        60
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php": {
+      "appointment": [
+        76,
+        77,
+        96,
+        121,
+        122,
+        123,
+        180,
+        215,
+        266,
+        283,
+        300,
+        310
+      ],
+      "date_parser": [
+        96,
+        193,
+        266
+      ],
+      "current_time": [
+        96,
+        231,
+        316,
+        351,
+        352,
+        379,
+        387,
+        395,
+        403,
+        404
+      ],
+      "zone_conversion": [
+        269,
+        310
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Provider/PostBidController.php": {
+      "current_time": [
+        111,
+        112,
+        113
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Provider/PostController.php": {
+      "current_time": [
+        51
+      ]
+    },
+    "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Provider/QuotationController.php": {
+      "appointment": [
+        107,
+        108,
+        109,
+        114,
+        125,
+        126,
+        128,
+        129
+      ],
+      "date_parser": [
+        109
+      ],
+      "current_time": [
+        65,
+        71,
+        83,
+        84,
+        150,
+        151,
+        173,
+        181,
+        182
+      ]
+    },
+    "Admin Panel/Modules/Auth/Http/Controllers/LoginController.php": {
+      "date_parser": [
+        368,
+        369
+      ],
+      "current_time": [
+        167
+      ]
+    },
+    "Admin Panel/Modules/Auth/Http/Controllers/Web/PasswordResetController.php": {
+      "date_parser": [
+        74,
+        75,
+        159,
+        160,
+        175,
+        176,
+        181,
+        193,
+        203
+      ],
+      "current_time": [
+        90,
+        200,
+        254
+      ]
+    },
+    "Admin Panel/Modules/Auth/Http/Controllers/Web/VerificationController.php": {
+      "date_parser": [
+        81,
+        183,
+        214,
+        257
+      ],
+      "current_time": [
+        83,
+        123,
+        183,
+        208,
+        214,
+        258
+      ]
+    },
+    "Admin Panel/Modules/Auth/Http/Controllers/Api/V1/LoginController.php": {
+      "date_parser": [
+        92,
+        93,
+        138,
+        139,
+        185,
+        186,
+        222,
+        223,
+        305,
+        306,
+        329,
+        330
+      ],
+      "current_time": [
+        272
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Resources/views/quality/index.blade.php": {
+      "appointment": [
+        110,
+        242,
+        288
+      ],
+      "slot": [
+        110
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Resources/views/admin/report/transaction.blade.php": {
+      "date_parser": [
+        305
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/AdminController.php": {
+      "current_time": [
+        116,
+        123,
+        124,
+        149,
+        504,
+        505
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/RoleController.php": {
+      "current_time": [
+        197
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Analytics/SearchController.php": {
+      "current_time": [
+        55,
+        58,
+        61,
+        64,
+        67,
+        70,
+        73,
+        76,
+        79,
+        82,
+        85,
+        88,
+        110,
+        113,
+        116,
+        119,
+        122,
+        125,
+        128,
+        131,
+        134,
+        137,
+        140,
+        143,
+        206,
+        209,
+        212,
+        215,
+        218,
+        221,
+        224,
+        227,
+        230,
+        233,
+        236,
+        239,
+        263,
+        266,
+        269,
+        272,
+        275,
+        278,
+        281,
+        284,
+        287,
+        290,
+        293,
+        296
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Report/BookingReportController.php": {
+      "date_parser": [
+        132,
+        133,
+        134,
+        360
+      ],
+      "current_time": [
+        207,
+        209,
+        211,
+        236,
+        237,
+        239,
+        240,
+        364,
+        367,
+        370,
+        371,
+        374,
+        379,
+        382,
+        385,
+        388,
+        391,
+        394,
+        397,
+        400
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Report/ProviderReportController.php": {
+      "date_parser": [
+        106,
+        205
+      ],
+      "current_time": [
+        110,
+        113,
+        116,
+        119,
+        122,
+        125,
+        128,
+        131,
+        134,
+        137,
+        140,
+        143,
+        209,
+        212,
+        215,
+        218,
+        221,
+        224,
+        227,
+        230,
+        233,
+        236,
+        239,
+        242
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Report/TransactionReportController.php": {
+      "date_parser": [
+        249,
+        250
+      ],
+      "current_time": [
+        246
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Report/Business/EarningReportController.php": {
+      "date_parser": [
+        102,
+        103,
+        104,
+        631,
+        632,
+        822,
+        823,
+        1126,
+        1233,
+        1383
+      ],
+      "current_time": [
+        393,
+        395,
+        397,
+        437,
+        438,
+        440,
+        441,
+        615,
+        624,
+        625,
+        626,
+        627,
+        767,
+        801,
+        816,
+        817,
+        818,
+        819,
+        846,
+        847,
+        1130,
+        1133,
+        1136,
+        1139,
+        1142,
+        1145,
+        1148,
+        1151,
+        1154,
+        1157,
+        1160,
+        1163,
+        1230
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Report/Business/ExpenseReportController.php": {
+      "date_parser": [
+        101,
+        102,
+        103,
+        881,
+        929
+      ],
+      "current_time": [
+        447,
+        449,
+        451,
+        501,
+        502,
+        504,
+        505,
+        885,
+        888,
+        891,
+        894,
+        897,
+        900,
+        903,
+        906,
+        909,
+        912,
+        915,
+        918,
+        925
+      ]
+    },
+    "Admin Panel/Modules/AdminModule/Http/Controllers/Web/Admin/Report/Business/OverviewReportController.php": {
+      "date_parser": [
+        95,
+        96,
+        97,
+        509,
+        510,
+        511,
+        679
+      ],
+      "current_time": [
+        390,
+        392,
+        394,
+        437,
+        438,
+        440,
+        441,
+        676
+      ]
+    },
+    "User app and web/lib/helper/booking_helper.dart": {
+      "appointment": [
+        38,
+        41,
+        44,
+        47,
+        50,
+        53
+      ]
+    },
+    "User app and web/lib/helper/checkout_helper.dart": {
+      "date_parser": [
+        247,
+        249
+      ],
+      "current_time": [
+        247,
+        249
+      ]
+    },
+    "User app and web/lib/helper/date_converter.dart": {
+      "date_parser": [
+        8,
+        13,
+        17,
+        23,
+        29,
+        35,
+        39,
+        43,
+        47,
+        51,
+        65,
+        71,
+        79,
+        85,
+        91,
+        101,
+        109,
+        113,
+        141,
+        144,
+        170,
+        174,
+        186,
+        194,
+        206
+      ],
+      "current_time": [
+        186
+      ]
+    },
+    "User app and web/lib/helper/saudi_time.dart": {
+      "date_parser": [
+        6,
+        25,
+        43
+      ],
+      "current_time": [
+        18
+      ]
+    },
+    "User app and web/lib/util/core_export.dart": {
+      "appointment": [
+        138
+      ]
+    },
+    "User app and web/lib/feature/forget/new_pass_screen.dart": {
+      "current_time": [
+        127
+      ]
+    },
+    "User app and web/lib/feature/visit_package/view/package_visit_screen.dart": {
+      "appointment": [
+        168,
+        358
+      ],
+      "slot": [
+        168,
+        331
+      ],
+      "date_parser": [
+        331,
+        358
+      ]
+    },
+    "User app and web/lib/feature/visit_package/view/visit_packages_screen.dart": {
+      "date_parser": [
+        23,
+        32
+      ],
+      "current_time": [
+        28,
+        35
+      ]
+    },
+    "User app and web/lib/feature/subscription/view/my_subscription_details_screen.dart": {
+      "date_parser": [
+        37
+      ],
+      "current_time": [
+        40
+      ]
+    },
+    "User app and web/lib/feature/splash/controller/splash_controller.dart": {
+      "date_parser": [
+        55
+      ],
+      "current_time": [
+        19,
+        54,
+        77
+      ]
+    },
+    "User app and web/lib/feature/review/view/rate_review_screen.dart": {
+      "current_time": [
+        379
+      ]
+    },
+    "User app and web/lib/feature/provider/controller/nearby_provider_controller.dart": {
+      "current_time": [
+        260,
+        285
+      ]
+    },
+    "User app and web/lib/feature/provider/view/provider_availability_screen.dart": {
+      "current_time": [
+        28,
+        29
+      ]
+    },
+    "User app and web/lib/feature/profile/controller/user_controller.dart": {
+      "current_time": [
+        33
+      ]
+    },
+    "User app and web/lib/feature/profile/widget/update_additional_field_widget.dart": {
+      "date_parser": [
+        107
+      ],
+      "current_time": [
+        103,
+        109,
+        117
+      ]
+    },
+    "User app and web/lib/feature/notification/controller/notification_controller.dart": {
+      "date_parser": [
+        39,
+        40,
+        51
+      ]
+    },
+    "User app and web/lib/feature/my_post/view/provider_offer_details_screen.dart": {
+      "date_parser": [
+        17
+      ],
+      "current_time": [
+        19
+      ]
+    },
+    "User app and web/lib/feature/my_post/view/quote_request_details_screen.dart": {
+      "appointment": [
+        114,
+        116,
+        133
+      ]
+    },
+    "User app and web/lib/feature/my_post/widgets/provider_bidding_notification_dialog.dart": {
+      "date_parser": [
+        253,
+        265
+      ],
+      "current_time": [
+        258,
+        270
+      ]
+    },
+    "User app and web/lib/feature/location/controller/location_controller.dart": {
+      "appointment": [
+        971
+      ],
+      "current_time": [
+        17,
+        29,
+        151,
+        289,
+        302,
+        747
+      ]
+    },
+    "User app and web/lib/feature/location/view/access_location_screen.dart": {
+      "current_time": [
+        313,
+        363
+      ]
+    },
+    "User app and web/lib/feature/html/model/page_details_model.dart": {
+      "date_parser": [
+        42,
+        43
+      ],
+      "zone_conversion": [
+        54,
+        55
+      ]
+    },
+    "User app and web/lib/feature/home/widget/campaign_view.dart": {
+      "date_parser": [
+        142,
+        146
+      ]
+    },
+    "User app and web/lib/feature/create_post/controller/create_post_controller.dart": {
+      "appointment": [
+        58
+      ],
+      "date_parser": [
+        116
+      ]
+    },
+    "User app and web/lib/feature/create_post/model/create_post_body.dart": {
+      "appointment": [
+        8,
+        18,
+        30,
+        44,
+        56
+      ]
+    },
+    "User app and web/lib/feature/create_post/model/my_post_model.dart": {
+      "appointment": [
+        134,
+        171
+      ]
+    },
+    "User app and web/lib/feature/create_post/repository/create_post_repo.dart": {
+      "appointment": [
+        43,
+        96,
+        119
+      ]
+    },
+    "User app and web/lib/feature/create_post/view/create_post_screen.dart": {
+      "current_time": [
+        61,
+        62,
+        63,
+        68
+      ],
+      "zone_conversion": [
+        78
+      ]
+    },
+    "User app and web/lib/feature/create_post/widget/dynamic_service_fields.dart": {
+      "current_time": [
+        189,
+        190,
+        202
+      ],
+      "zone_conversion": [
+        194
+      ]
+    },
+    "User app and web/lib/feature/conversation/controller/conversation_controller.dart": {
+      "current_time": [
+        460,
+        541
+      ]
+    },
+    "User app and web/lib/feature/checkout/controller/checkout_controller.dart": {
+      "appointment": [
+        92
+      ]
+    },
+    "User app and web/lib/feature/checkout/controller/schedule_controller.dart": {
+      "appointment": [
+        316
+      ],
+      "date_parser": [
+        26,
+        29,
+        88,
+        209,
+        238,
+        246,
+        251,
+        255,
+        258
+      ],
+      "current_time": [
+        26,
+        29,
+        209,
+        251,
+        255,
+        258
+      ]
+    },
+    "User app and web/lib/feature/checkout/model/post_details_model.dart": {
+      "appointment": [
+        45,
+        80
+      ]
+    },
+    "User app and web/lib/feature/checkout/repo/checkout_repo.dart": {
+      "appointment": [
+        98,
+        128
+      ]
+    },
+    "User app and web/lib/feature/checkout/repo/schedule_repo.dart": {
+      "appointment": [
+        17
+      ],
+      "slot": [
+        44
+      ],
+      "date_parser": [
+        35,
+        40,
+        41
+      ],
+      "zone_conversion": [
+        43
+      ]
+    },
+    "User app and web/lib/feature/checkout/view/custom_post_checkout_screen.dart": {
+      "appointment": [
+        583
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/proceed_to_checkout_button_widget.dart": {
+      "appointment": [
+        580
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/available_slot_picker.dart": {
+      "slot": [
+        114,
+        120,
+        200,
+        231,
+        234
+      ],
+      "date_parser": [
+        31,
+        106,
+        114,
+        120,
+        169,
+        199,
+        233
+      ],
+      "current_time": [
+        31,
+        169
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart": {
+      "date_parser": [
+        578,
+        901,
+        905
+      ],
+      "current_time": [
+        578
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart": {
+      "date_parser": [
+        63,
+        70,
+        116,
+        121
+      ],
+      "current_time": [
+        63,
+        70,
+        116,
+        121
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/order_details_page.dart": {
+      "appointment": [
+        5
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/order_details_page_web.dart": {
+      "appointment": [
+        5
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/provider_details_card.dart": {
+      "date_parser": [
+        24,
+        27
+      ],
+      "current_time": [
+        24,
+        27
+      ]
+    },
+    "User app and web/lib/feature/checkout/widget/order_details_section/repeat_booking_schedule_widget.dart": {
+      "appointment": [
+        2,
+        3,
+        4
+      ]
+    },
+    "User app and web/lib/feature/cart/view/cart_screen.dart": {
+      "current_time": [
+        343,
+        346
+      ]
+    },
+    "User app and web/lib/feature/booking/model/booking_details_model.dart": {
+      "appointment": [
+        55,
+        113,
+        188,
+        319
+      ]
+    },
+    "User app and web/lib/feature/booking/model/easy_rebooking_model.dart": {
+      "appointment": [
+        89,
+        134,
+        182
+      ]
+    },
+    "User app and web/lib/feature/booking/model/service_booking_model.dart": {
+      "appointment": [
+        103,
+        126,
+        154,
+        184,
+        208,
+        243,
+        281,
+        350
+      ]
+    },
+    "User app and web/lib/feature/booking/view/web_booking_details_screen.dart": {
+      "appointment": [
+        127,
+        146
+      ],
+      "date_parser": [
+        127,
+        128
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/booking_history.dart": {
+      "appointment": [
+        95,
+        106
+      ],
+      "date_parser": [
+        105,
+        370
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/booking_info.dart": {
+      "appointment": [
+        83,
+        86,
+        88
+      ],
+      "date_parser": [
+        76,
+        88
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/booking_item_card.dart": {
+      "date_parser": [
+        29
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/booking_workflow_panel.dart": {
+      "date_parser": [
+        228,
+        334
+      ],
+      "current_time": [
+        235
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/repeat/all_booking_summary_widget.dart": {
+      "date_parser": [
+        85,
+        90,
+        101,
+        153,
+        158,
+        169
+      ],
+      "current_time": [
+        88,
+        93,
+        104,
+        156,
+        161,
+        170
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart": {
+      "appointment": [
+        144
+      ],
+      "date_parser": [
+        143
+      ],
+      "current_time": [
+        154
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/repeat/next_service_widget.dart": {
+      "appointment": [
+        149,
+        153
+      ],
+      "date_parser": [
+        153
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/repeat/repeat_booking_service_log_widget.dart": {
+      "appointment": [
+        372,
+        409,
+        420,
+        431,
+        442
+      ],
+      "date_parser": [
+        371,
+        418,
+        440
+      ]
+    },
+    "User app and web/lib/feature/booking/widget/repeat/schedule_widget.dart": {
+      "date_parser": [
+        51,
+        73,
+        82
+      ],
+      "current_time": [
+        73,
+        82
+      ]
+    },
+    "User app and web/lib/feature/auth/widgets/additional_field_widget.dart": {
+      "current_time": [
+        125,
+        127
+      ]
+    },
+    "User app and web/lib/feature/address/view/address_screen.dart": {
+      "current_time": [
+        105
+      ]
+    },
+    "User app and web/lib/common/widgets/address_selection_bottom_sheet.dart": {
+      "current_time": [
+        436,
+        472
+      ]
+    },
+    "User app and web/lib/common/widgets/custom_date_range_picker.dart": {
+      "current_time": [
+        28,
+        29
+      ]
+    },
+    "User app and web/lib/common/widgets/direct_service_fields.dart": {
+      "date_parser": [
+        180
+      ],
+      "current_time": [
+        180,
+        191
+      ],
+      "zone_conversion": [
+        185
+      ]
+    },
+    "User app and web/lib/common/widgets/service_center_dialog.dart": {
+      "current_time": [
+        65
+      ],
+      "zone_conversion": [
+        65
+      ]
+    },
+    "User app and web/lib/api/remote/client_api.dart": {
+      "current_time": [
+        173
+      ]
+    },
+    "Provider app/lib/api/api_client.dart": {
+      "current_time": [
+        105
+      ]
+    },
+    "Provider app/lib/helper/booking_helper.dart": {
+      "appointment": [
+        19,
+        22,
+        25,
+        28,
+        31,
+        34
+      ]
+    },
+    "Provider app/lib/helper/date_converter.dart": {
+      "date_parser": [
+        8,
+        14,
+        29,
+        39,
+        45,
+        50,
+        54,
+        58,
+        62,
+        66,
+        70,
+        88,
+        94,
+        98,
+        104,
+        113,
+        123,
+        127,
+        134,
+        140,
+        146,
+        199,
+        204,
+        205,
+        206,
+        209,
+        210,
+        211,
+        236,
+        239,
+        247
+      ],
+      "current_time": [
+        113,
+        134,
+        204,
+        205,
+        206,
+        209,
+        210,
+        211
+      ]
+    },
+    "Provider app/lib/helper/saudi_time.dart": {
+      "date_parser": [
+        6,
+        25,
+        43
+      ],
+      "current_time": [
+        18
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/controller/business_subscription_controller.dart": {
+      "date_parser": [
+        174
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/controller/subscription_invoice_controller.dart": {
+      "date_parser": [
+        251,
+        308,
+        313
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/widget/business/business_plan_details_widget.dart": {
+      "date_parser": [
+        34,
+        44,
+        47,
+        132
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/widget/business/business_transaction_search_widget.dart": {
+      "current_time": [
+        160
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/widget/business/change_business_plan_bottom_sheet.dart": {
+      "date_parser": [
+        121,
+        122
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/widget/business/warning_tooltip_widget.dart": {
+      "date_parser": [
+        25,
+        61,
+        63,
+        65
+      ]
+    },
+    "Provider app/lib/feature/subscriptions/view/business/business_plan_screen.dart": {
+      "date_parser": [
+        41
+      ]
+    },
+    "Provider app/lib/feature/splash/controller/splash_controller.dart": {
+      "date_parser": [
+        66
+      ],
+      "current_time": [
+        14,
+        65,
+        97
+      ]
+    },
+    "Provider app/lib/feature/settings/business/widget/time_picker_widget.dart": {
+      "current_time": [
+        38
+      ]
+    },
+    "Provider app/lib/feature/service_details/model/service_faq_model.dart": {
+      "date_parser": [
+        120,
+        121
+      ],
+      "zone_conversion": [
+        129,
+        130
+      ]
+    },
+    "Provider app/lib/feature/serviceman/operations/workforce_editors.dart": {
+      "slot": [
+        133,
+        134,
+        181,
+        186,
+        214,
+        215,
+        242,
+        243,
+        296,
+        306,
+        340,
+        341
+      ],
+      "date_parser": [
+        248,
+        258,
+        340,
+        341
+      ],
+      "current_time": [
+        258
+      ]
+    },
+    "Provider app/lib/feature/serviceman/view/technician_operations_screen.dart": {
+      "slot": [
+        328,
+        354,
+        357,
+        380
+      ]
+    },
+    "Provider app/lib/feature/review/model/review_model.dart": {
+      "appointment": [
+        162,
+        181,
+        201,
+        227
+      ]
+    },
+    "Provider app/lib/feature/reporting/controller/booking_report_controller.dart": {
+      "current_time": [
+        208
+      ]
+    },
+    "Provider app/lib/feature/reporting/controller/business_report_controller.dart": {
+      "current_time": [
+        396
+      ]
+    },
+    "Provider app/lib/feature/reporting/controller/transaction_report_controller.dart": {
+      "current_time": [
+        352
+      ]
+    },
+    "Provider app/lib/feature/reporting/model/booking_report_model.dart": {
+      "appointment": [
+        287,
+        312,
+        343,
+        378
+      ]
+    },
+    "Provider app/lib/feature/reporting/model/business_report_earning_model.dart": {
+      "appointment": [
+        137,
+        159,
+        186,
+        216
+      ]
+    },
+    "Provider app/lib/feature/reporting/model/business_report_expense_model.dart": {
+      "appointment": [
+        224,
+        246,
+        273,
+        301
+      ]
+    },
+    "Provider app/lib/feature/reporting/view/branch_cash_operations_screen.dart": {
+      "current_time": [
+        42,
+        410,
+        412
+      ]
+    },
+    "Provider app/lib/feature/reporting/view/transaction_report.dart": {
+      "current_time": [
+        83
+      ]
+    },
+    "Provider app/lib/feature/reporting/widgets/booking_report/booking_report_listview.dart": {
+      "date_parser": [
+        205
+      ]
+    },
+    "Provider app/lib/feature/quality/view/branch_quality_screen.dart": {
+      "appointment": [
+        320
+      ],
+      "date_parser": [
+        283,
+        284,
+        285,
+        393
+      ],
+      "current_time": [
+        283,
+        284,
+        285,
+        393
+      ],
+      "zone_conversion": [
+        73,
+        326,
+        385
+      ]
+    },
+    "Provider app/lib/feature/profile/widgets/update_additional_field_widget.dart": {
+      "date_parser": [
+        128
+      ],
+      "current_time": [
+        123,
+        130,
+        138
+      ]
+    },
+    "Provider app/lib/feature/profile/view/view/profile_screen.dart": {
+      "current_time": [
+        613,
+        622
+      ]
+    },
+    "Provider app/lib/feature/payement_information/model/payment_method_list_model.dart": {
+      "date_parser": [
+        68,
+        69
+      ],
+      "zone_conversion": [
+        82,
+        83
+      ]
+    },
+    "Provider app/lib/feature/notifications/controller/notification_controller.dart": {
+      "date_parser": [
+        77,
+        78,
+        89
+      ]
+    },
+    "Provider app/lib/feature/nav/widgets/subscription_trail_end_widget.dart": {
+      "date_parser": [
+        28
+      ]
+    },
+    "Provider app/lib/feature/location/controller/location_controller.dart": {
+      "current_time": [
+        15,
+        16,
+        69,
+        76,
+        108,
+        167,
+        278,
+        289,
+        292
+      ]
+    },
+    "Provider app/lib/feature/html/model/pages_details_model.dart": {
+      "date_parser": [
+        42,
+        43
+      ],
+      "zone_conversion": [
+        54,
+        55
+      ]
+    },
+    "Provider app/lib/feature/dashboard/model/dashboard_json.dart": {
+      "date_parser": [
+        16
+      ]
+    },
+    "Provider app/lib/feature/dashboard/model/recent_activity_model.dart": {
+      "appointment": [
+        17,
+        42,
+        68,
+        101
+      ]
+    },
+    "Provider app/lib/feature/dashboard/view/dashboard_screen.dart": {
+      "date_parser": [
+        54
+      ]
+    },
+    "Provider app/lib/feature/dashboard/widgets/app_bar.dart": {
+      "current_time": [
+        226,
+        237
+      ]
+    },
+    "Provider app/lib/feature/custom_post/model/post_model.dart": {
+      "appointment": [
+        142,
+        185,
+        329,
+        336
+      ]
+    },
+    "Provider app/lib/feature/custom_post/repository/post_repo.dart": {
+      "appointment": [
+        36
+      ]
+    },
+    "Provider app/lib/feature/conversation/controller/conversation_controller.dart": {
+      "current_time": [
+        453,
+        498
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/controller/calendar_controller.dart": {
+      "date_parser": [
+        27,
+        632
+      ],
+      "current_time": [
+        27,
+        395,
+        399,
+        400,
+        411,
+        412,
+        632
+      ],
+      "zone_conversion": [
+        455,
+        456
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/controller/calender_order_filter_controller.dart": {
+      "date_parser": [
+        121,
+        122
+      ],
+      "current_time": [
+        121,
+        122
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/model/calender_order_model.dart": {
+      "appointment": [
+        136,
+        146,
+        158,
+        159,
+        172
+      ],
+      "date_parser": [
+        53,
+        56,
+        111,
+        112,
+        158,
+        165
+      ],
+      "zone_conversion": [
+        172,
+        176
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/model/request_model.dart": {
+      "appointment": [
+        9,
+        45,
+        78
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/widgets/booking_item_card.dart": {
+      "appointment": [
+        127
+      ],
+      "date_parser": [
+        127
+      ],
+      "zone_conversion": [
+        317
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/widgets/month_cell_order_count_widget.dart": {
+      "date_parser": [
+        25,
+        26,
+        27
+      ],
+      "current_time": [
+        25,
+        26,
+        27
+      ]
+    },
+    "Provider app/lib/feature/booking_requests/widgets/provider_booking_overview.dart": {
+      "appointment": [
+        124
+      ]
+    },
+    "Provider app/lib/feature/booking_details/controller/booking_details_controller.dart": {
+      "current_time": [
+        120,
+        123
+      ]
+    },
+    "Provider app/lib/feature/booking_details/controller/booking_edit_controller.dart": {
+      "appointment": [
+        102,
+        103,
+        105,
+        106,
+        182
+      ],
+      "date_parser": [
+        74,
+        77,
+        392,
+        397,
+        412,
+        415
+      ],
+      "current_time": [
+        74,
+        77,
+        392,
+        397,
+        415
+      ]
+    },
+    "Provider app/lib/feature/booking_details/controller/invoice_controller.dart": {
+      "date_parser": [
+        41
+      ],
+      "current_time": [
+        41
+      ]
+    },
+    "Provider app/lib/feature/booking_details/model/bookings_details_model.dart": {
+      "appointment": [
+        45,
+        99,
+        161,
+        281,
+        858,
+        893,
+        933,
+        1003
+      ]
+    },
+    "Provider app/lib/feature/booking_details/repo/booking_details_repo.dart": {
+      "appointment": [
+        147,
+        162
+      ]
+    },
+    "Provider app/lib/feature/booking_details/view/booking_edit_screen.dart": {
+      "appointment": [
+        255,
+        576
+      ],
+      "date_parser": [
+        289,
+        576
+      ]
+    },
+    "Provider app/lib/feature/booking_details/widget/booking_details_overview.dart": {
+      "appointment": [
+        90
+      ]
+    },
+    "Provider app/lib/feature/booking_details/widget/regular_booking/booking_status.dart": {
+      "appointment": [
+        90,
+        94,
+        312
+      ],
+      "date_parser": [
+        93,
+        354
+      ]
+    },
+    "Provider app/lib/feature/booking_details/widget/repeat_booking/all_booking_summary_widget.dart": {
+      "date_parser": [
+        100,
+        124,
+        129
+      ],
+      "current_time": [
+        101,
+        127,
+        130
+      ]
+    },
+    "Provider app/lib/feature/booking_details/widget/repeat_booking/next_upcoming_service_widget.dart": {
+      "appointment": [
+        97,
+        107
+      ],
+      "date_parser": [
+        97,
+        107
+      ]
+    },
+    "Provider app/lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart": {
+      "appointment": [
+        222
+      ],
+      "date_parser": [
+        221
+      ]
+    },
+    "Provider app/lib/feature/auth/widgets/additional_field_widget.dart": {
+      "current_time": [
+        124,
+        126
+      ]
+    },
+    "Provider app/lib/feature/advertisement/controller/advertisement_controller.dart": {
+      "current_time": [
+        552,
+        567,
+        689
+      ],
+      "zone_conversion": [
+        687
+      ]
+    },
+    "Provider app/lib/feature/advertisement/view/create_advertisement_screen.dart": {
+      "current_time": [
+        246,
+        248
+      ]
+    },
+    "Provider app/lib/common/widgets/direct_service_fields.dart": {
+      "date_parser": [
+        180
+      ],
+      "current_time": [
+        180,
+        191
+      ],
+      "zone_conversion": [
+        185
+      ]
+    },
+    "Provider app/lib/common/widgets/show_custom_time_picker.dart": {
+      "current_time": [
+        6
+      ]
+    },
+    "Provider app/lib/common/widgets/nirab/booking_display.dart": {
+      "date_parser": [
+        42,
+        43
+      ]
+    },
+    "Service man app/lib/api/api_client.dart": {
+      "current_time": [
+        103
+      ]
+    },
+    "Service man app/lib/helper/date_converter.dart": {
+      "date_parser": [
+        10,
+        14,
+        20,
+        26,
+        30,
+        34,
+        39,
+        44,
+        50,
+        54,
+        70,
+        74
+      ],
+      "current_time": [
+        44
+      ]
+    },
+    "Service man app/lib/helper/saudi_time.dart": {
+      "date_parser": [
+        6,
+        25,
+        43
+      ],
+      "current_time": [
+        18
+      ]
+    },
+    "Service man app/lib/feature/nav/bottom_nav_screen.dart": {
+      "current_time": [
+        26,
+        27,
+        30
+      ]
+    },
+    "Service man app/lib/feature/splash/controller/splash_controller.dart": {
+      "date_parser": [
+        36
+      ],
+      "current_time": [
+        35,
+        61
+      ]
+    },
+    "Service man app/lib/feature/profile/controller/user_controller.dart": {
+      "date_parser": [
+        82
+      ]
+    },
+    "Service man app/lib/feature/notifications/controller/notification_controller.dart": {
+      "date_parser": [
+        81,
+        82,
+        89
+      ]
+    },
+    "Service man app/lib/feature/html/model/pages_details_model.dart": {
+      "date_parser": [
+        42,
+        43
+      ],
+      "zone_conversion": [
+        54,
+        55
+      ]
+    },
+    "Service man app/lib/feature/dashboard/controller/dashboard_controller.dart": {
+      "current_time": [
+        34,
+        57,
+        58,
+        86,
+        150,
+        202
+      ]
+    },
+    "Service man app/lib/feature/dashboard/model/dashboard_model.dart": {
+      "appointment": [
+        142,
+        165,
+        188,
+        223
+      ]
+    },
+    "Service man app/lib/feature/dashboard/view/dashboard_screen.dart": {
+      "current_time": [
+        22,
+        23,
+        27
+      ]
+    },
+    "Service man app/lib/feature/dashboard/widgets/custom_drop_down_button.dart": {
+      "current_time": [
+        26
+      ]
+    },
+    "Service man app/lib/feature/dashboard/widgets/earning_statistics_section.dart": {
+      "current_time": [
+        10,
+        63,
+        64,
+        83
+      ]
+    },
+    "Service man app/lib/feature/conversation/controller/conversation_controller.dart": {
+      "current_time": [
+        375,
+        451
+      ]
+    },
+    "Service man app/lib/feature/booking_request/model/booking_request_model.dart": {
+      "appointment": [
+        10,
+        46,
+        81,
+        134,
+        169,
+        209,
+        277
+      ]
+    },
+    "Service man app/lib/feature/booking_request/widgets/booking_request_item_card.dart": {
+      "appointment": [
+        195,
+        196
+      ]
+    },
+    "Service man app/lib/feature/booking_details/controller/booking_edit_controller.dart": {
+      "appointment": [
+        84,
+        85,
+        186
+      ],
+      "date_parser": [
+        70,
+        73,
+        397,
+        413,
+        426,
+        432,
+        434
+      ],
+      "current_time": [
+        70,
+        73,
+        397,
+        413,
+        426,
+        434
+      ]
+    },
+    "Service man app/lib/feature/booking_details/controller/invoice_controller.dart": {
+      "date_parser": [
+        41
+      ],
+      "current_time": [
+        41
+      ]
+    },
+    "Service man app/lib/feature/booking_details/model/booking_details_model.dart": {
+      "appointment": [
+        84,
+        124,
+        178,
+        264
+      ]
+    },
+    "Service man app/lib/feature/booking_details/repository/booking_details_repo.dart": {
+      "appointment": [
+        124,
+        139
+      ],
+      "current_time": [
+        80
+      ],
+      "zone_conversion": [
+        80
+      ]
+    },
+    "Service man app/lib/feature/booking_details/view/booking_edit_screen.dart": {
+      "appointment": [
+        140
+      ],
+      "date_parser": [
+        170
+      ]
+    },
+    "Service man app/lib/feature/booking_details/widget/booking_display.dart": {
+      "date_parser": [
+        63,
+        64
+      ]
+    },
+    "Service man app/lib/feature/booking_details/widget/booking_info_view.dart": {
+      "appointment": [
+        60
+      ]
+    },
+    "Service man app/lib/feature/booking_details/widget/booking_status.dart": {
+      "appointment": [
+        113
+      ],
+      "date_parser": [
+        193
+      ],
+      "zone_conversion": [
+        199
+      ]
+    },
+    "Service man app/lib/feature/booking_details/widget/service_execution_panel.dart": {
+      "current_time": [
+        104,
+        490
+      ],
+      "zone_conversion": [
+        104,
+        491,
+        492
+      ]
+    },
+    "Service man app/lib/feature/auth/model/technician_application.dart": {
+      "date_parser": [
+        26,
+        27
+      ]
+    },
+    "Service man app/lib/feature/auth/view/technician_application_screen.dart": {
+      "zone_conversion": [
+        402
+      ]
+    },
+    "Service man app/lib/common/widgets/direct_service_fields.dart": {
+      "date_parser": [
+        180
+      ],
+      "current_time": [
+        180,
+        191
+      ],
+      "zone_conversion": [
+        185
+      ]
+    }
+  }
+}

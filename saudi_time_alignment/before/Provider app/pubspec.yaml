@@ -1,0 +1,111 @@
+name: demandium_provider
+description: NIRAB CLEAN — مقدم الخدمة
+
+
+publish_to: 'none' #
+
+version: 1.0.0+2
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  flutter_svg: 2.2.4
+  get: ^4.7.3
+  intl: ^0.20.2
+  path: ^1.9.1
+  http: ^1.6.0
+  shared_preferences: ^2.5.5
+  connectivity_plus: ^7.1.1
+  firebase_core: ^4.9.0
+  firebase_messaging: ^16.2.2
+  image_picker: ^1.2.2
+  cached_network_image: ^3.4.1
+  url_launcher: ^6.3.2
+  country_code_picker: ^3.4.1
+  pin_code_fields: ^9.4.0
+  flutter_widget_from_html_core: ^0.17.2
+  flutter_typeahead: ^6.0.0
+  shimmer_animation: ^2.2.2+1
+  fl_chart: ^1.2.0
+  dotted_border: ^3.1.0
+  flutter_local_notifications: ^21.0.0
+  file_picker: ^11.0.2
+  pdf: ^3.12.0
+  open_file: ^3.5.11
+  flutter_downloader: ^1.12.0
+  permission_handler: ^12.0.1
+  printing: ^5.14.3
+  expandable_bottom_sheet: ^1.1.1+1
+  shimmer: ^3.0.0
+  currency_text_input_formatter: ^2.3.0
+  graphic: ^2.7.0
+  syncfusion_flutter_charts: ^33.2.7
+  google_maps_flutter: ^2.17.0
+  geolocator: ^14.0.2
+  flutter_slidable: ^4.0.3
+  flutter_switch: ^0.3.2
+  just_the_tooltip: ^0.0.12
+  flutter_inappwebview: ^6.1.5
+  universal_html: ^2.3.0
+  scroll_to_index: ^3.0.1
+  photo_view: ^0.15.0
+  phone_numbers_parser: ^9.0.22
+  path_provider: ^2.1.5
+  video_player: ^2.11.1
+  chewie: ^1.13.0
+  firebase_auth: ^6.5.1
+  readmore: ^3.0.0
+  showcaseview: ^5.0.2
+  skeletonizer: ^2.1.3
+  syncfusion_flutter_calendar: ^33.2.7
+  loading_animation_widget: ^1.3.0
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/brand/
+    - assets/icons/solar/
+    - assets/icons/currency/
+    - assets/language/
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/font/Roboto-Light.ttf
+          weight: 300
+        - asset: assets/font/Roboto-Regular.ttf
+          weight: 400
+        - asset: assets/font/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/font/Roboto-Bold.ttf
+          weight: 700
+
+    - family: Norsal
+      fonts:
+        - asset: assets/font/Norsal-ExtraLight.otf
+          weight: 200
+        - asset: assets/font/Norsal-Regular.otf
+          weight: 400
+        - asset: assets/font/Norsal-SemiBold.otf
+          weight: 600
+        - asset: assets/font/Norsal-Bold.otf
+          weight: 700
+    - family: SaudiRiyal
+      fonts:
+        - asset: assets/font/SaudiRiyal-Regular.otf

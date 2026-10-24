@@ -1,0 +1,458 @@
+{
+  "Admin Panel/app/Support/SaudiTime.php": {
+    "existed": false
+  },
+  "Admin Panel/config/nirab_time.php": {
+    "existed": false
+  },
+  "Admin Panel/.env.example": {
+    "existed": true
+  },
+  "Admin Panel/config/nirab_execution.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Casts/SaudiAppointment.php": {
+    "existed": false
+  },
+  "Admin Panel/app/Traits/HasSaudiAppointment.php": {
+    "existed": false
+  },
+  "Admin Panel/Modules/BookingModule/Entities/Booking.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Entities/BookingRepeat.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Entities/BookingScheduleHistory.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Services/BookingSchedule.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Services/AvailabilityService.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ProviderManagement/Services/BranchScheduleService.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ProviderManagement/Services/BranchCapacityPolicy.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Customer/DispatchController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Customer/BookingController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Provider/DispatchController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ProviderManagement/Http/Controllers/Api/V1/Provider/TimeScheduleController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/CustomerSubscriptionModule/Services/VisitPackageService.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ServiceManagement/Http/Controllers/Web/Admin/OperationsController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/PricingRuleController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ServiceManagement/Http/Controllers/Api/V1/Customer/PricingController.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Http/Controllers/BranchOnboardingController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ServiceManagement/Entities/PricingRule.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ServiceManagement/Services/PricingEngine.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Http/Controllers/BranchWorkspaceController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Services/BookingAmendmentService.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Console/Commands/QualityReminders.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Services/BranchReportService.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Services/BranchPeriod.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Services/OperationalPresentation.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Console/Kernel.php": {
+    "existed": true
+  },
+  "User app and web/lib/helper/saudi_time.dart": {
+    "existed": false
+  },
+  "User app and web/pubspec.yaml": {
+    "existed": true
+  },
+  "User app and web/pubspec.lock": {
+    "existed": true
+  },
+  "User app and web/.dart_tool/package_config.json": {
+    "existed": true
+  },
+  "User app and web/.dart_tool/package_graph.json": {
+    "existed": true
+  },
+  "User app and web/lib/helper/date_converter.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/model/booking_details_model.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/model/easy_rebooking_model.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/model/service_booking_model.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/home/widget/campaign_view.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/view/web_booking_details_screen.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/booking_history.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/booking_info.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/repeat/all_booking_summary_widget.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/repeat/next_service_widget.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/repeat/schedule_widget.dart": {
+    "existed": true
+  },
+  "Provider app/lib/helper/saudi_time.dart": {
+    "existed": false
+  },
+  "Provider app/pubspec.yaml": {
+    "existed": true
+  },
+  "Provider app/pubspec.lock": {
+    "existed": true
+  },
+  "Provider app/.dart_tool/package_config.json": {
+    "existed": true
+  },
+  "Provider app/.dart_tool/package_graph.json": {
+    "existed": true
+  },
+  "Provider app/lib/helper/date_converter.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/review/model/review_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/reporting/model/booking_report_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/reporting/model/business_report_earning_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/reporting/model/business_report_expense_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/dashboard/model/recent_activity_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_requests/model/request_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/model/bookings_details_model.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/subscriptions/controller/subscription_invoice_controller.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_requests/widgets/booking_item_card.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/view/booking_edit_screen.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/widget/regular_booking/booking_status.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/widget/repeat_booking/all_booking_summary_widget.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/widget/repeat_booking/next_upcoming_service_widget.dart": {
+    "existed": true
+  },
+  "Provider app/lib/common/widgets/nirab/booking_display.dart": {
+    "existed": true
+  },
+  "Service man app/lib/helper/saudi_time.dart": {
+    "existed": false
+  },
+  "Service man app/pubspec.yaml": {
+    "existed": true
+  },
+  "Service man app/pubspec.lock": {
+    "existed": true
+  },
+  "Service man app/.dart_tool/package_config.json": {
+    "existed": true
+  },
+  "Service man app/.dart_tool/package_graph.json": {
+    "existed": true
+  },
+  "Service man app/lib/helper/date_converter.dart": {
+    "existed": true
+  },
+  "Service man app/lib/feature/dashboard/model/dashboard_model.dart": {
+    "existed": true
+  },
+  "Service man app/lib/feature/booking_request/model/booking_request_model.dart": {
+    "existed": true
+  },
+  "Service man app/lib/feature/booking_details/model/booking_details_model.dart": {
+    "existed": true
+  },
+  "Service man app/lib/feature/booking_details/widget/booking_display.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/checkout/widget/order_details_section/available_slot_picker.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/checkout/controller/schedule_controller.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/checkout/repo/schedule_repo.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/booking_workflow_panel.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/visit_package/view/package_visit_screen.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/visit_package/view/visit_packages_screen.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_requests/model/calender_order_model.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart": {
+    "existed": true
+  },
+  "User app and web/lib/feature/checkout/widget/order_details_section/provider_details_card.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_requests/controller/calendar_controller.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_requests/controller/calender_order_filter_controller.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_requests/widgets/month_cell_order_count_widget.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/controller/booking_edit_controller.dart": {
+    "existed": true
+  },
+  "Service man app/lib/feature/booking_details/controller/booking_edit_controller.dart": {
+    "existed": true
+  },
+  "User app and web/test/feature/slot_timezone_test.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/dashboard/model/dashboard_json.dart": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Http/Controllers/Web/Admin/BookingController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Http/Controllers/Web/Provider/BookingController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Services/DirectBookingReservationGuard.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/ProviderManagement/Services/BranchZoneChangeService.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BidModule/Entities/Post.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BidModule/Entities/QuoteInspection.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Provider/QuotationController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BidModule/Http/Controllers/APi/V1/Customer/QuotationController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Http/Controllers/Api/V1/Provider/BookingController.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/cash/operations.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/details.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/fullbooking-invoice.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/fullbooking-single-invoice.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/invoice.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/rebooking-ongoing.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/repeat-booking-details.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/repeat-status.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/service-log.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/status.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/details.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/fullbooking-invoice.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/fullbooking-single-invoice.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/invoice.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/offline-payment-list.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/rebooking-ongoing.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/repeat-booking-details.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/repeat-status.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/service-log.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/status.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/admin/booking/verification-list.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/resources/views/branch/finance.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Services/OperationalAnalytics.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Services/GeoService.php": {
+    "existed": true
+  },
+  "Admin Panel/tests/Unit/SlotTimezoneTest.php": {
+    "existed": true
+  },
+  "Admin Panel/tests/Unit/SaudiTimeContractTest.php": {
+    "existed": false
+  },
+  "User app and web/test/unit/saudi_time_contract_check.dart": {
+    "existed": false
+  },
+  "Provider app/test/unit/saudi_time_contract_check.dart": {
+    "existed": false
+  },
+  "Service man app/test/unit/saudi_time_contract_check.dart": {
+    "existed": false
+  },
+  "Admin Panel/resources/views/branch/bookings.blade.php": {
+    "existed": true
+  },
+  "Admin Panel/resources/views/branch/workspace.blade.php": {
+    "existed": true
+  },
+  "User app and web/lib/feature/subscription/view/my_subscription_details_screen.dart": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Services/TrackingService.php": {
+    "existed": true
+  },
+  "Admin Panel/public/assets/common/js/nirab-branch.js": {
+    "existed": true
+  },
+  "User app and web/lib/feature/booking/widget/repeat/repeat_booking_service_log_widget.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/widget/repeat_booking/repeat_booking_service_log.dart": {
+    "existed": true
+  },
+  "Admin Panel/app/Observers/QualityCommunicationObserver.php": {
+    "existed": true
+  },
+  "Admin Panel/app/Lib/Helpers.php": {
+    "existed": true
+  },
+  "User app and web/lib/helper/checkout_helper.dart": {
+    "existed": true
+  },
+  "Admin Panel/config/app.php": {
+    "existed": true
+  },
+  "Admin Panel/tests/Unit/BranchWorkspaceTest.php": {
+    "existed": true
+  },
+  "Admin Panel/tools/saudi-time-baseline.php": {
+    "existed": false
+  },
+  "Provider app/lib/feature/serviceman/operations/workforce_editors.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/serviceman/view/technician_operations_screen.dart": {
+    "existed": true
+  },
+  "Provider app/lib/feature/quality/view/branch_quality_screen.dart": {
+    "existed": true
+  },
+  "Admin Panel/Modules/BookingModule/Resources/views/provider/booking/calendar-view.blade.php": {
+    "existed": true
+  },
+  "Provider app/lib/feature/booking_details/controller/invoice_controller.dart": {
+    "existed": true
+  },
+  "Service man app/lib/feature/booking_details/controller/invoice_controller.dart": {
+    "existed": true
+  }
+}

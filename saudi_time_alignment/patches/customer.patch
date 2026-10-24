@@ -1,0 +1,2873 @@
+diff --git a/lib/feature/booking/model/booking_details_model.dart b/lib/feature/booking/model/booking_details_model.dart
+index 84414bc..48ec017 100644
+--- a/lib/feature/booking/model/booking_details_model.dart
++++ b/lib/feature/booking/model/booking_details_model.dart
+@@ -185,7 +185,7 @@ class BookingDetailsContent {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/booking/model/easy_rebooking_model.dart b/lib/feature/booking/model/easy_rebooking_model.dart
+index 3186083..30a4567 100644
+--- a/lib/feature/booking/model/easy_rebooking_model.dart
++++ b/lib/feature/booking/model/easy_rebooking_model.dart
+@@ -179,7 +179,7 @@ class Data {
+     );
+     totalTaxAmount = double.tryParse(json['total_tax_amount'].toString());
+     totalDiscountAmount = json['total_discount_amount'];
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/booking/model/service_booking_model.dart b/lib/feature/booking/model/service_booking_model.dart
+index 5f08b64..b9ea120 100644
+--- a/lib/feature/booking/model/service_booking_model.dart
++++ b/lib/feature/booking/model/service_booking_model.dart
+@@ -151,7 +151,7 @@ class BookingModel {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+@@ -278,7 +278,7 @@ class RepeatBooking {
+     totalDiscountAmount = double.tryParse(
+       json['total_discount_amount'].toString(),
+     );
+-    serviceSchedule = json['service_schedule'];
++    serviceSchedule = (json['service_schedule_at'] ?? json['service_schedule']);
+     serviceAddressId = json['service_address_id'];
+     createdAt = json['created_at'];
+     updatedAt = json['updated_at'];
+diff --git a/lib/feature/booking/view/web_booking_details_screen.dart b/lib/feature/booking/view/web_booking_details_screen.dart
+index 22b4d6f..94ec54c 100644
+--- a/lib/feature/booking/view/web_booking_details_screen.dart
++++ b/lib/feature/booking/view/web_booking_details_screen.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_service_card.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_foundation.dart';
+@@ -123,8 +124,8 @@ class BookingDetailsTopCard extends StatelessWidget {
+   @override
+   Widget build(BuildContext context) {
+     final booking = bookingDetailsContent;
+-    final schedule = DateTime.tryParse(booking.serviceSchedule ?? '');
+-    final created = DateTime.tryParse(booking.createdAt ?? '');
++    final schedule = SaudiTime.tryAppointment(booking.serviceSchedule ?? '');
++    final created = SaudiTime.tryInstant(booking.createdAt);
+     return Padding(
+       padding: const EdgeInsets.all(16),
+       child: NirabPanel(
+@@ -138,7 +139,7 @@ class BookingDetailsTopCard extends StatelessWidget {
+             const SizedBox(height: 12),
+             if (created != null)
+               Text(
+-                '${'booking_place'.tr}: ${DateConverter.dateMonthYearTimeTwentyFourFormat(created.toLocal())}',
++                '${'booking_place'.tr}: ${DateConverter.dateMonthYearTimeTwentyFourFormat(created)}',
+               ),
+             if (schedule != null)
+               Text(
+diff --git a/lib/feature/booking/widget/booking_history.dart b/lib/feature/booking/widget/booking_history.dart
+index 163dbfc..e521c38 100644
+--- a/lib/feature/booking/widget/booking_history.dart
++++ b/lib/feature/booking/widget/booking_history.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/feature/booking/widget/booking_screen_shimmer.dart';
+ import 'package:nirab_clean/feature/booking/widget/timeline/connectors.dart';
+@@ -12,103 +13,180 @@ import 'package:nirab_clean/util/core_export.dart';
+ class BookingHistory extends StatelessWidget {
+   final String? id;
+   final bool isSubBooking;
+-  const BookingHistory({super.key, this.id, required this.isSubBooking}) ;
++  const BookingHistory({super.key, this.id, required this.isSubBooking});
+   @override
+   Widget build(BuildContext context) {
+-
+-    Get.lazyPut(() => BookingDetailsController(bookingDetailsRepo: BookingDetailsRepo(sharedPreferences: Get.find(), apiClient: Get.find())));
++    Get.lazyPut(
++      () => BookingDetailsController(
++        bookingDetailsRepo: BookingDetailsRepo(
++          sharedPreferences: Get.find(),
++          apiClient: Get.find(),
++        ),
++      ),
++    );
+     return RefreshIndicator(
+       onRefresh: () async {
+-        if(id != null){
+-          if(isSubBooking) {
+-            await Get.find<BookingDetailsController>().getSubBookingDetails(bookingId: id!);
++        if (id != null) {
++          if (isSubBooking) {
++            await Get.find<BookingDetailsController>().getSubBookingDetails(
++              bookingId: id!,
++            );
+           } else {
+-            await Get.find<BookingDetailsController>().getBookingDetails(bookingId: id!);
++            await Get.find<BookingDetailsController>().getBookingDetails(
++              bookingId: id!,
++            );
+           }
+         }
+       },
+       child: GetBuilder<BookingDetailsController>(
+-        builder: (bookingDetailsController){
+-          BookingDetailsContent? bookingDetails = isSubBooking ? bookingDetailsController.subBookingDetailsContent : bookingDetailsController.bookingDetailsContent;
+-           if(bookingDetails != null){
+-             return SingleChildScrollView(
+-               physics: AlwaysScrollableScrollPhysics(),
+-               child: Column(
+-                 children: [
+-
+-                   ResponsiveHelper.isDesktop(context) ? const SizedBox() :
+-                   Column(
+-                     children: [
+-                       Gaps.verticalGapOf(Dimensions.paddingSizeExtraLarge),
+-                       Row(
+-                         mainAxisAlignment: MainAxisAlignment.center,
+-                         children: [
+-                           Text('${'booking_place'.tr} : ',
+-                             style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color),
+-                           ),
+-                           Text(DateConverter.dateMonthYearTimeTwentyFourFormat(DateConverter.isoUtcStringToLocalDate(bookingDetails.createdAt!.toString())),textDirection: TextDirection.ltr,
+-                             style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault),),
+-                         ],
+-                       ),
+-
+-                       const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+-                       Gaps.verticalGapOf(Dimensions.paddingSizeExtraSmall),
++        builder: (bookingDetailsController) {
++          BookingDetailsContent? bookingDetails = isSubBooking
++              ? bookingDetailsController.subBookingDetailsContent
++              : bookingDetailsController.bookingDetailsContent;
++          if (bookingDetails != null) {
++            return SingleChildScrollView(
++              physics: AlwaysScrollableScrollPhysics(),
++              child: Column(
++                children: [
++                  ResponsiveHelper.isDesktop(context)
++                      ? const SizedBox()
++                      : Column(
++                          children: [
++                            Gaps.verticalGapOf(
++                              Dimensions.paddingSizeExtraLarge,
++                            ),
++                            Row(
++                              mainAxisAlignment: MainAxisAlignment.center,
++                              children: [
++                                Text(
++                                  '${'booking_place'.tr} : ',
++                                  style: robotoMedium.copyWith(
++                                    fontSize: Dimensions.fontSizeDefault,
++                                    color: Theme.of(
++                                      context,
++                                    ).textTheme.bodyLarge!.color,
++                                  ),
++                                ),
++                                Text(
++                                  DateConverter.dateMonthYearTimeTwentyFourFormat(
++                                    DateConverter.isoUtcStringToLocalDate(
++                                      bookingDetails.createdAt!.toString(),
++                                    ),
++                                  ),
++                                  textDirection: TextDirection.ltr,
++                                  style: robotoRegular.copyWith(
++                                    fontSize: Dimensions.fontSizeDefault,
++                                  ),
++                                ),
++                              ],
++                            ),
+ 
+-                       Row(
+-                         mainAxisAlignment: MainAxisAlignment.center,
+-                         children: [
+-                           Text("${'service_scheduled_date'.tr} : ",
+-                             style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color),
+-                           ),
+-                           Text(DateConverter.dateMonthYearTimeTwentyFourFormat(DateTime.tryParse(bookingDetails.serviceSchedule!)!),
+-                             style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault),
+-                             textDirection:  TextDirection.ltr,),
+-                         ],
+-                       ),
+-                       const SizedBox(height: Dimensions.paddingSizeSmall,),
+-                       Text.rich(
+-                         TextSpan(text: '${'payment_status'.tr} : ',
+-                           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color),
+-                           children: [
+-                             TextSpan(text: '${bookingDetails.isPaid == 0 ? 'unpaid'.tr: 'paid'.tr} ',
+-                                 style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault,
+-                                     color: bookingDetails.isPaid == 0?Theme.of(context).colorScheme.error : Colors.green,decoration: TextDecoration.none)),
+-                           ],
+-                         ),
+-                       ),
+-                       const SizedBox(height: Dimensions.paddingSizeSmall,),
+-                       Text.rich(
+-                         TextSpan(
+-                           text: '${'booking_status'.tr} : ',
+-                           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color),
+-                           children: [
+-                             TextSpan(
+-                                 text: bookingDetails.bookingStatus!.tr,
+-                                 style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color:  Theme.of(context).colorScheme.primary)),
+-                           ],
+-                         ),
+-                       ),
+-                       Gaps.verticalGapOf(Dimensions.paddingSizeDefault),
+-                     ],
+-                   ),
++                            const SizedBox(
++                              height: Dimensions.paddingSizeExtraSmall,
++                            ),
++                            Gaps.verticalGapOf(
++                              Dimensions.paddingSizeExtraSmall,
++                            ),
+ 
++                            Row(
++                              mainAxisAlignment: MainAxisAlignment.center,
++                              children: [
++                                Text(
++                                  "${'service_scheduled_date'.tr} : ",
++                                  style: robotoMedium.copyWith(
++                                    fontSize: Dimensions.fontSizeDefault,
++                                    color: Theme.of(
++                                      context,
++                                    ).textTheme.bodyLarge!.color,
++                                  ),
++                                ),
++                                Text(
++                                  DateConverter.dateMonthYearTimeTwentyFourFormat(
++                                    SaudiTime.tryAppointment(
++                                      bookingDetails.serviceSchedule!,
++                                    )!,
++                                  ),
++                                  style: robotoRegular.copyWith(
++                                    fontSize: Dimensions.fontSizeDefault,
++                                  ),
++                                  textDirection: TextDirection.ltr,
++                                ),
++                              ],
++                            ),
++                            const SizedBox(height: Dimensions.paddingSizeSmall),
++                            Text.rich(
++                              TextSpan(
++                                text: '${'payment_status'.tr} : ',
++                                style: robotoMedium.copyWith(
++                                  fontSize: Dimensions.fontSizeDefault,
++                                  color: Theme.of(
++                                    context,
++                                  ).textTheme.bodyLarge!.color,
++                                ),
++                                children: [
++                                  TextSpan(
++                                    text:
++                                        '${bookingDetails.isPaid == 0 ? 'unpaid'.tr : 'paid'.tr} ',
++                                    style: robotoMedium.copyWith(
++                                      fontSize: Dimensions.fontSizeDefault,
++                                      color: bookingDetails.isPaid == 0
++                                          ? Theme.of(context).colorScheme.error
++                                          : Colors.green,
++                                      decoration: TextDecoration.none,
++                                    ),
++                                  ),
++                                ],
++                              ),
++                            ),
++                            const SizedBox(height: Dimensions.paddingSizeSmall),
++                            Text.rich(
++                              TextSpan(
++                                text: '${'booking_status'.tr} : ',
++                                style: robotoMedium.copyWith(
++                                  fontSize: Dimensions.fontSizeDefault,
++                                  color: Theme.of(
++                                    context,
++                                  ).textTheme.bodyLarge!.color,
++                                ),
++                                children: [
++                                  TextSpan(
++                                    text: bookingDetails.bookingStatus!.tr,
++                                    style: robotoMedium.copyWith(
++                                      fontSize: Dimensions.fontSizeDefault,
++                                      color: Theme.of(
++                                        context,
++                                      ).colorScheme.primary,
++                                    ),
++                                  ),
++                                ],
++                              ),
++                            ),
++                            Gaps.verticalGapOf(Dimensions.paddingSizeDefault),
++                          ],
++                        ),
+ 
+-                   Padding(
+-                     padding:  const EdgeInsets.all(Dimensions.paddingSizeDefault),
+-                     child: HistoryStatus(
+-                       bookingDetailsContent: bookingDetails,
+-                       statusHistories: bookingDetails.statusHistories,
+-                       scheduleHistories: bookingDetails.scheduleHistories,
+-                       increment: bookingDetails.scheduleHistories!.length > 1  && bookingDetails.statusHistories!.isNotEmpty ? 2 : 1,
+-                     ),
+-                   ),
+-                   const SizedBox(height: Dimensions.paddingSizeExtraLarge,),
+-                 ],
+-               ),
+-             );
+-           }else{
+-             return const SingleChildScrollView(child: BookingScreenShimmer());
+-           }
++                  Padding(
++                    padding: const EdgeInsets.all(
++                      Dimensions.paddingSizeDefault,
++                    ),
++                    child: HistoryStatus(
++                      bookingDetailsContent: bookingDetails,
++                      statusHistories: bookingDetails.statusHistories,
++                      scheduleHistories: bookingDetails.scheduleHistories,
++                      increment:
++                          bookingDetails.scheduleHistories!.length > 1 &&
++                              bookingDetails.statusHistories!.isNotEmpty
++                          ? 2
++                          : 1,
++                    ),
++                  ),
++                  const SizedBox(height: Dimensions.paddingSizeExtraLarge),
++                ],
++              ),
++            );
++          } else {
++            return const SingleChildScrollView(child: BookingScreenShimmer());
++          }
+         },
+       ),
+     );
+@@ -120,8 +198,12 @@ class HistoryStatus extends StatelessWidget {
+   final List<StatusHistories>? statusHistories;
+   final List<ScheduleHistories>? scheduleHistories;
+   final int increment;
+-  const HistoryStatus({super.key,
+-    required this.statusHistories, this.scheduleHistories, required this.increment, this.bookingDetailsContent
++  const HistoryStatus({
++    super.key,
++    required this.statusHistories,
++    this.scheduleHistories,
++    required this.increment,
++    this.bookingDetailsContent,
+   });
+   @override
+   Widget build(BuildContext context) {
+@@ -129,153 +211,240 @@ class HistoryStatus extends StatelessWidget {
+       shrinkWrap: true,
+       physics: const NeverScrollableScrollPhysics(),
+       theme: TimelineThemeData(
+-          nodePosition: 0,
+-          indicatorTheme: const IndicatorThemeData(position: 0, size: 30.0)),
+-      padding: EdgeInsets.symmetric(vertical: 20.0,horizontal: Get.find<LocalizationController>().isLtr?0:10),
+-      builder: TimelineTileBuilder.connected(connectionDirection: ConnectionDirection.before,
++        nodePosition: 0,
++        indicatorTheme: const IndicatorThemeData(position: 0, size: 30.0),
++      ),
++      padding: EdgeInsets.symmetric(
++        vertical: 20.0,
++        horizontal: Get.find<LocalizationController>().isLtr ? 0 : 10,
++      ),
++      builder: TimelineTileBuilder.connected(
++        connectionDirection: ConnectionDirection.before,
+ 
+-        itemCount: statusHistories!.length+increment,
++        itemCount: statusHistories!.length + increment,
+ 
+         contentsBuilder: (_, index) {
++          return Padding(
++            padding: const EdgeInsets.only(
++              left: 20.0,
++              bottom: 20.0,
++              top: 7,
++              right: 10,
++            ),
++            child: index == 0
++                ? Column(
++                    mainAxisSize: MainAxisSize.min,
++                    crossAxisAlignment: CrossAxisAlignment.start,
++                    children: [
++                      Text(
++                        "${'service_booked_by_customer'.tr} ${bookingDetailsContent?.customer?.firstName ?? bookingDetailsContent?.serviceAddress?.contactPersonName ?? ""} "
++                        "${bookingDetailsContent?.customer?.lastName ?? ""}",
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeDefault,
++                        ),
++                      ),
++                      const SizedBox(height: Dimensions.paddingSizeSmall),
+ 
+-          return Padding(padding:  const EdgeInsets.only(left: 20.0,bottom: 20.0,top: 7,right: 10), child:
+-          index==0?
+-          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
+-            children: [
+-              Text("${'service_booked_by_customer'.tr} ${bookingDetailsContent?.customer?.firstName?? bookingDetailsContent?.serviceAddress?.contactPersonName??""} "
+-                  "${bookingDetailsContent?.customer?.lastName??""}",
+-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)
+-              ),
+-              const SizedBox(height: Dimensions.paddingSizeSmall),
+-
+-              Text(DateConverter.dateMonthYearTimeTwentyFourFormat(DateConverter.isoUtcStringToLocalDate(scheduleHistories![index].createdAt!)),
+-                style: robotoRegular.copyWith(
+-                  fontSize: Dimensions.fontSizeSmall,
+-                  color: Theme.of(context).secondaryHeaderColor,
+-                ),
+-                textDirection: TextDirection.ltr,
+-              ),
+-              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+-            ],
+-          ) :index==1 && statusHistories!.isNotEmpty ?
+-          Column(
+-            mainAxisSize: MainAxisSize.min,
+-            crossAxisAlignment: CrossAxisAlignment.start,
+-            children: [
+-              Text("${'booking'.tr} ${statusHistories![index-1].bookingStatus.toString().tr.toLowerCase()} ${'by'.tr} "
+-                  "${statusHistories![index-1].user!.userType.toString().tr} ",
+-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,),
+-              ),
+-
++                      Text(
++                        DateConverter.dateMonthYearTimeTwentyFourFormat(
++                          DateConverter.isoUtcStringToLocalDate(
++                            scheduleHistories![index].createdAt!,
++                          ),
++                        ),
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeSmall,
++                          color: Theme.of(context).secondaryHeaderColor,
++                        ),
++                        textDirection: TextDirection.ltr,
++                      ),
++                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
++                    ],
++                  )
++                : index == 1 && statusHistories!.isNotEmpty
++                ? Column(
++                    mainAxisSize: MainAxisSize.min,
++                    crossAxisAlignment: CrossAxisAlignment.start,
++                    children: [
++                      Text(
++                        "${'booking'.tr} ${statusHistories![index - 1].bookingStatus.toString().tr.toLowerCase()} ${'by'.tr} "
++                        "${statusHistories![index - 1].user!.userType.toString().tr} ",
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeDefault,
++                        ),
++                      ),
+ 
+-              const SizedBox(height: Dimensions.paddingSizeSmall),
+-              statusHistories![index-1].user?.userType!='provider-admin'?
+-              Text("${statusHistories![index-1].user?.firstName??""} ${statusHistories![index-1].user?.lastName??""}",
+-                style: robotoRegular.copyWith(
+-                  fontSize: Dimensions.fontSizeSmall,
+-                  color: Theme.of(context).secondaryHeaderColor,
+-                ),
+-              ): Text(bookingDetailsContent?.provider?.companyName??"",
+-                style: robotoRegular.copyWith(
+-                  fontSize: Dimensions.fontSizeSmall,
+-                  color: Theme.of(context).secondaryHeaderColor,
+-                ),
+-              ),
++                      const SizedBox(height: Dimensions.paddingSizeSmall),
++                      statusHistories![index - 1].user?.userType !=
++                              'provider-admin'
++                          ? Text(
++                              "${statusHistories![index - 1].user?.firstName ?? ""} ${statusHistories![index - 1].user?.lastName ?? ""}",
++                              style: robotoRegular.copyWith(
++                                fontSize: Dimensions.fontSizeSmall,
++                                color: Theme.of(context).secondaryHeaderColor,
++                              ),
++                            )
++                          : Text(
++                              bookingDetailsContent?.provider?.companyName ??
++                                  "",
++                              style: robotoRegular.copyWith(
++                                fontSize: Dimensions.fontSizeSmall,
++                                color: Theme.of(context).secondaryHeaderColor,
++                              ),
++                            ),
+ 
++                      const SizedBox(height: Dimensions.paddingSizeSmall),
+ 
+-              const SizedBox(height: Dimensions.paddingSizeSmall,),
++                      Text(
++                        DateConverter.dateMonthYearTimeTwentyFourFormat(
++                          DateConverter.isoUtcStringToLocalDate(
++                            statusHistories![index - 1].createdAt!,
++                          ),
++                        ),
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeSmall,
++                          color: Theme.of(context).secondaryHeaderColor,
++                        ),
++                        textDirection: TextDirection.ltr,
++                      ),
++                      const SizedBox(height: Dimensions.paddingSizeDefault),
++                    ],
++                  )
++                : index == 2 && scheduleHistories!.length > 1
++                ? Column(
++                    mainAxisSize: MainAxisSize.min,
++                    crossAxisAlignment: CrossAxisAlignment.start,
++                    children: [
++                      SizedBox(
++                        height: (scheduleHistories!.length - 1) * 80,
+ 
+-              Text(DateConverter.dateMonthYearTimeTwentyFourFormat(DateConverter.isoUtcStringToLocalDate(statusHistories![index-1].createdAt!)),
+-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall,color: Theme.of(context).secondaryHeaderColor),
+-                textDirection: TextDirection.ltr,
+-              ),
+-              const SizedBox(height: Dimensions.paddingSizeDefault,),
+-            ],
+-          )
++                        child: ListView.builder(
++                          itemBuilder: (_, index) {
++                            return Column(
++                              mainAxisSize: MainAxisSize.min,
++                              crossAxisAlignment: CrossAxisAlignment.start,
++                              children: [
++                                Text(
++                                  "${'schedule_changed_by'.tr} ${scheduleHistories![index + 1].user!.userType.toString().tr}",
++                                  style: robotoRegular.copyWith(
++                                    fontSize: Dimensions.fontSizeDefault,
++                                  ),
++                                ),
++                                const SizedBox(
++                                  height: Dimensions.paddingSizeSmall,
++                                ),
++                                if (scheduleHistories?[index + 1]
++                                        .user
++                                        ?.userType !=
++                                    'provider-admin')
++                                  Text(
++                                    "${scheduleHistories![index + 1].user?.firstName.toString()} ${scheduleHistories![index + 1].user?.lastName.toString()}",
++                                    style: robotoRegular.copyWith(
++                                      fontSize: Dimensions.fontSizeSmall,
++                                      color: Theme.of(
++                                        context,
++                                      ).secondaryHeaderColor,
++                                    ),
++                                    textDirection: TextDirection.ltr,
++                                  ),
++                                if (scheduleHistories?[index + 1]
++                                        .user
++                                        ?.userType ==
++                                    'provider-admin')
++                                  Text(
++                                    "${bookingDetailsContent?.provider?.companyName ?? ""} ",
++                                    style: robotoRegular.copyWith(
++                                      fontSize: Dimensions.fontSizeSmall,
++                                      color: Theme.of(
++                                        context,
++                                      ).secondaryHeaderColor,
++                                    ),
++                                    textDirection: TextDirection.ltr,
++                                  ),
+ 
+-              :index==2 && scheduleHistories!.length>1?
+-          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
+-            children: [
+-              SizedBox(
+-                height: (scheduleHistories!.length-1)*80,
++                                const SizedBox(
++                                  height: Dimensions.paddingSizeSmall,
++                                ),
+ 
+-                child: ListView.builder(itemBuilder: (_,index){
+-                  return  Column(
++                                Text(
++                                  DateConverter.dateMonthYearTimeTwentyFourFormat(
++                                    SaudiTime.tryAppointment(
++                                      scheduleHistories![index + 1].schedule!,
++                                    )!,
++                                  ),
++                                  style: robotoRegular.copyWith(
++                                    fontSize: Dimensions.fontSizeSmall,
++                                    color: Theme.of(
++                                      context,
++                                    ).secondaryHeaderColor,
++                                  ),
++                                  textDirection: TextDirection.ltr,
++                                ),
++                                const SizedBox(
++                                  height: Dimensions.paddingSizeExtraSmall,
++                                ),
++                              ],
++                            );
++                          },
++                          shrinkWrap: true,
++                          physics: const NeverScrollableScrollPhysics(),
++                          itemCount: scheduleHistories!.length - 1,
++                        ),
++                      ),
++                    ],
++                  )
++                : Column(
+                     mainAxisSize: MainAxisSize.min,
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+-                      Text("${'schedule_changed_by'.tr} ${scheduleHistories![index+1].user!.userType.toString().tr}",
+-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault,),
+-                      ),
+-                      const SizedBox(height: Dimensions.paddingSizeSmall,),
+-                      if(scheduleHistories?[index+1].user?.userType !='provider-admin')
+-                      Text("${scheduleHistories![index+1].user?.firstName.toString()} ${scheduleHistories![index+1].user?.lastName.toString()}",
+-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall,
+-                            color: Theme.of(context).secondaryHeaderColor),
+-                        textDirection: TextDirection.ltr,
++                      Text(
++                        "${'booking'.tr} ${statusHistories?[index - increment].bookingStatus.toString().tr.toLowerCase()} ${'by'.tr} "
++                        "${statusHistories?[index - increment].user?.userType.toString().tr} ",
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeDefault,
++                        ),
+                       ),
+-                      if(scheduleHistories?[index+1].user?.userType=='provider-admin')
+-                        Text("${bookingDetailsContent?.provider?.companyName??""} ",
+-                          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall,
+-                              color: Theme.of(context).secondaryHeaderColor),
+-                          textDirection: TextDirection.ltr,
++
++                      const SizedBox(height: Dimensions.paddingSizeSmall),
++                      Text(
++                        bookingDetailsContent?.provider?.companyName ?? "",
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeSmall,
++                          color: Theme.of(context).secondaryHeaderColor,
+                         ),
++                      ),
+ 
+-                      const SizedBox(height: Dimensions.paddingSizeSmall,),
++                      const SizedBox(height: Dimensions.paddingSizeSmall),
+ 
+-                      Text(DateConverter.dateMonthYearTimeTwentyFourFormat(DateTime.tryParse(scheduleHistories![index+1].schedule!)!),
+-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall,
+-                            color: Theme.of(context).secondaryHeaderColor),
++                      Text(
++                        DateConverter.dateMonthYearTimeTwentyFourFormat(
++                          DateConverter.isoUtcStringToLocalDate(
++                            statusHistories![index - increment].updatedAt!,
++                          ),
++                        ),
++                        style: robotoRegular.copyWith(
++                          fontSize: Dimensions.fontSizeSmall,
++                          color: Theme.of(context).secondaryHeaderColor,
++                        ),
+                         textDirection: TextDirection.ltr,
+                       ),
+-                      const SizedBox(height: Dimensions.paddingSizeExtraSmall,),
+-
++                      const SizedBox(height: Dimensions.paddingSizeDefault),
+                     ],
+-                  );},
+-                  shrinkWrap:true,
+-                  physics: const NeverScrollableScrollPhysics(),
+-                  itemCount: scheduleHistories!.length-1,
+-                ),
+-              ),
+-            ],
+-          )
+-              :Column(
+-            mainAxisSize: MainAxisSize.min,
+-            crossAxisAlignment: CrossAxisAlignment.start,
+-            children: [
+-              Text("${'booking'.tr} ${statusHistories?[index-increment].bookingStatus.toString().tr.toLowerCase()} ${'by'.tr} "
+-                  "${statusHistories?[index-increment].user?.userType.toString().tr} ",
+-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)
+-              ),
+-
+-              const SizedBox(height: Dimensions.paddingSizeSmall),
+-              Text(bookingDetailsContent?.provider?.companyName??"",
+-                  style: robotoRegular.copyWith(
+-                    fontSize: Dimensions.fontSizeSmall,
+-                    color: Theme.of(context).secondaryHeaderColor,
+-                  )
+-              ),
+-
+-              const SizedBox(height: Dimensions.paddingSizeSmall),
+-
+-              Text(DateConverter.dateMonthYearTimeTwentyFourFormat(DateConverter.isoUtcStringToLocalDate(statusHistories![index-increment].updatedAt!)),
+-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall,color: Theme.of(context).secondaryHeaderColor),
+-                textDirection: TextDirection.ltr,
+-              ),
+-              const SizedBox(height: Dimensions.paddingSizeDefault,),
+-            ],
+-          ),
+-          );},
++                  ),
++          );
++        },
+ 
+-        connectorBuilder: (_, index, c) => SolidLineConnector(color: Theme.of(context).colorScheme.primary),
++        connectorBuilder: (_, index, c) =>
++            SolidLineConnector(color: Theme.of(context).colorScheme.primary),
+ 
+         indicatorBuilder: (_, index) {
+           return DotIndicator(
+             color: Theme.of(context).colorScheme.primary,
+-            child: Center(child : NirabIcon(Icons.check,color:light.cardColor)),
++            child: Center(
++              child: NirabIcon(Icons.check, color: light.cardColor),
++            ),
+           );
+         },
+       ),
+     );
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/lib/feature/booking/widget/booking_info.dart b/lib/feature/booking/widget/booking_info.dart
+index 1475812..e6b7f53 100644
+--- a/lib/feature/booking/widget/booking_info.dart
++++ b/lib/feature/booking/widget/booking_info.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/feature/booking/widget/booking_status_widget.dart';
+ import 'package:get/get.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+@@ -84,7 +85,7 @@ class BookingInfo extends StatelessWidget {
+                 img: Images.calendar1,
+                 title: "${'service_schedule_date'.tr} : ",
+                 date: DateConverter.dateMonthYearTimeTwentyFourFormat(
+-                  DateTime.tryParse(bookingDetails.serviceSchedule!)!,
++                  SaudiTime.tryAppointment(bookingDetails.serviceSchedule!)!,
+                 ),
+               ),
+             Gaps.verticalGapOf(Dimensions.paddingSizeExtraSmall),
+diff --git a/lib/feature/booking/widget/booking_workflow_panel.dart b/lib/feature/booking/widget/booking_workflow_panel.dart
+index d717002..60073e2 100644
+--- a/lib/feature/booking/widget/booking_workflow_panel.dart
++++ b/lib/feature/booking/widget/booking_workflow_panel.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/feature/booking/widget/booking_invoices_panel.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+@@ -330,7 +331,7 @@ class _BookingWorkflowPanelState extends State<BookingWorkflowPanel>
+                     ),
+                   if (captured != null)
+                     Text(
+-                      '${'tracking_last_updated'.tr}: ${DateConverter.dateMonthYearTimeTwentyFourFormat(captured.toLocal())}',
++                      '${'tracking_last_updated'.tr}: ${DateConverter.dateMonthYearTimeTwentyFourFormat(SaudiTime.forDisplay(captured))}',
+                     ),
+                   if (_active)
+                     TextButton.icon(
+diff --git a/lib/feature/booking/widget/repeat/all_booking_summary_widget.dart b/lib/feature/booking/widget/repeat/all_booking_summary_widget.dart
+index 8e61dd7..2b351df 100644
+--- a/lib/feature/booking/widget/repeat/all_booking_summary_widget.dart
++++ b/lib/feature/booking/widget/repeat/all_booking_summary_widget.dart
+@@ -1,93 +1,201 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+ 
+ class AllBookingSummaryWidget extends StatelessWidget {
+   final TabController? tabController;
+   final BookingDetailsContent bookingDetails;
+-  const AllBookingSummaryWidget({super.key, this.tabController, required this.bookingDetails,});
++  const AllBookingSummaryWidget({
++    super.key,
++    this.tabController,
++    required this.bookingDetails,
++  });
+ 
+   @override
+   Widget build(BuildContext context) {
+-
+     return Container(
+-      decoration: BoxDecoration(color: Theme.of(context).cardColor , borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+-        boxShadow: Get.find<ThemeController>().darkTheme ? null : searchBoxShadow,
+-      ),//boxShadow: shadow),
+-      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+-
+-      child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+-
+-        Padding(
+-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+-          child: Row( mainAxisAlignment: MainAxisAlignment.spaceBetween ,children: [
+-            Text(
+-              'all_booking_summary'.tr,
+-              style:robotoMedium.copyWith(
+-                color: Theme.of(context).textTheme.bodyLarge!.color!,
+-              ),
++      decoration: BoxDecoration(
++        color: Theme.of(context).cardColor,
++        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
++        boxShadow: Get.find<ThemeController>().darkTheme
++            ? null
++            : searchBoxShadow,
++      ), //boxShadow: shadow),
++      padding: const EdgeInsets.symmetric(
++        vertical: Dimensions.paddingSizeDefault,
++      ),
++
++      child: Column(
++        crossAxisAlignment: CrossAxisAlignment.center,
++        children: [
++          Padding(
++            padding: const EdgeInsets.symmetric(
++              horizontal: Dimensions.paddingSizeDefault,
+             ),
+-            InkWell(
+-              onTap: (){
+-                tabController?.index = 1;
+-              },
+-              child: Text('view_all_booking'.tr, style: robotoBold.copyWith(color: Theme.of(context).colorScheme.primary)),
+-            )
+-          ]),
+-        ),
+-
+-        const SizedBox(height: Dimensions.paddingSizeSmall),
+-        Divider(height: 1, thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.4),),
+-        const SizedBox(height: Dimensions.paddingSizeSmall),
+-
+-        ResponsiveHelper.isDesktop(context) ? Row(children: [
+-          Expanded(child: Column(children: [
+-            _ItemWidget(title: "booking_type", subtitle: "${bookingDetails.bookingType?.toLowerCase()}".tr,),
+-            _ItemWidget(
+-              title: "date_range",
+-              subtitle: DateConverter.convertDateTimeRangeToString(
+-                  DateTimeRange(
+-                    start: DateTime.tryParse(bookingDetails.startDate ?? "") ?? DateTime.now(),
+-                    end: DateTime.tryParse(bookingDetails.endDate ?? "") ?? DateTime.now(),
++            child: Row(
++              mainAxisAlignment: MainAxisAlignment.spaceBetween,
++              children: [
++                Text(
++                  'all_booking_summary'.tr,
++                  style: robotoMedium.copyWith(
++                    color: Theme.of(context).textTheme.bodyLarge!.color!,
+                   ),
+-                  format: "d MMM, y"
+-              ),
+-            ),
+-            _ItemWidget(title: "arrival_time", subtitle: DateConverter.convertDateTimeToTime(DateTime.tryParse(bookingDetails.startDate ?? "") ?? DateTime.now()),),
+-            _ItemWidget(title: "total_amount", subtitle: PriceConverter.convertPrice( bookingDetails.totalBookingAmount ?? 0)),
+-
+-          ])),
+-
+-          Expanded(child: Column(children: [
+-            _ItemWidget(title: "total_booking", subtitle: "${bookingDetails.totalCount ?? ""}"),
+-            _ItemWidget(title: "completed", subtitle: "${bookingDetails.completedCount ?? ""}"),
+-            _ItemWidget(title: "canceled", subtitle: "${bookingDetails.canceledCount ?? ""}"),
+-            _ItemWidget(title: "payment", subtitle: "${bookingDetails.paymentMethod}".tr),
+-          ]))
+-
+-        ]) : Column(children: [
+-          _ItemWidget(title: "booking_type", subtitle: "${bookingDetails.bookingType?.toLowerCase()}".tr,),
+-          _ItemWidget(
+-            title: "date_range",
+-            subtitle: DateConverter.convertDateTimeRangeToString(
+-                DateTimeRange(
+-                  start: DateTime.tryParse(bookingDetails.startDate!) ?? DateTime.now(),
+-                  end: DateTime.tryParse(bookingDetails.endDate!) ?? DateTime.now(),
+                 ),
+-                format: "d MMM, y"
++                InkWell(
++                  onTap: () {
++                    tabController?.index = 1;
++                  },
++                  child: Text(
++                    'view_all_booking'.tr,
++                    style: robotoBold.copyWith(
++                      color: Theme.of(context).colorScheme.primary,
++                    ),
++                  ),
++                ),
++              ],
+             ),
+           ),
+-          _ItemWidget(title: "arrival_time", subtitle: DateConverter.convertDateTimeToTime(DateTime.tryParse(bookingDetails.startDate!) ?? DateTime.now()),),
+-          _ItemWidget(title: "total_booking", subtitle: "${bookingDetails.totalCount ?? ""}"),
+-          _ItemWidget(title: "completed", subtitle: "${bookingDetails.completedCount ?? ""}"),
+-          _ItemWidget(title: "canceled", subtitle: "${bookingDetails.canceledCount ?? ""}"),
+-          _ItemWidget(title: "total_amount", subtitle: PriceConverter.convertPrice( bookingDetails.totalBookingAmount ?? 0)),
+-          _ItemWidget(title: "payment", subtitle: "${bookingDetails.paymentMethod}".tr),
+-        ])
+-
+ 
+-
+-
+-      ]),
++          const SizedBox(height: Dimensions.paddingSizeSmall),
++          Divider(
++            height: 1,
++            thickness: 1,
++            color: Theme.of(context).hintColor.withValues(alpha: 0.4),
++          ),
++          const SizedBox(height: Dimensions.paddingSizeSmall),
++
++          ResponsiveHelper.isDesktop(context)
++              ? Row(
++                  children: [
++                    Expanded(
++                      child: Column(
++                        children: [
++                          _ItemWidget(
++                            title: "booking_type",
++                            subtitle:
++                                "${bookingDetails.bookingType?.toLowerCase()}"
++                                    .tr,
++                          ),
++                          _ItemWidget(
++                            title: "date_range",
++                            subtitle:
++                                DateConverter.convertDateTimeRangeToString(
++                                  DateTimeRange(
++                                    start:
++                                        SaudiTime.tryAppointment(
++                                          bookingDetails.startDate ?? "",
++                                        ) ??
++                                        DateTime.now(),
++                                    end:
++                                        SaudiTime.tryAppointment(
++                                          bookingDetails.endDate ?? "",
++                                        ) ??
++                                        DateTime.now(),
++                                  ),
++                                  format: "d MMM, y",
++                                ),
++                          ),
++                          _ItemWidget(
++                            title: "arrival_time",
++                            subtitle: DateConverter.convertDateTimeToTime(
++                              SaudiTime.tryAppointment(
++                                    bookingDetails.startDate ?? "",
++                                  ) ??
++                                  DateTime.now(),
++                            ),
++                          ),
++                          _ItemWidget(
++                            title: "total_amount",
++                            subtitle: PriceConverter.convertPrice(
++                              bookingDetails.totalBookingAmount ?? 0,
++                            ),
++                          ),
++                        ],
++                      ),
++                    ),
++
++                    Expanded(
++                      child: Column(
++                        children: [
++                          _ItemWidget(
++                            title: "total_booking",
++                            subtitle: "${bookingDetails.totalCount ?? ""}",
++                          ),
++                          _ItemWidget(
++                            title: "completed",
++                            subtitle: "${bookingDetails.completedCount ?? ""}",
++                          ),
++                          _ItemWidget(
++                            title: "canceled",
++                            subtitle: "${bookingDetails.canceledCount ?? ""}",
++                          ),
++                          _ItemWidget(
++                            title: "payment",
++                            subtitle: "${bookingDetails.paymentMethod}".tr,
++                          ),
++                        ],
++                      ),
++                    ),
++                  ],
++                )
++              : Column(
++                  children: [
++                    _ItemWidget(
++                      title: "booking_type",
++                      subtitle:
++                          "${bookingDetails.bookingType?.toLowerCase()}".tr,
++                    ),
++                    _ItemWidget(
++                      title: "date_range",
++                      subtitle: DateConverter.convertDateTimeRangeToString(
++                        DateTimeRange(
++                          start:
++                              SaudiTime.tryAppointment(
++                                bookingDetails.startDate!,
++                              ) ??
++                              DateTime.now(),
++                          end:
++                              SaudiTime.tryAppointment(
++                                bookingDetails.endDate!,
++                              ) ??
++                              DateTime.now(),
++                        ),
++                        format: "d MMM, y",
++                      ),
++                    ),
++                    _ItemWidget(
++                      title: "arrival_time",
++                      subtitle: DateConverter.convertDateTimeToTime(
++                        SaudiTime.tryAppointment(bookingDetails.startDate!) ??
++                            DateTime.now(),
++                      ),
++                    ),
++                    _ItemWidget(
++                      title: "total_booking",
++                      subtitle: "${bookingDetails.totalCount ?? ""}",
++                    ),
++                    _ItemWidget(
++                      title: "completed",
++                      subtitle: "${bookingDetails.completedCount ?? ""}",
++                    ),
++                    _ItemWidget(
++                      title: "canceled",
++                      subtitle: "${bookingDetails.canceledCount ?? ""}",
++                    ),
++                    _ItemWidget(
++                      title: "total_amount",
++                      subtitle: PriceConverter.convertPrice(
++                        bookingDetails.totalBookingAmount ?? 0,
++                      ),
++                    ),
++                    _ItemWidget(
++                      title: "payment",
++                      subtitle: "${bookingDetails.paymentMethod}".tr,
++                    ),
++                  ],
++                ),
++        ],
++      ),
+     );
+   }
+ }
+@@ -99,19 +207,27 @@ class _ItemWidget extends StatelessWidget {
+ 
+   @override
+   Widget build(BuildContext context) {
+-    return Padding(padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: 3),
+-      child: Row(children: [
+-        Expanded(
+-          flex: 3,
+-          child: Text(title.tr, style: robotoLight,),
+-        ),
+-        const Text("    :  "),
+-        Expanded(
+-          flex: 4,
+-          child: Text( subtitle , style: robotoRegular.copyWith(height: 1.3,fontSize: Dimensions.fontSizeSmall),),
+-        ),
+-      ]),
++    return Padding(
++      padding: const EdgeInsets.symmetric(
++        horizontal: Dimensions.paddingSizeDefault,
++        vertical: 3,
++      ),
++      child: Row(
++        children: [
++          Expanded(flex: 3, child: Text(title.tr, style: robotoLight)),
++          const Text("    :  "),
++          Expanded(
++            flex: 4,
++            child: Text(
++              subtitle,
++              style: robotoRegular.copyWith(
++                height: 1.3,
++                fontSize: Dimensions.fontSizeSmall,
++              ),
++            ),
++          ),
++        ],
++      ),
+     );
+   }
+ }
+-
+diff --git a/lib/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart b/lib/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart
+index 939ab8a..c764dd1 100644
+--- a/lib/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart
++++ b/lib/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart
+@@ -1,24 +1,30 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+ 
+-
+ class CustomRepeatBookingScheduleBottomSheet extends StatefulWidget {
+   final BookingDetailsContent bookingDetailsContent;
+-  const CustomRepeatBookingScheduleBottomSheet({super.key, required this.bookingDetailsContent,});
++  const CustomRepeatBookingScheduleBottomSheet({
++    super.key,
++    required this.bookingDetailsContent,
++  });
+ 
+   @override
+-  State<CustomRepeatBookingScheduleBottomSheet> createState() => _ProductBottomSheetState();
++  State<CustomRepeatBookingScheduleBottomSheet> createState() =>
++      _ProductBottomSheetState();
+ }
+ 
+-class _ProductBottomSheetState extends State<CustomRepeatBookingScheduleBottomSheet> {
++class _ProductBottomSheetState
++    extends State<CustomRepeatBookingScheduleBottomSheet> {
+   @override
+-
+   @override
+   Widget build(BuildContext context) {
+-    if(ResponsiveHelper.isDesktop(context)) {
+-      return  Dialog(
+-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
++    if (ResponsiveHelper.isDesktop(context)) {
++      return Dialog(
++        shape: RoundedRectangleBorder(
++          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
++        ),
+         insetPadding: const EdgeInsets.all(30),
+         clipBehavior: Clip.antiAliasWithSaveLayer,
+         child: pointerInterceptor(),
+@@ -27,86 +33,152 @@ class _ProductBottomSheetState extends State<CustomRepeatBookingScheduleBottomSh
+     return pointerInterceptor();
+   }
+ 
+-  Widget pointerInterceptor(){
+-
+-    List<RepeatBooking> repeatBookingList = widget.bookingDetailsContent.repeatBookingList ?? [];
++  Widget pointerInterceptor() {
++    List<RepeatBooking> repeatBookingList =
++        widget.bookingDetailsContent.repeatBookingList ?? [];
+ 
+     return Padding(
+-      padding: EdgeInsets.only(top: ResponsiveHelper.isWeb()? 0 :Dimensions.cartDialogPadding),
++      padding: EdgeInsets.only(
++        top: ResponsiveHelper.isWeb() ? 0 : Dimensions.cartDialogPadding,
++      ),
+       child: PointerInterceptor(
+         child: Container(
+-          width:ResponsiveHelper.isDesktop(context)? Dimensions.webMaxWidth / 2 :Dimensions.webMaxWidth,
++          width: ResponsiveHelper.isDesktop(context)
++              ? Dimensions.webMaxWidth / 2
++              : Dimensions.webMaxWidth,
+           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+           decoration: BoxDecoration(
+             color: Theme.of(context).cardColor,
+-            borderRadius:  BorderRadius.vertical(
+-              top: Radius.circular( ResponsiveHelper.isDesktop(context) ? Dimensions.radiusDefault : Dimensions.radiusExtraLarge),
+-            ),
+-          ),
+-          child: Column( mainAxisSize: MainAxisSize.min, children: [
+-
+-            ResponsiveHelper.isDesktop(context) ?
+-            Align(
+-              alignment: Alignment.topRight,
+-              child: InkWell(
+-                onTap: ()=> Get.back(),
+-                child: Container(
+-                  decoration: BoxDecoration(
+-                    shape: BoxShape.circle,
+-                    color: Get.isDarkMode ? Colors.grey.shade600 : Colors.grey.shade400
+-                  ),
+-                  padding: const EdgeInsets.all(3),
+-                  child: const NirabIcon(Icons.close, color: Colors.white, size: 18,),
+-                ),
++            borderRadius: BorderRadius.vertical(
++              top: Radius.circular(
++                ResponsiveHelper.isDesktop(context)
++                    ? Dimensions.radiusDefault
++                    : Dimensions.radiusExtraLarge,
+               ),
+-            ) : Container(
+-              height: 3,width: 80,
+-              decoration: BoxDecoration(
+-                color: Theme.of(context).hintColor.withValues(alpha: 0.5),
+-                borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge)
+-              ),
+-              margin: const EdgeInsets.only(top: Dimensions.paddingSizeLarge, bottom: Dimensions.paddingSizeLarge),
+             ),
+-
+-            Text('scheduled_list'.tr, style: robotoMedium,),
+-            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+-
+-            Text("you_will_receive_your_service_in_the_days_bellow".tr, style: robotoLight,),
+-            const SizedBox(height: Dimensions.paddingSizeDefault),
+-
+-            ConstrainedBox(
+-              constraints: BoxConstraints(minHeight: Get.height * 0.1, maxHeight: Get.height * 0.5),
+-              child: ListView.builder(
+-                shrinkWrap: true,
+-                itemCount: repeatBookingList.length,
+-                physics: const ClampingScrollPhysics(),
+-                itemBuilder: (context, index) {
+-                  return Container(
+-                    padding: const EdgeInsets.symmetric(vertical:Dimensions.paddingSizeDefault, horizontal: Dimensions.paddingSizeDefault),
+-                    decoration: BoxDecoration(
+-                      color: Theme.of(context).hoverColor,
+-                      borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusSeven)),
++          ),
++          child: Column(
++            mainAxisSize: MainAxisSize.min,
++            children: [
++              ResponsiveHelper.isDesktop(context)
++                  ? Align(
++                      alignment: Alignment.topRight,
++                      child: InkWell(
++                        onTap: () => Get.back(),
++                        child: Container(
++                          decoration: BoxDecoration(
++                            shape: BoxShape.circle,
++                            color: Get.isDarkMode
++                                ? Colors.grey.shade600
++                                : Colors.grey.shade400,
++                          ),
++                          padding: const EdgeInsets.all(3),
++                          child: const NirabIcon(
++                            Icons.close,
++                            color: Colors.white,
++                            size: 18,
++                          ),
++                        ),
++                      ),
++                    )
++                  : Container(
++                      height: 3,
++                      width: 80,
++                      decoration: BoxDecoration(
++                        color: Theme.of(
++                          context,
++                        ).hintColor.withValues(alpha: 0.5),
++                        borderRadius: BorderRadius.circular(
++                          Dimensions.radiusExtraLarge,
++                        ),
++                      ),
++                      margin: const EdgeInsets.only(
++                        top: Dimensions.paddingSizeLarge,
++                        bottom: Dimensions.paddingSizeLarge,
++                      ),
+                     ),
+-                    margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall, left: 10, right: 10),
+-                    child: GetBuilder<CartController>(builder: (cartController){
+-                      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+-                        Text( DateConverter.dateStringMonthYear(DateTime.tryParse(repeatBookingList[index].serviceSchedule!)),style: robotoRegular,),
+ 
+-                        Row(children: [
+-                          Text(DateConverter.convertDateTimeToTime(DateTime.now()), style: robotoRegular,),
+-                          const SizedBox(width: Dimensions.paddingSizeSmall,),
+-                          NirabIcon(Icons.access_time, size: 17, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),)
+-                        ])
++              Text('scheduled_list'.tr, style: robotoMedium),
++              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+ 
+-                      ]);
+-                    },
+-                    ),
+-                  );
+-                },
++              Text(
++                "you_will_receive_your_service_in_the_days_bellow".tr,
++                style: robotoLight,
+               ),
+-            ),
++              const SizedBox(height: Dimensions.paddingSizeDefault),
+ 
+-          ])
++              ConstrainedBox(
++                constraints: BoxConstraints(
++                  minHeight: Get.height * 0.1,
++                  maxHeight: Get.height * 0.5,
++                ),
++                child: ListView.builder(
++                  shrinkWrap: true,
++                  itemCount: repeatBookingList.length,
++                  physics: const ClampingScrollPhysics(),
++                  itemBuilder: (context, index) {
++                    return Container(
++                      padding: const EdgeInsets.symmetric(
++                        vertical: Dimensions.paddingSizeDefault,
++                        horizontal: Dimensions.paddingSizeDefault,
++                      ),
++                      decoration: BoxDecoration(
++                        color: Theme.of(context).hoverColor,
++                        borderRadius: const BorderRadius.all(
++                          Radius.circular(Dimensions.radiusSeven),
++                        ),
++                      ),
++                      margin: const EdgeInsets.only(
++                        bottom: Dimensions.paddingSizeSmall,
++                        left: 10,
++                        right: 10,
++                      ),
++                      child: GetBuilder<CartController>(
++                        builder: (cartController) {
++                          return Row(
++                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
++                            children: [
++                              Text(
++                                DateConverter.dateStringMonthYear(
++                                  SaudiTime.tryAppointment(
++                                    repeatBookingList[index].serviceSchedule!,
++                                  ),
++                                ),
++                                style: robotoRegular,
++                              ),
++
++                              Row(
++                                children: [
++                                  Text(
++                                    DateConverter.convertDateTimeToTime(
++                                      DateTime.now(),
++                                    ),
++                                    style: robotoRegular,
++                                  ),
++                                  const SizedBox(
++                                    width: Dimensions.paddingSizeSmall,
++                                  ),
++                                  NirabIcon(
++                                    Icons.access_time,
++                                    size: 17,
++                                    color: Theme.of(context)
++                                        .textTheme
++                                        .bodyLarge
++                                        ?.color
++                                        ?.withValues(alpha: 0.6),
++                                  ),
++                                ],
++                              ),
++                            ],
++                          );
++                        },
++                      ),
++                    );
++                  },
++                ),
++              ),
++            ],
++          ),
+         ),
+       ),
+     );
+diff --git a/lib/feature/booking/widget/repeat/next_service_widget.dart b/lib/feature/booking/widget/repeat/next_service_widget.dart
+index 11f5412..f5895b5 100644
+--- a/lib/feature/booking/widget/repeat/next_service_widget.dart
++++ b/lib/feature/booking/widget/repeat/next_service_widget.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/feature/booking/widget/booking_status_widget.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+@@ -8,94 +9,160 @@ class NextServiceWidget extends StatelessWidget {
+ 
+   @override
+   Widget build(BuildContext context) {
+-
+     return Container(
+-      decoration: BoxDecoration(color: Theme.of(context).cardColor , borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+-        boxShadow: Get.find<ThemeController>().darkTheme ? null : searchBoxShadow,
++      decoration: BoxDecoration(
++        color: Theme.of(context).cardColor,
++        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
++        boxShadow: Get.find<ThemeController>().darkTheme
++            ? null
++            : searchBoxShadow,
++      ),
++      padding: const EdgeInsets.symmetric(
++        vertical: Dimensions.paddingSizeDefault,
+       ),
+-      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+-
+-      child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+ 
+-        Padding(
+-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+-          child: Row( mainAxisAlignment: MainAxisAlignment.spaceBetween ,children: [
+-            Text(
+-              booking.bookingStatus == "accepted" ? 'next_service'.tr : "ongoing_service".tr,
+-              style:robotoMedium.copyWith(
+-                color: Theme.of(context).textTheme.bodyLarge!.color!,
+-              ),
++      child: Column(
++        crossAxisAlignment: CrossAxisAlignment.center,
++        children: [
++          Padding(
++            padding: const EdgeInsets.symmetric(
++              horizontal: Dimensions.paddingSizeDefault,
+             ),
+-            InkWell(
+-              onTap: (){
+-                Get.toNamed(RouteHelper.getBookingDetailsScreen(subBookingId : booking.id!));
+-              },
+-              child: Text('view_details'.tr, style: robotoBold.copyWith(color: Theme.of(context).colorScheme.primary)),
+-            )
+-          ]),
+-        ),
+-
+-        const SizedBox(height: Dimensions.paddingSizeSmall),
+-        Divider(height: 1, thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.4),),
+-        const SizedBox(height: Dimensions.paddingSizeSmall),
+-
+-        Padding(
+-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+-          child: Column(children: [
+-            Row( mainAxisAlignment: MainAxisAlignment.spaceBetween ,children: [
+-              Text(
+-                'ID # ${booking.readableId ?? ""}',
+-                style:robotoMedium.copyWith(
+-                  color: Theme.of(context).textTheme.bodyLarge!.color!,
+-                  fontSize: Dimensions.fontSizeSmall + 1,
+-                ),
+-              ),
+-              Text( PriceConverter.convertPrice(booking.totalBookingAmount ?? 0), style: robotoMedium),
+-            ]),
+-          ]),
+-        ),
+-        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+-        Padding(
+-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+-          child: Column(children: [
+-            Row( mainAxisAlignment: MainAxisAlignment.spaceBetween ,children: [
+-              BookingStatusButtonWidget(bookingStatus: booking.bookingStatus,),
+-              Row( mainAxisAlignment: MainAxisAlignment.center, children: [
+-                Text("${"payment_status".tr} :  ", style: robotoLight),
++            child: Row(
++              mainAxisAlignment: MainAxisAlignment.spaceBetween,
++              children: [
+                 Text(
+-                  booking.isPaid == 1 ?"paid".tr : "unpaid".tr,
++                  booking.bookingStatus == "accepted"
++                      ? 'next_service'.tr
++                      : "ongoing_service".tr,
+                   style: robotoMedium.copyWith(
+-                    color:  booking.isPaid == 1 ? Colors.green : Theme.of(context).colorScheme.error,
+-                    fontSize: Dimensions.fontSizeSmall + 1
++                    color: Theme.of(context).textTheme.bodyLarge!.color!,
++                  ),
++                ),
++                InkWell(
++                  onTap: () {
++                    Get.toNamed(
++                      RouteHelper.getBookingDetailsScreen(
++                        subBookingId: booking.id!,
++                      ),
++                    );
++                  },
++                  child: Text(
++                    'view_details'.tr,
++                    style: robotoBold.copyWith(
++                      color: Theme.of(context).colorScheme.primary,
++                    ),
+                   ),
+                 ),
++              ],
++            ),
++          ),
+ 
+-              ]),
+-            ]),
++          const SizedBox(height: Dimensions.paddingSizeSmall),
++          Divider(
++            height: 1,
++            thickness: 1,
++            color: Theme.of(context).hintColor.withValues(alpha: 0.4),
++          ),
++          const SizedBox(height: Dimensions.paddingSizeSmall),
+ 
+-            const SizedBox(height: Dimensions.paddingSizeDefault),
+-            DottedBorder(
+-              options: RoundedRectDottedBorderOptions(
+-                dashPattern: const [4, 2],
+-                strokeWidth: 1.1,
+-                color: Theme.of(context).hintColor.withValues(alpha: 0.2),
+-                radius: const Radius.circular(Dimensions.radiusDefault),
+-              ),
+-              child: Container(
+-                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault, horizontal: Dimensions.paddingSizeSmall),
+-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05)),
+-                  child: Column(children: [
+-                    const Row(),
+-                    Text("scheduled_at".tr, style: robotoRegular),
+-                    const SizedBox(height: Dimensions.paddingSizeEight),
+-                    Text(DateConverter.dateMonthYearTime(DateTime.tryParse(booking.serviceSchedule!)).tr, style: robotoLight,),
+-                  ])
+-              ),
++          Padding(
++            padding: const EdgeInsets.symmetric(
++              horizontal: Dimensions.paddingSizeDefault,
+             ),
+-          ]),
+-        ),
++            child: Column(
++              children: [
++                Row(
++                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
++                  children: [
++                    Text(
++                      'ID # ${booking.readableId ?? ""}',
++                      style: robotoMedium.copyWith(
++                        color: Theme.of(context).textTheme.bodyLarge!.color!,
++                        fontSize: Dimensions.fontSizeSmall + 1,
++                      ),
++                    ),
++                    Text(
++                      PriceConverter.convertPrice(
++                        booking.totalBookingAmount ?? 0,
++                      ),
++                      style: robotoMedium,
++                    ),
++                  ],
++                ),
++              ],
++            ),
++          ),
++          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
++          Padding(
++            padding: const EdgeInsets.symmetric(
++              horizontal: Dimensions.paddingSizeDefault,
++            ),
++            child: Column(
++              children: [
++                Row(
++                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
++                  children: [
++                    BookingStatusButtonWidget(
++                      bookingStatus: booking.bookingStatus,
++                    ),
++                    Row(
++                      mainAxisAlignment: MainAxisAlignment.center,
++                      children: [
++                        Text("${"payment_status".tr} :  ", style: robotoLight),
++                        Text(
++                          booking.isPaid == 1 ? "paid".tr : "unpaid".tr,
++                          style: robotoMedium.copyWith(
++                            color: booking.isPaid == 1
++                                ? Colors.green
++                                : Theme.of(context).colorScheme.error,
++                            fontSize: Dimensions.fontSizeSmall + 1,
++                          ),
++                        ),
++                      ],
++                    ),
++                  ],
++                ),
+ 
+-      ]),
++                const SizedBox(height: Dimensions.paddingSizeDefault),
++                DottedBorder(
++                  options: RoundedRectDottedBorderOptions(
++                    dashPattern: const [4, 2],
++                    strokeWidth: 1.1,
++                    color: Theme.of(context).hintColor.withValues(alpha: 0.2),
++                    radius: const Radius.circular(Dimensions.radiusDefault),
++                  ),
++                  child: Container(
++                    padding: const EdgeInsets.symmetric(
++                      vertical: Dimensions.paddingSizeDefault,
++                      horizontal: Dimensions.paddingSizeSmall,
++                    ),
++                    decoration: BoxDecoration(
++                      borderRadius: BorderRadius.circular(5),
++                      color: Theme.of(
++                        context,
++                      ).colorScheme.primary.withValues(alpha: 0.05),
++                    ),
++                    child: Column(
++                      children: [
++                        const Row(),
++                        Text("scheduled_at".tr, style: robotoRegular),
++                        const SizedBox(height: Dimensions.paddingSizeEight),
++                        Text(
++                          DateConverter.dateMonthYearTime(
++                            SaudiTime.tryAppointment(booking.serviceSchedule!),
++                          ).tr,
++                          style: robotoLight,
++                        ),
++                      ],
++                    ),
++                  ),
++                ),
++              ],
++            ),
++          ),
++        ],
++      ),
+     );
+   }
+ }
+diff --git a/lib/feature/booking/widget/repeat/repeat_booking_service_log_widget.dart b/lib/feature/booking/widget/repeat/repeat_booking_service_log_widget.dart
+index acb92ed..320b2ae 100644
+--- a/lib/feature/booking/widget/repeat/repeat_booking_service_log_widget.dart
++++ b/lib/feature/booking/widget/repeat/repeat_booking_service_log_widget.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/common/models/popup_menu_model.dart';
+ import 'package:nirab_clean/feature/booking/view/repeat_booking_details_screen.dart';
+@@ -367,7 +368,7 @@ class _ServiceLogItem extends StatelessWidget {
+                           (title == "upcoming")
+                               ? Text(
+                                   DateConverter.dateMonthYearTime(
+-                                    DateTime.tryParse(
++                                    SaudiTime.tryAppointment(
+                                       serviceList[index]!.serviceSchedule!,
+                                     ),
+                                   ),
+@@ -414,7 +415,7 @@ class _ServiceLogItem extends StatelessWidget {
+                                                 ),
+                                                 Text(
+                                                   DateConverter.dateMonthYearTime(
+-                                                    DateTime.tryParse(
++                                                    SaudiTime.tryAppointment(
+                                                       serviceList[index]!
+                                                           .serviceSchedule!,
+                                                     ),
+@@ -436,7 +437,7 @@ class _ServiceLogItem extends StatelessWidget {
+                                                 ),
+                                                 Text(
+                                                   DateConverter.dateMonthYearTime(
+-                                                    DateTime.tryParse(
++                                                    SaudiTime.tryAppointment(
+                                                       serviceList[index]!
+                                                           .serviceSchedule!,
+                                                     ),
+diff --git a/lib/feature/booking/widget/repeat/schedule_widget.dart b/lib/feature/booking/widget/repeat/schedule_widget.dart
+index df411e4..16d14eb 100644
+--- a/lib/feature/booking/widget/repeat/schedule_widget.dart
++++ b/lib/feature/booking/widget/repeat/schedule_widget.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/feature/booking/widget/repeat/custom_repeat_booking_bottom_sheet.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+@@ -8,99 +9,160 @@ class ScheduleWidget extends StatelessWidget {
+ 
+   @override
+   Widget build(BuildContext context) {
+-
+     List<String> weekNames = bookingDetailsContent.weekNames ?? [];
+ 
+     return Container(
+-      decoration: BoxDecoration(color: Theme.of(context).cardColor , borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+-        boxShadow: Get.find<ThemeController>().darkTheme ? null : searchBoxShadow,
+-      ),//boxShadow: shadow),
++      decoration: BoxDecoration(
++        color: Theme.of(context).cardColor,
++        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
++        boxShadow: Get.find<ThemeController>().darkTheme
++            ? null
++            : searchBoxShadow,
++      ), //boxShadow: shadow),
+       padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+-      child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.center , children: [
+-
+-        Text(
+-          'this_booking_will_be_continued'.tr,
+-          style:robotoMedium.copyWith(
+-            color: Theme.of(context).textTheme.bodyLarge!.color!,
+-            fontSize: Dimensions.fontSizeSmall + 1,
++      child: Column(
++        crossAxisAlignment: CrossAxisAlignment.center,
++        mainAxisAlignment: MainAxisAlignment.center,
++        children: [
++          Text(
++            'this_booking_will_be_continued'.tr,
++            style: robotoMedium.copyWith(
++              color: Theme.of(context).textTheme.bodyLarge!.color!,
++              fontSize: Dimensions.fontSizeSmall + 1,
++            ),
+           ),
+-        ),
+-        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+-
+-        (bookingDetailsContent.bookingType?.toLowerCase() == "weekly") ?
+-         Wrap(
+-           spacing: 8.0, // Horizontal space between the children
+-           runSpacing: 4.0,
+-           children: weekNames.map((entry) {
+-             return Text(entry.toLowerCase().tr, style:robotoLight.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color!),);
+-           }).toList(),
++          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+ 
+-         ) : Text(
+-          bookingDetailsContent.bookingType?.toLowerCase() == "daily"  ?
+-          "${"daily_at".tr } ${DateConverter.convert24HourTimeTo12HourTime(DateTime.tryParse(bookingDetailsContent.time!)!)}": "within_the_selected_days".tr ,
+-          style:robotoLight.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color!),
+-        ),
+-        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
++          (bookingDetailsContent.bookingType?.toLowerCase() == "weekly")
++              ? Wrap(
++                  spacing: 8.0, // Horizontal space between the children
++                  runSpacing: 4.0,
++                  children: weekNames.map((entry) {
++                    return Text(
++                      entry.toLowerCase().tr,
++                      style: robotoLight.copyWith(
++                        color: Theme.of(context).textTheme.bodyLarge!.color!,
++                      ),
++                    );
++                  }).toList(),
++                )
++              : Text(
++                  bookingDetailsContent.bookingType?.toLowerCase() == "daily"
++                      ? "${"daily_at".tr} ${DateConverter.convert24HourTimeTo12HourTime(SaudiTime.tryAppointment(bookingDetailsContent.time!)!)}"
++                      : "within_the_selected_days".tr,
++                  style: robotoLight.copyWith(
++                    color: Theme.of(context).textTheme.bodyLarge!.color!,
++                  ),
++                ),
++          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+ 
+-        Text.rich(
+-          TextSpan(
+-            style: DefaultTextStyle.of(context).style,
+-            children: [
+-              TextSpan(text: bookingDetailsContent.bookingType?.toLowerCase() != "weekly" ? 'from'.tr : 'every_week_from'.tr, style: robotoLight),
+-              TextSpan(text: "  ${DateConverter.dateStringMonthYear(DateTime.tryParse(bookingDetailsContent.startDate??"") ?? DateTime.now())}", style: robotoBold.copyWith(
+-                color: Theme.of(context).colorScheme.primary, fontSize: Dimensions.fontSizeSmall
+-              )),
+-              TextSpan(text: "  ${'to'.tr}  ", style: robotoLight),
+-              TextSpan(text: " ${DateConverter.dateStringMonthYear(DateTime.tryParse(bookingDetailsContent.endDate??"") ?? DateTime.now() )}", style: robotoBold.copyWith(
+-                color: Theme.of(context).colorScheme.primary, fontSize: Dimensions.fontSizeSmall
+-              )),
+-            ],
+-          ),
+-          textAlign: TextAlign.center,
+-        ),
+-        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+-
+-        Center(
+-          child: Text.rich(
++          Text.rich(
+             TextSpan(
+               style: DefaultTextStyle.of(context).style,
+               children: [
+-                TextSpan(text: 'you_will_receive_this_services_total'.tr, style: robotoLight),
+-                TextSpan(text: " ${bookingDetailsContent.totalCount ?? ""} ${'times'.tr}", style: robotoBold.copyWith(
+-                  color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: Dimensions.fontSizeSmall
+-                )),
++                TextSpan(
++                  text:
++                      bookingDetailsContent.bookingType?.toLowerCase() !=
++                          "weekly"
++                      ? 'from'.tr
++                      : 'every_week_from'.tr,
++                  style: robotoLight,
++                ),
++                TextSpan(
++                  text:
++                      "  ${DateConverter.dateStringMonthYear(SaudiTime.tryAppointment(bookingDetailsContent.startDate ?? "") ?? DateTime.now())}",
++                  style: robotoBold.copyWith(
++                    color: Theme.of(context).colorScheme.primary,
++                    fontSize: Dimensions.fontSizeSmall,
++                  ),
++                ),
++                TextSpan(text: "  ${'to'.tr}  ", style: robotoLight),
++                TextSpan(
++                  text:
++                      " ${DateConverter.dateStringMonthYear(SaudiTime.tryAppointment(bookingDetailsContent.endDate ?? "") ?? DateTime.now())}",
++                  style: robotoBold.copyWith(
++                    color: Theme.of(context).colorScheme.primary,
++                    fontSize: Dimensions.fontSizeSmall,
++                  ),
++                ),
+               ],
+             ),
+             textAlign: TextAlign.center,
+           ),
+-        ),
++          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+ 
+-        if(bookingDetailsContent.bookingType?.toLowerCase() == "custom") InkWell(
+-          onTap: () {
+-            if(ResponsiveHelper.isDesktop(context)){
+-              Get.dialog( CustomRepeatBookingScheduleBottomSheet(bookingDetailsContent: bookingDetailsContent,));
+-            }else{
+-              showModalBottomSheet(
+-                context: context, useRootNavigator: true,
+-                isScrollControlled: true, backgroundColor: Colors.transparent,
+-                builder: (context) =>  CustomRepeatBookingScheduleBottomSheet(bookingDetailsContent: bookingDetailsContent,),
+-              );
+-            }
+-          },
+-          child: Container(
+-            decoration: BoxDecoration(
+-              borderRadius: BorderRadius.circular(Dimensions.radiusSeven),
+-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
++          Center(
++            child: Text.rich(
++              TextSpan(
++                style: DefaultTextStyle.of(context).style,
++                children: [
++                  TextSpan(
++                    text: 'you_will_receive_this_services_total'.tr,
++                    style: robotoLight,
++                  ),
++                  TextSpan(
++                    text:
++                        " ${bookingDetailsContent.totalCount ?? ""} ${'times'.tr}",
++                    style: robotoBold.copyWith(
++                      color: Theme.of(context).textTheme.bodyLarge?.color,
++                      fontSize: Dimensions.fontSizeSmall,
++                    ),
++                  ),
++                ],
++              ),
++              textAlign: TextAlign.center,
+             ),
+-            margin: const EdgeInsets.only(top: Dimensions.paddingSizeDefault),
+-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
+-            child: Text('view_schedules'.tr, style: robotoBold.copyWith(color: Theme.of(context).colorScheme.primary, fontSize: Dimensions.fontSizeSmall),),
+           ),
+-        ),
+ 
+-        const SizedBox(height: Dimensions.paddingSizeTine),
++          if (bookingDetailsContent.bookingType?.toLowerCase() == "custom")
++            InkWell(
++              onTap: () {
++                if (ResponsiveHelper.isDesktop(context)) {
++                  Get.dialog(
++                    CustomRepeatBookingScheduleBottomSheet(
++                      bookingDetailsContent: bookingDetailsContent,
++                    ),
++                  );
++                } else {
++                  showModalBottomSheet(
++                    context: context,
++                    useRootNavigator: true,
++                    isScrollControlled: true,
++                    backgroundColor: Colors.transparent,
++                    builder: (context) =>
++                        CustomRepeatBookingScheduleBottomSheet(
++                          bookingDetailsContent: bookingDetailsContent,
++                        ),
++                  );
++                }
++              },
++              child: Container(
++                decoration: BoxDecoration(
++                  borderRadius: BorderRadius.circular(Dimensions.radiusSeven),
++                  color: Theme.of(
++                    context,
++                  ).colorScheme.primary.withValues(alpha: 0.1),
++                ),
++                margin: const EdgeInsets.only(
++                  top: Dimensions.paddingSizeDefault,
++                ),
++                padding: const EdgeInsets.symmetric(
++                  horizontal: Dimensions.paddingSizeDefault,
++                  vertical: Dimensions.paddingSizeExtraSmall,
++                ),
++                child: Text(
++                  'view_schedules'.tr,
++                  style: robotoBold.copyWith(
++                    color: Theme.of(context).colorScheme.primary,
++                    fontSize: Dimensions.fontSizeSmall,
++                  ),
++                ),
++              ),
++            ),
+ 
+-      ]),
++          const SizedBox(height: Dimensions.paddingSizeTine),
++        ],
++      ),
+     );
+   }
+ }
+diff --git a/lib/feature/checkout/controller/schedule_controller.dart b/lib/feature/checkout/controller/schedule_controller.dart
+index fe031f5..60f1d2c 100644
+--- a/lib/feature/checkout/controller/schedule_controller.dart
++++ b/lib/feature/checkout/controller/schedule_controller.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:get/get.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:intl/intl.dart';
+@@ -22,10 +23,10 @@ class ScheduleController extends GetxController implements GetxService {
+   ScheduleType? _initialSelectedScheduleType;
+   ScheduleType? get initialSelectedScheduleType => _initialSelectedScheduleType;
+ 
+-  String _selectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
++  String _selectedDate = DateFormat('yyyy-MM-dd').format(SaudiTime.now());
+   String _selectedTime = DateFormat(
+     'HH:mm:ss',
+-  ).format(DateTime.now().add(const Duration(minutes: 2)));
++  ).format(SaudiTime.now().add(const Duration(minutes: 2)));
+ 
+   String get selectedDate => _selectedDate;
+   set selectedDate(String value) {
+@@ -84,7 +85,7 @@ class ScheduleController extends GetxController implements GetxService {
+     final wireSchedule = schedule == _scheduleTime
+         ? (_selectedSlotStartsAt ?? schedule)
+         : schedule;
+-    final startsAt = DateTime.tryParse(wireSchedule);
++    final startsAt = SaudiTime.tryAppointment(wireSchedule);
+     if (startsAt == null) return false;
+     final first = post != null || cart.isEmpty ? null : cart.first;
+     try {
+@@ -205,7 +206,7 @@ class ScheduleController extends GetxController implements GetxService {
+     } else if (_initialSelectedScheduleType == ScheduleType.asap) {
+       _selectedScheduleType = ScheduleType.asap;
+       scheduleTime =
+-          "${DateFormat('yyyy-MM-dd').format(DateTime.now())} ${DateFormat('HH:mm:ss').format(DateTime.now().add(const Duration(minutes: 2)))}";
++          "${DateFormat('yyyy-MM-dd').format(SaudiTime.now())} ${DateFormat('HH:mm:ss').format(SaudiTime.now().add(const Duration(minutes: 2)))}";
+     } else {
+       _selectedScheduleType = ScheduleType.schedule;
+       scheduleTime = "$selectedDate $selectedTime";
+@@ -234,7 +235,7 @@ class ScheduleController extends GetxController implements GetxService {
+   DateTime? getSelectedDateTime() {
+     return _selectedScheduleType == ScheduleType.schedule &&
+             displayScheduleTime != null
+-        ? DateFormat('yyyy-MM-dd HH:mm:ss').parse(displayScheduleTime!)
++        ? SaudiTime.appointment(displayScheduleTime!)
+         : null;
+   }
+ 
+@@ -242,19 +243,19 @@ class ScheduleController extends GetxController implements GetxService {
+     AdvanceBooking advanceBooking, {
+     String? originalStartsAt,
+   }) {
+-    final instant = DateTime.parse(
++    final instant = SaudiTime.appointment(
+       originalStartsAt ??
+           _selectedSlotStartsAt ??
+           "$selectedDate $selectedTime",
+     );
+-    Duration difference = instant.difference(DateTime.now());
++    Duration difference = instant.difference(SaudiTime.now());
+ 
+     if (advanceBooking.advancedBookingRestrictionType == "day" &&
+         difference.inDays < advanceBooking.advancedBookingRestrictionValue!) {
+-      return "${'you_can_not_select_schedule_before'.tr} ${DateConverter.dateMonthYearTimeTwentyFourFormat(DateTime.now().add(Duration(days: advanceBooking.advancedBookingRestrictionValue!)))}";
++      return "${'you_can_not_select_schedule_before'.tr} ${DateConverter.dateMonthYearTimeTwentyFourFormat(SaudiTime.now().add(Duration(days: advanceBooking.advancedBookingRestrictionValue!)))}";
+     } else if (advanceBooking.advancedBookingRestrictionType == "hour" &&
+         difference.inHours < advanceBooking.advancedBookingRestrictionValue!) {
+-      return "${'you_can_not_select_schedule_before'.tr} ${DateConverter.dateMonthYearTimeTwentyFourFormat(DateTime.now().add(Duration(hours: advanceBooking.advancedBookingRestrictionValue!)))}";
++      return "${'you_can_not_select_schedule_before'.tr} ${DateConverter.dateMonthYearTimeTwentyFourFormat(SaudiTime.now().add(Duration(hours: advanceBooking.advancedBookingRestrictionValue!)))}";
+     } else {
+       return null;
+     }
+diff --git a/lib/feature/checkout/repo/schedule_repo.dart b/lib/feature/checkout/repo/schedule_repo.dart
+index 216cb5c..670ce0b 100644
+--- a/lib/feature/checkout/repo/schedule_repo.dart
++++ b/lib/feature/checkout/repo/schedule_repo.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/api/remote/client_api.dart';
+ import 'package:get/get.dart';
+ import 'package:nirab_clean/util/app_constants.dart';
+@@ -30,13 +31,15 @@ class ScheduleRepo extends GetxService {
+     String branchSelection = 'manual',
+   }) {
+     // Selected slots retain the API offset verbatim. A DateTime fallback is an
+-    // instant and must include Z, even on Web/Android devices in another zone.
+-    final wireStart = originalStartsAt ?? startsAt.toUtc().toIso8601String();
++    // Saudi picker wall clock, independent of the device timezone.
++    final wireStart = originalStartsAt ?? SaudiTime.appointmentToken(startsAt);
+     final values = <String, String?>{
+       'zone_id': zoneId,
+       'contract_version': '2',
+       'date': validateOnly
+-          ? wireStart.split(RegExp('[T ]')).first
++          ? SaudiTime.appointmentToken(
++              SaudiTime.appointment(wireStart),
++            ).split('T').first
+           : startsAt.toIso8601String().split('T').first,
+       'starts_at': validateOnly ? wireStart : null,
+       'provider_id': providerId,
+diff --git a/lib/feature/checkout/widget/order_details_section/available_slot_picker.dart b/lib/feature/checkout/widget/order_details_section/available_slot_picker.dart
+index 6a75429..075dd36 100644
+--- a/lib/feature/checkout/widget/order_details_section/available_slot_picker.dart
++++ b/lib/feature/checkout/widget/order_details_section/available_slot_picker.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+@@ -27,7 +28,7 @@ class AvailableSlotPicker extends StatefulWidget {
+ }
+ 
+ class _AvailableSlotPickerState extends State<AvailableSlotPicker> {
+-  DateTime _day = DateUtils.dateOnly(DateTime.now());
++  DateTime _day = DateUtils.dateOnly(SaudiTime.now());
+   List<Map<String, dynamic>> _slots = [];
+   Map<String, dynamic>? _selected;
+   String? _timezone;
+@@ -102,7 +103,7 @@ class _AvailableSlotPickerState extends State<AvailableSlotPicker> {
+             response.body['content'] is! Map) {
+           throw StateError('availability');
+         }
+-        _timezone = response.body['content']['timezone']?.toString();
++        _timezone = SaudiTime.timezone;
+         final values = response.body['content']['slots'];
+         if (values is! List) throw StateError('availability');
+         final slots = values
+@@ -116,7 +117,7 @@ class _AvailableSlotPickerState extends State<AvailableSlotPicker> {
+             )
+             .toList();
+         String key(Map<String, dynamic> slot) =>
+-            '${slot['starts_at'].toString().substring(11, 19)}|${slot['provider_id']}';
++            '${DateFormat('HH:mm:ss').format(SaudiTime.appointment(slot['starts_at'].toString()))}|${slot['provider_id']}';
+         final keys = slots.map(key).toSet();
+         common = common == null
+             ? slots
+@@ -165,7 +166,7 @@ class _AvailableSlotPickerState extends State<AvailableSlotPicker> {
+                   onTap: widget.days != null
+                       ? null
+                       : () async {
+-                          final now = DateUtils.dateOnly(DateTime.now());
++                          final now = DateUtils.dateOnly(SaudiTime.now());
+                           final day = await showDatePicker(
+                             context: context,
+                             initialDate: _day,
+@@ -194,9 +195,9 @@ class _AvailableSlotPickerState extends State<AvailableSlotPicker> {
+                       spacing: 8,
+                       runSpacing: 8,
+                       children: _slots.map((slot) {
+-                        // This offset-free value is for display only.
+-                        final wallTime = DateTime.parse(
+-                          slot['starts_at'].toString().substring(0, 19),
++                        // Render in Asia/Riyadh and retain the original slot token for submission.
++                        final wallTime = SaudiTime.appointment(
++                          slot['starts_at'].toString(),
+                         );
+                         return ChoiceChip(
+                           label: Text(
+@@ -229,8 +230,8 @@ class _AvailableSlotPickerState extends State<AvailableSlotPicker> {
+                               final controller = Get.find<ScheduleController>();
+                               final originalStartsAt = slot['starts_at']
+                                   .toString();
+-                              final wallTime = DateTime.parse(
+-                                slot['starts_at'].toString().substring(0, 19),
++                              final wallTime = SaudiTime.appointment(
++                                slot['starts_at'].toString(),
+                               );
+                               if (widget.onSelected != null) {
+                                 widget.onSelected!(
+diff --git a/lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart b/lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart
+index 9535913..5c5891d 100644
+--- a/lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart
++++ b/lib/feature/checkout/widget/order_details_section/custom_repeat_booking_schedule.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/feature/checkout/widget/order_details_section/available_repeat_time_picker.dart';
+ import 'package:nirab_clean/feature/checkout/widget/order_details_section/custom_repeat_booking_expansion_tile.dart';
+@@ -574,7 +575,7 @@ class _CalenderWidget extends StatelessWidget {
+                 );
+                 TimeOfDay initialPickedTime = oldList.isNotEmpty
+                     ? DateConverter.convertDateTimeToTimeOfDay(oldList.first)
+-                    : TimeOfDay.now();
++                    : TimeOfDay.fromDateTime(SaudiTime.now());
+ 
+                 if (result['added'] != null) {
+                   DateTime date = result['added']!;
+diff --git a/lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart b/lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart
+index 9857199..c4f00ae 100644
+--- a/lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart
++++ b/lib/feature/checkout/widget/order_details_section/daily_repeat_booking_schedule.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/custom_date_range_picker.dart';
+ import 'package:nirab_clean/feature/checkout/widget/order_details_section/available_repeat_time_picker.dart';
+ import 'package:nirab_clean/common/widgets/custom_tooltip_widget.dart';
+@@ -59,13 +60,15 @@ class DailyRepeatBookingSchedule extends StatelessWidget {
+                       if (dateRange != null &&
+                           scheduleController.pickedDailyRepeatTime != null) {
+                         DateTime startDate = dateRange.start;
+-                        DateTime now = DateTime.now();
++                        DateTime now = SaudiTime.now();
+                         if (startDate.year == now.year &&
+                             startDate.month == now.month &&
+                             startDate.day == now.day) {
+                           TimeOfDay pickedTime =
+                               scheduleController.pickedDailyRepeatTime!;
+-                          TimeOfDay nowTime = TimeOfDay.now();
++                          TimeOfDay nowTime = TimeOfDay.fromDateTime(
++                            SaudiTime.now(),
++                          );
+                           if (pickedTime.hour < nowTime.hour ||
+                               (pickedTime.hour == nowTime.hour &&
+                                   pickedTime.minute < nowTime.minute)) {
+@@ -110,11 +113,13 @@ class DailyRepeatBookingSchedule extends StatelessWidget {
+                         DateTime startDate = scheduleController
+                             .pickedDailyRepeatBookingDateRange!
+                             .start;
+-                        DateTime now = DateTime.now();
++                        DateTime now = SaudiTime.now();
+                         if (startDate.year == now.year &&
+                             startDate.month == now.month &&
+                             startDate.day == now.day) {
+-                          TimeOfDay nowTime = TimeOfDay.now();
++                          TimeOfDay nowTime = TimeOfDay.fromDateTime(
++                            SaudiTime.now(),
++                          );
+                           if (time.hour < nowTime.hour ||
+                               (time.hour == nowTime.hour &&
+                                   time.minute < nowTime.minute)) {
+diff --git a/lib/feature/checkout/widget/order_details_section/provider_details_card.dart b/lib/feature/checkout/widget/order_details_section/provider_details_card.dart
+index 6f1261f..d5e0389 100644
+--- a/lib/feature/checkout/widget/order_details_section/provider_details_card.dart
++++ b/lib/feature/checkout/widget/order_details_section/provider_details_card.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+@@ -20,10 +21,10 @@ class ProviderDetailsCard extends StatelessWidget {
+           final weekends =
+               cartController.checkoutItems[0].provider?.weekends ?? [];
+           String currentTime = DateConverter.convertStringTimeToDate(
+-            DateTime.now(),
++            SaudiTime.now(),
+           );
+ 
+-          String dayOfWeek = DateConverter.dateToWeek(DateTime.now());
++          String dayOfWeek = DateConverter.dateToWeek(SaudiTime.now());
+ 
+           if (startTime != null && endTime != null) {
+             timeSlotAvailable =
+diff --git a/lib/feature/home/widget/campaign_view.dart b/lib/feature/home/widget/campaign_view.dart
+index 29fc370..669d3cb 100644
+--- a/lib/feature/home/widget/campaign_view.dart
++++ b/lib/feature/home/widget/campaign_view.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_foundation.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_service_card.dart';
+ import 'package:nirab_clean/feature/home/marketing/marketing_feed.dart';
+@@ -138,11 +139,11 @@ class CampaignTerms extends StatelessWidget {
+       );
+     }
+     if (discount.startDate != null &&
+-        DateTime.tryParse(discount.startDate!) != null) {
++        SaudiTime.tryAppointment(discount.startDate!) != null) {
+       terms.add('${'nirab_campaign_start'.tr}: ${discount.startDate}');
+     }
+     if (discount.endDate != null &&
+-        DateTime.tryParse(discount.endDate!) != null) {
++        SaudiTime.tryAppointment(discount.endDate!) != null) {
+       terms.add('${'nirab_campaign_end'.tr}: ${discount.endDate}');
+     }
+     if (!compact) {
+diff --git a/lib/feature/subscription/view/my_subscription_details_screen.dart b/lib/feature/subscription/view/my_subscription_details_screen.dart
+index b06f871..0e5a305 100644
+--- a/lib/feature/subscription/view/my_subscription_details_screen.dart
++++ b/lib/feature/subscription/view/my_subscription_details_screen.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/common/widgets/address_selection_drawer.dart';
+ import 'package:nirab_clean/common/widgets/confirmation_dialog.dart';
+@@ -33,7 +34,7 @@ class _MySubscriptionDetailsScreenState
+     extends State<MySubscriptionDetailsScreen> {
+   bool _membershipActive(UserController user) {
+     final plan = user.userInfoModel?.subscribedPlan;
+-    final expires = DateTime.tryParse(plan?.expireDate ?? '');
++    final expires = SaudiTime.tryInstant(plan?.expireDate);
+     return plan?.status == 'active' &&
+         expires != null &&
+         expires.isAfter(DateTime.now());
+@@ -378,7 +379,7 @@ class _MySubscriptionDetailsScreenState
+                                                     ?.subscribedPlan
+                                                     ?.startDate !=
+                                                 null
+-                                            ? DateConverter.isoStringToLocalDateOnly(
++                                            ? DateConverter.instantDateOnly(
+                                                 userController
+                                                         .userInfoModel
+                                                         ?.subscribedPlan
+@@ -401,7 +402,7 @@ class _MySubscriptionDetailsScreenState
+                                                     ?.subscribedPlan
+                                                     ?.expireDate !=
+                                                 null
+-                                            ? DateConverter.isoStringToLocalDateOnly(
++                                            ? DateConverter.instantDateOnly(
+                                                 userController
+                                                         .userInfoModel
+                                                         ?.subscribedPlan
+diff --git a/lib/feature/visit_package/view/package_visit_screen.dart b/lib/feature/visit_package/view/package_visit_screen.dart
+index 0854dcc..4cc39f1 100644
+--- a/lib/feature/visit_package/view/package_visit_screen.dart
++++ b/lib/feature/visit_package/view/package_visit_screen.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/direct_service_fields.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_foundation.dart';
+@@ -96,8 +97,10 @@ class _PackageVisitScreenState extends State<PackageVisitScreen> {
+ 
+   List<Map> get _variants => (_context?['variations'] as List? ?? [])
+       .whereType<Map>()
+-      .where((item) =>
+-          item['zone_id'] == _address?.zoneId || item['zone_id'] == null)
++      .where(
++        (item) =>
++            item['zone_id'] == _address?.zoneId || item['zone_id'] == null,
++      )
+       .toList();
+ 
+   Future<void> _pickSlot() async {
+@@ -323,7 +326,9 @@ class _PackageVisitScreenState extends State<PackageVisitScreen> {
+                 ListTile(
+                   title: Text('available_slots'.tr),
+                   subtitle: Text(
+-                    _slot?['starts_at']?.toString() ?? 'ux_choose_slot'.tr,
++                    _slot == null
++                        ? 'ux_choose_slot'.tr
++                        : '${DateConverter.dateTimeStringToDateTime(_slot!['starts_at'].toString())} · ${SaudiTime.timezone}',
+                   ),
+                   trailing: const NirabIcon(Icons.event),
+                   onTap: _busy || _address == null || _variant == null
+@@ -350,7 +355,7 @@ class _PackageVisitScreenState extends State<PackageVisitScreen> {
+                           ),
+                           Text('${_preview!['address']}'),
+                           Text(
+-                            '${_preview!['branch_name']}\n${_preview!['service_schedule']}  ·  ${_preview!['timezone']}',
++                            '${_preview!['branch_name']}\n${DateConverter.dateTimeStringToDateTime((_preview!['service_schedule_at'] ?? _preview!['service_schedule']).toString())}  ·  ${SaudiTime.timezone}',
+                           ),
+                           Text(
+                             '${'ux_visit_balance_summary'.tr}: ${_preview!['remaining_before']}  →  ${_preview!['remaining_after']}',
+diff --git a/lib/feature/visit_package/view/visit_packages_screen.dart b/lib/feature/visit_package/view/visit_packages_screen.dart
+index b98f6a7..7157b13 100644
+--- a/lib/feature/visit_package/view/visit_packages_screen.dart
++++ b/lib/feature/visit_package/view/visit_packages_screen.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_icon.dart';
+ import 'package:nirab_clean/common/widgets/nirab/nirab_foundation.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+@@ -19,7 +20,7 @@ class _VisitPackagesScreenState extends State<VisitPackagesScreen> {
+   String? _packagesError;
+ 
+   bool _eligibleForVisit(Map package) {
+-    final expiry = DateTime.tryParse(package['expires_at']?.toString() ?? '');
++    final expiry = SaudiTime.tryInstant(package['expires_at']?.toString());
+     final remaining = int.tryParse('${package['remaining_visits']}') ?? 0;
+     return package['status'] == 'active' &&
+         remaining > 0 &&
+@@ -28,7 +29,7 @@ class _VisitPackagesScreenState extends State<VisitPackagesScreen> {
+   }
+ 
+   String _displayStatus(Map package) {
+-    final expires = DateTime.tryParse(package['expires_at']?.toString() ?? '');
++    final expires = SaudiTime.tryInstant(package['expires_at']?.toString());
+     if (package['status'] == 'active' &&
+         expires != null &&
+         !expires.isAfter(DateTime.now())) {
+@@ -319,28 +320,41 @@ class _VisitPackagesScreenState extends State<VisitPackagesScreen> {
+                           ),
+                         ),
+                       NirabInfoPanel(message: 'ux_package_wallet_only'.tr),
+-                      GetBuilder<UserController>(builder: (userController) {
+-                        final balance = userController.userInfoModel?.walletBalance;
+-                        return TextButton.icon(
+-                          icon: const NirabIcon(
+-                            Icons.account_balance_wallet_outlined,
+-                          ),
+-                          label: Text(balance == null
+-                              ? 'my_wallet'.tr
+-                              : '${'my_wallet'.tr} (${PriceConverter.convertPrice(balance)})'),
+-                          onPressed: () async {
+-                            await Get.toNamed(RouteHelper.getMyWalletScreen());
+-                            if (mounted) {
+-                              await _load();
+-                              try {
+-                                await Get.find<UserController>().getUserInfo(reload: true);
+-                              } catch (_) {
+-                                if (mounted) customSnackBar('ux_wallet_balance_refresh_failed'.tr);
++                      GetBuilder<UserController>(
++                        builder: (userController) {
++                          final balance =
++                              userController.userInfoModel?.walletBalance;
++                          return TextButton.icon(
++                            icon: const NirabIcon(
++                              Icons.account_balance_wallet_outlined,
++                            ),
++                            label: Text(
++                              balance == null
++                                  ? 'my_wallet'.tr
++                                  : '${'my_wallet'.tr} (${PriceConverter.convertPrice(balance)})',
++                            ),
++                            onPressed: () async {
++                              await Get.toNamed(
++                                RouteHelper.getMyWalletScreen(),
++                              );
++                              if (mounted) {
++                                await _load();
++                                try {
++                                  await Get.find<UserController>().getUserInfo(
++                                    reload: true,
++                                  );
++                                } catch (_) {
++                                  if (mounted) {
++                                    customSnackBar(
++                                      'ux_wallet_balance_refresh_failed'.tr,
++                                    );
++                                  }
++                                }
+                               }
+-                            }
+-                          },
+-                        );
+-                      }),
++                            },
++                          );
++                        },
++                      ),
+                       NirabSectionHeader(title: 'quality_packages'.tr),
+                       if (_packagesError != null)
+                         ListTile(
+@@ -370,7 +384,7 @@ class _VisitPackagesScreenState extends State<VisitPackagesScreen> {
+                                   '${'quality_remaining_visits'.tr}: ${package['remaining_visits']} / ${package['total_visits']}',
+                                 ),
+                                 Text(
+-                                  '${'ux_package_expiry'.tr}: ${package['expires_at']}',
++                                  '${'ux_package_expiry'.tr}: ${package['expires_at'] == null ? '—' : DateConverter.isoStringToLocalDateAndTime(package['expires_at'].toString())}',
+                                 ),
+                                 Text(
+                                   '${'status'.tr}: ${'ux_package_status_${_displayStatus(package)}'.tr}',
+diff --git a/lib/helper/checkout_helper.dart b/lib/helper/checkout_helper.dart
+index 2c20009..222ab38 100644
+--- a/lib/helper/checkout_helper.dart
++++ b/lib/helper/checkout_helper.dart
+@@ -1,3 +1,4 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'dart:convert';
+ 
+ import 'package:get/get.dart';
+@@ -243,9 +244,9 @@ class CheckoutHelper {
+         'saturday': DateTime.saturday,
+         'sunday': DateTime.sunday,
+       };
+-      DateTime startDate = dateRange?.start ?? DateTime.now();
++      DateTime startDate = dateRange?.start ?? SaudiTime.now();
+       DateTime endDate =
+-          dateRange?.end ?? DateTime.now().add(const Duration(days: 6));
++          dateRange?.end ?? SaudiTime.now().add(const Duration(days: 6));
+ 
+       for (
+         DateTime currentDate = startDate;
+diff --git a/lib/helper/date_converter.dart b/lib/helper/date_converter.dart
+index be33bac..0eee8f5 100644
+--- a/lib/helper/date_converter.dart
++++ b/lib/helper/date_converter.dart
+@@ -1,47 +1,60 @@
++import 'package:nirab_clean/helper/saudi_time.dart';
+ import 'package:nirab_clean/util/core_export.dart';
+ import 'package:get/get.dart';
+ import 'package:intl/intl.dart';
+ 
+ class DateConverter {
++  static String instantDateOnly(String value) =>
++      DateFormat('dd MMM yyyy').format(SaudiTime.instant(value));
+ 
+   static String formatDate(DateTime dateTime) {
+-    return DateFormat('yyyy-MM-dd hh:mm:ss a').format(dateTime);
++    return DateFormat(
++      'yyyy-MM-dd hh:mm:ss a',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static String dateToTimeOnly(DateTime dateTime) {
+-    return DateFormat(_timeFormatter()).format(dateTime);
++    return DateFormat(_timeFormatter()).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static String dateToDateAndTime(DateTime dateTime) {
+-    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
++    return DateFormat(
++      'yyyy-MM-dd HH:mm:ss',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static String dateToDateOnly(DateTime dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss').format(dateTime);
++    return DateFormat(
++      'yyyy-MM-ddTHH:mm:ss',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static String dateTimeStringToDateTime(String dateTime) {
+-    return DateFormat('dd MMM yyyy  ${_timeFormatter()}').format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
++    return DateFormat(
++      'dd MMM yyyy  ${_timeFormatter()}',
++    ).format(SaudiTime.appointment(dateTime));
+   }
+ 
+   static String dateTimeStringToDateOnly(String dateTime) {
+-    return DateFormat('yyyy-MM-dd').format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
++    return DateFormat('yyyy-MM-dd').format(SaudiTime.appointment(dateTime));
+   }
+ 
+   static DateTime dateTimeStringToDate(String dateTime) {
+-    return DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime);
++    return SaudiTime.appointment(dateTime);
+   }
+ 
+   static DateTime isoStringToLocalDate(String dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime);
++    return SaudiTime.appointment(dateTime);
+   }
+ 
+   static DateTime isoUtcStringToLocalDate(String dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime, true).toLocal();
++    return SaudiTime.instant(dateTime);
+   }
+ 
+   static String isoStringToDateTimeString(String dateTime) {
+-    return DateFormat('dd MMM yyyy  ${_timeFormatter()}').format(isoStringToLocalDate(dateTime));
++    return DateFormat(
++      'dd MMM yyyy  ${_timeFormatter()}',
++    ).format(isoStringToLocalDate(dateTime));
+   }
+ 
+   static String isoStringToLocalDateOnly(String dateTime) {
+@@ -49,11 +62,13 @@ class DateConverter {
+   }
+ 
+   static String stringToLocalDateOnly(String dateTime) {
+-    return DateFormat('dd MMM, yyyy').format(DateFormat('yyyy-MM-dd').parse(dateTime));
++    return DateFormat('dd MMM, yyyy').format(SaudiTime.appointment(dateTime));
+   }
+ 
+   static String localDateToIsoString(DateTime dateTime) {
+-    return DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').format(dateTime);
++    return DateFormat(
++      'yyyy-MM-ddTHH:mm:ss.SSS',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+   static String convertStringDateTimeToTime(String time) {
+@@ -61,35 +76,41 @@ class DateConverter {
+   }
+ 
+   static String convertDateTimeToTime(DateTime time) {
+-    return DateFormat(_timeFormatter()).format(time);
++    return DateFormat(_timeFormatter()).format(SaudiTime.forDisplay(time));
+   }
+ 
+   static String convertStringTimeToDate(DateTime time) {
+-    return _localDateFormatter(_timeFormatter()).format(time);
++    return _localDateFormatter(
++      _timeFormatter(),
++    ).format(SaudiTime.forDisplay(time));
+   }
+ 
+-  static String convertStringTimeToDateTime (DateTime time){
+-    return DateFormat('EEE \'at\' ${_timeFormatter()}').format(time.toLocal());
++  static String convertStringTimeToDateTime(DateTime time) {
++    return DateFormat(
++      'EEE \'at\' ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(time));
+   }
+ 
+   static DateTime convertStringTimeToDateOnly(String time) {
+     return DateFormat('yyyy-MM-dd').parse(time);
+   }
+ 
+-  static String dateMonthYearTime(DateTime ? dateTime) {
+-    return _localDateFormatter('d MMM, y, ${_timeFormatter()}').format(dateTime!);
++  static String dateMonthYearTime(DateTime? dateTime) {
++    return _localDateFormatter(
++      'd MMM, y, ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static String isoStringToLocalTimeOnly(String dateTime) {
+     return DateFormat('HH:mm aa').format(isoStringToLocalDate(dateTime));
+   }
+ 
+-  static String dateStringMonthYear(DateTime ? dateTime) {
+-    return DateFormat('d MMM, y').format(dateTime!);
++  static String dateStringMonthYear(DateTime? dateTime) {
++    return DateFormat('d MMM, y').format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+-  static String dateToWeek(DateTime ? dateTime) {
+-    return DateFormat('EEEE').format(dateTime!);
++  static String dateToWeek(DateTime? dateTime) {
++    return DateFormat('EEEE').format(SaudiTime.forDisplay(dateTime!));
+   }
+ 
+   static DateTime convertTimeToDateTime(String time) {
+@@ -104,27 +125,32 @@ class DateConverter {
+     return DateFormat(_timeFormatter()).format(DateFormat('HH:mm').parse(time));
+   }
+ 
+-  static DateTime combineDateTimeAndTimeOfDay({required DateTime date, required TimeOfDay time}) {
+-    return DateTime(
+-      date.year,
+-      date.month,
+-      date.day,
+-      time.hour,
+-      time.minute,
+-    );
++  static DateTime combineDateTimeAndTimeOfDay({
++    required DateTime date,
++    required TimeOfDay time,
++  }) {
++    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+   }
+ 
+-
+-  static String convertDateTimeRangeToString(DateTimeRange dateRange, {String format = 'dd / MM / yy'}) {
+-    final startDate = DateFormat(format).format(dateRange.start);
+-    final endDate = DateFormat(format).format(dateRange.end);
++  static String convertDateTimeRangeToString(
++    DateTimeRange dateRange, {
++    String format = 'dd / MM / yy',
++  }) {
++    final startDate = DateFormat(
++      format,
++    ).format(SaudiTime.forDisplay(dateRange.start));
++    final endDate = DateFormat(
++      format,
++    ).format(SaudiTime.forDisplay(dateRange.end));
+     if (startDate == endDate) {
+       return startDate;
+     }
+     return '$startDate   -   $endDate';
+   }
+ 
+-  static DateTimeRange? convertDateTimeListToDateTimeRange(List<DateTime> dateList) {
++  static DateTimeRange? convertDateTimeListToDateTimeRange(
++    List<DateTime> dateList,
++  ) {
+     if (dateList.isEmpty) {
+       return null;
+     }
+@@ -134,51 +160,56 @@ class DateConverter {
+     return DateTimeRange(start: start, end: end);
+   }
+ 
+-
+-  static String convert24HourTimeTo12HourTimeWithDay(DateTime time, bool isToday) {
+-    if(isToday){
+-      return DateFormat('\'Today at\' ${_timeFormatter()}').format(time);
+-    }else{
+-      return DateFormat('\'Yesterday at\' ${_timeFormatter()}').format(time);
++  static String convert24HourTimeTo12HourTimeWithDay(
++    DateTime time,
++    bool isToday,
++  ) {
++    if (isToday) {
++      return DateFormat(
++        '\'Today at\' ${_timeFormatter()}',
++      ).format(SaudiTime.forDisplay(time));
++    } else {
++      return DateFormat(
++        '\'Yesterday at\' ${_timeFormatter()}',
++      ).format(SaudiTime.forDisplay(time));
+     }
+-
+   }
+ 
+-
+-
+-
+   static String _timeFormatter() {
+-    return Get.find<SplashController>().configModel.content?.timeFormat == '24' ? 'HH:mm' :
+-    'hh:mm a';
++    return Get.find<SplashController>().configModel.content?.timeFormat == '24'
++        ? 'HH:mm'
++        : 'hh:mm a';
+   }
+ 
+-  static int countDays(DateTime ? dateTime) {
++  static int countDays(DateTime? dateTime) {
+     final startDate = dateTime!;
+-    final endDate = DateTime.now();
++    final endDate = SaudiTime.now();
+     final difference = endDate.difference(startDate).inDays;
+     return difference;
+   }
+ 
+   static String dateMonthYearTimeTwentyFourFormat(DateTime dateTime) {
+-    return _localDateFormatter('d MMM,y ${_timeFormatter()}').format(dateTime);
++    return _localDateFormatter(
++      'd MMM,y ${_timeFormatter()}',
++    ).format(SaudiTime.forDisplay(dateTime));
+   }
+ 
+-
+   static String isoStringToLocalDateAndTime(String dateTime) {
+-    return _localDateFormatter('dd MMM yyyy \'at\' ${_timeFormatter()}').format(isoUtcStringToLocalDate(dateTime));
++    return _localDateFormatter(
++      'dd MMM yyyy \'at\' ${_timeFormatter()}',
++    ).format(isoUtcStringToLocalDate(dateTime));
+   }
+ 
+-
+   static String convert24HourTimeTo12HourTime(DateTime time) {
+-    return _localDateFormatter(_timeFormatter()).format(time);
++    return _localDateFormatter(
++      _timeFormatter(),
++    ).format(SaudiTime.forDisplay(time));
+   }
+ 
+-
+-  static DateFormat _localDateFormatter(String format){
+-    return DateFormat(format
+-        //, Get.find<LocalizationController>().locale.languageCode
++  static DateFormat _localDateFormatter(String format) {
++    return DateFormat(
++      format,
++      //, Get.find<LocalizationController>().locale.languageCode
+     );
+   }
+-
+-
+ }
+diff --git a/pubspec.lock b/pubspec.lock
+index 1fa305b..4d98d86 100644
+--- a/pubspec.lock
++++ b/pubspec.lock
+@@ -2051,7 +2051,7 @@ packages:
+     source: hosted
+     version: "3.7.1"
+   timezone:
+-    dependency: transitive
++    dependency: "direct main"
+     description:
+       name: timezone
+       sha256: "981d1020d6ef8fe1e7b3de5054e5b25579ae7c403d7734adc508ffc47668e9cb"
+diff --git a/pubspec.yaml b/pubspec.yaml
+index 2135b9b..adb21cb 100644
+--- a/pubspec.yaml
++++ b/pubspec.yaml
+@@ -7,6 +7,7 @@ environment:
+   sdk: ^3.9.2
+ 
+ dependencies:
++  timezone: ^0.11.1
+   crypto: ^3.0.6
+   flutter:
+     sdk: flutter
+diff --git a/test/feature/slot_timezone_test.dart b/test/feature/slot_timezone_test.dart
+index ae509c2..52e5b2a 100644
+--- a/test/feature/slot_timezone_test.dart
++++ b/test/feature/slot_timezone_test.dart
+@@ -21,11 +21,11 @@ class _Api extends Fake implements ApiClient {
+       statusCode: 200,
+       body: {
+         'content': {
+-          'timezone': 'UTC',
++          'timezone': 'Asia/Riyadh',
+           'provider_id': available ? 'branch' : null,
+           'requested_slot_available': available,
+           'slots': [
+-            {'starts_at': '2026-10-15T08:00:00+00:00', 'provider_id': 'branch'},
++            {'starts_at': '2026-10-15T11:00:00+03:00', 'provider_id': 'branch'},
+           ],
+         },
+       },
+@@ -115,13 +115,13 @@ void main() {
+         api.requests.single.queryParameters.containsKey('starts_at'),
+         isFalse,
+       );
+-      expect(find.text('08:00'), findsOneWidget);
++      expect(find.text('11:00'), findsOneWidget);
+       await tester.tap(find.byType(ChoiceChip));
+       await tester.pump();
+       await tester.tap(find.text('ok'));
+       await tester.pumpAndSettle();
+-      expect(controller.displayScheduleTime, '2026-10-15 08:00:00');
+-      expect(controller.scheduleTime, '2026-10-15T08:00:00+00:00');
++      expect(controller.displayScheduleTime, '2026-10-15 11:00:00');
++      expect(controller.scheduleTime, '2026-10-15T11:00:00+03:00');
+       expect(controller.resolvedProviderId, 'branch');
+       expect(
+         await controller.validateRealAvailability(
+@@ -166,7 +166,7 @@ void main() {
+     'equivalent offsets are preserved and DateTime fallback includes UTC',
+     () async {
+       for (final value in [
+-        '2026-10-15T08:00:00+00:00',
++        '2026-10-15T11:00:00+03:00',
+         '2026-10-15T08:00:00.000Z',
+         '2026-10-15T11:00:00+03:00',
+       ]) {
+@@ -208,8 +208,8 @@ void main() {
+       ]) {
+         controller.buildSchedule(
+           scheduleType: ScheduleType.schedule,
+-          schedule: '2026-10-15 08:00:00',
+-          originalStartsAt: '2026-10-15T08:00:00+00:00',
++          schedule: '2026-10-15 11:00:00',
++          originalStartsAt: '2026-10-15T11:00:00+03:00',
+           shouldUpdate: false,
+         );
+         controller.resolvedProviderId = 'branch';
+@@ -225,8 +225,8 @@ void main() {
+     () async {
+       controller.buildSchedule(
+         scheduleType: ScheduleType.schedule,
+-        schedule: '2026-10-15 08:00:00',
+-        originalStartsAt: '2026-10-15T08:00:00+00:00',
++        schedule: '2026-10-15 11:00:00',
++        originalStartsAt: '2026-10-15T11:00:00+03:00',
+         shouldUpdate: false,
+       );
+       api.gate = Completer<void>();
+diff --git a/lib/helper/saudi_time.dart b/lib/helper/saudi_time.dart
+new file mode 100644
+index 0000000..c53402a
+--- /dev/null
++++ b/lib/helper/saudi_time.dart
+@@ -0,0 +1,80 @@
++import 'package:timezone/data/latest.dart' as tzdata;
++import 'package:timezone/timezone.dart' as tz;
++
++/// Saudi appointments are civil wall time; technical timestamps are UTC instants.
++/// Never use the device timezone to interpret a business appointment.
++abstract final class SaudiTime {
++  static const timezone = 'Asia/Riyadh';
++  static final tz.Location _riyadh = _location();
++
++  static tz.Location _location() {
++    tzdata.initializeTimeZones();
++    return tz.getLocation(timezone);
++  }
++
++  static bool _hasZone(String value) =>
++      RegExp(r'(Z|[+-]\d{2}:?\d{2})$', caseSensitive: false).hasMatch(value);
++
++  static DateTime now() => tz.TZDateTime.now(_riyadh);
++
++  /// Legacy unzoned appointments keep their Saudi hour without any +3 shift.
++  static DateTime appointment(String value) {
++    final raw = value.trim();
++    final civil = raw.contains(RegExp('[T ]')) ? raw : '${raw}T00:00:00';
++    return tz.TZDateTime.from(
++      DateTime.parse(_hasZone(raw) ? raw : '$civil+03:00'),
++      _riyadh,
++    );
++  }
++
++  static DateTime? tryAppointment(String? value) {
++    try {
++      return value == null ? null : appointment(value);
++    } on FormatException {
++      return null;
++    }
++  }
++
++  /// Unzoned creation, expiry and event timestamps are UTC, unlike appointments.
++  static DateTime instant(String value) {
++    final raw = value.trim();
++    final civil = raw.contains(RegExp('[T ]')) ? raw : '${raw}T00:00:00';
++    return tz.TZDateTime.from(
++      DateTime.parse(_hasZone(raw) ? raw : '${civil}Z'),
++      _riyadh,
++    );
++  }
++
++  static DateTime? tryInstant(String? value) {
++    try {
++      return value == null ? null : instant(value);
++    } on FormatException {
++      return null;
++    }
++  }
++
++  /// Picker values hold civil components, not a device-local instant.
++  static DateTime wall(DateTime value) => tz.TZDateTime(
++    _riyadh,
++    value.year,
++    value.month,
++    value.day,
++    value.hour,
++    value.minute,
++    value.second,
++    value.millisecond,
++    value.microsecond,
++  );
++
++  static DateTime forDisplay(DateTime value) =>
++      value is tz.TZDateTime || value.isUtc
++      ? tz.TZDateTime.from(value, _riyadh)
++      : wall(value);
++
++  static String appointmentToken(DateTime value) {
++    final date = forDisplay(value);
++    String two(int n) => n.toString().padLeft(2, '0');
++    return '${date.year.toString().padLeft(4, '0')}-${two(date.month)}-${two(date.day)}'
++        'T${two(date.hour)}:${two(date.minute)}:${two(date.second)}+03:00';
++  }
++}
+diff --git a/test/unit/saudi_time_contract_check.dart b/test/unit/saudi_time_contract_check.dart
+new file mode 100644
+index 0000000..6972424
+--- /dev/null
++++ b/test/unit/saudi_time_contract_check.dart
+@@ -0,0 +1,71 @@
++import 'package:timezone/timezone.dart' as tz;
++import 'package:nirab_clean/helper/saudi_time.dart';
++
++// Run with dart run; no Flutter binding, device, widgets or application startup.
++void main() {
++  var checks = 0;
++  void check(bool value, String label) {
++    checks++;
++    if (!value) throw StateError(label);
++  }
++
++  const canonical = '2026-10-26T11:00:00+03:00';
++  for (final value in [
++    canonical,
++    '2026-10-26 11:00:00',
++    '2026-10-26T08:00:00Z',
++    '2026-10-26T04:00:00-04:00',
++  ]) {
++    final date = SaudiTime.appointment(value);
++    check(date.hour == 11 && date.day == 26, 'appointment $value');
++    check(SaudiTime.appointmentToken(date) == canonical, 'canonical $value');
++  }
++  for (final zone in [
++    'UTC',
++    'Europe/London',
++    'America/New_York',
++    'Asia/Riyadh',
++  ]) {
++    final device = tz.TZDateTime.from(
++      DateTime.parse('2026-10-26T08:00:00Z'),
++      zone == 'UTC' ? tz.UTC : tz.getLocation(zone),
++    );
++    check(SaudiTime.forDisplay(device).hour == 11, 'display from $zone');
++  }
++  check(SaudiTime.instant('2026-10-26 08:00:00').hour == 11, 'naive UTC event');
++  check(
++    SaudiTime.instant('2026-10-26T11:00:00+03:00').hour == 11,
++    'zoned event',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26T20:30:00Z').day == 26,
++    '23:30 Saudi day',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26T21:30:00Z').day == 27,
++    '00:30 Saudi day',
++  );
++  check(
++    SaudiTime.appointment('2026-10-26').hour == 0,
++    'Saudi date-only midnight',
++  );
++  check(
++    SaudiTime.instant('2026-10-26').hour == 3,
++    'date-only UTC legacy event',
++  );
++  check(SaudiTime.tryAppointment('invalid') == null, 'invalid appointment');
++  check(SaudiTime.tryInstant(null) == null, 'missing event');
++  check(
++    SaudiTime.appointmentToken(DateTime(2026, 10, 26, 11)) == canonical,
++    'picker civil value',
++  );
++  final monthly = SaudiTime.appointment(
++    '2026-10-27 11:00:00',
++  ).add(const Duration(days: 30));
++  check(
++    monthly.day == 26 && monthly.month == 11 && monthly.hour == 11,
++    'monthly boundary',
++  );
++  // ignore: avoid_print
++  print('Saudi time contract: $checks checks passed');
++}

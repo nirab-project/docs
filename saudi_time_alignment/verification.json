@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-24",
+  "timezone": "Asia/Riyadh",
+  "app_timezone_preserved": "UTC",
+  "php_lint": {
+    "php_linted": 74,
+    "failures": []
+  },
+  "php_unit": {
+    "tests": 43,
+    "assertions": 1364,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 2.115,
+    "phpunit_deprecations": 1,
+    "mode": "isolated unit fixtures; no Laravel bootstrap or external DB"
+  },
+  "dart_contracts": {
+    "customer": 22,
+    "provider": 22,
+    "serviceman": 22,
+    "all_passed": true,
+    "command": "dart --disable-dart-dev --packages=.dart_tool/package_config.json test/unit/saudi_time_contract_check.dart"
+  },
+  "web_formatter_contracts": {
+    "checks": 24,
+    "passed": true,
+    "mode": "Node pure formatter checks; no browser/DOM"
+  },
+  "dart_format": {
+    "files": 64,
+    "passed": true
+  },
+  "scoped_flutter_analysis": {
+    "customer": {
+      "files": 27,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0,
+      "exit_code": 0
+    },
+    "provider_core": {
+      "files": 24,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0,
+      "exit_code": 0
+    },
+    "provider_additional": {
+      "files": 4,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 13,
+      "exit_code": 0,
+      "flags": [
+        "--no-pub",
+        "--no-fatal-infos"
+      ],
+      "note": "Pre-existing unnecessary_import / curly_braces style diagnostics"
+    },
+    "serviceman_core": {
+      "files": 8,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0,
+      "exit_code": 0
+    },
+    "serviceman_invoice": {
+      "files": 1,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0,
+      "exit_code": 0
+    },
+    "final_pure_time_utilities": {
+      "projects": 3,
+      "files_per_project": 2,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0,
+      "exit_code": 0
+    }
+  },
+  "dependency_resolution": "offline; timezone 0.11.1 promoted from transitive to direct in each project; no package version upgrades",
+  "not_run": [
+    "application builds",
+    "UI/widget tests",
+    "full local environment",
+    "production DB queries",
+    "deployment",
+    "migrations",
+    "four-surface runtime acceptance"
+  ],
+  "historical_bookings": {
+    "source": "user-provided implementation plan, not a live query",
+    "ids": [
+      100005,
+      100007,
+      100008,
+      100009
+    ],
+    "status": "unchanged; per-record provenance reconciliation pending"
+  },
+  "rollback": "before/ contains original modified files; patches/ contains per-project diffs; review later user edits before restoring",
+  "changed_source_files": {
+    "Admin Panel": 76,
+    "User app and web": 29,
+    "Provider app": 31,
+    "Service man app": 11
+  },
+  "patch_reverse_checks": {
+    "backend": 0,
+    "customer": 0,
+    "provider": 0,
+    "serviceman": 0
+  }
+}
