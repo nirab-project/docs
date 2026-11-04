@@ -1,0 +1,342 @@
+{
+  "date": "2026-11-05",
+  "scope": "MKT-01 through MKT-08; local implementation only",
+  "files": [
+    {
+      "repository": "Admin Panel",
+      "path": ".env.example",
+      "reason": "مفاتيح البيئة معطّلة افتراضياً ومن دون أسرار.",
+      "sha256": "bf03ad56aedf8b899ae41d3203d9e48802b054046f455bdd197460410e366797"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "Modules/AdminModule/Resources/views/layouts/partials/_aside.blade.php",
+      "reason": "رابط إدارة التسويق للمشرف الرئيسي.",
+      "sha256": "90e821cecf7301d17fff3b331bcd53f75386ea7984e3eab4f2813f5589dec4a3"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php",
+      "reason": "إرجاع فرق الكمية الحقيقي بعد نجاح الحفظ.",
+      "sha256": "f96c18082772ca50a6ab3ffd262b76afaee37a11064790615dd948d1c9593eea"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Console/Kernel.php",
+      "reason": "جدولة الإرسال والاستدراك والتنظيف.",
+      "sha256": "278f229cc570f84e65a9dc2bec7a7b6efea9467a81f01e36fb14fb7cee7b94bf"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Http/Controllers/MarketingIntegrationsController.php",
+      "reason": "صلاحيات المشرف، تحقق IDs، تدقيق التغييرات وإعادة المحاولة.",
+      "sha256": "68d49a1b79f835314df943aa07db9ad6c878bf7092288cdf3bf01c36df909e32"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Http/Controllers/MarketingTrackingController.php",
+      "reason": "إعدادات عامة آمنة وإيصالات موافقة وقراءة/إقرار الأحداث الموثقة.",
+      "sha256": "bf8bc908d22cc17cf83166777f87851a101fef1f5218bd5cef98369adc81ec77"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Jobs/DeliverMarketingEvent.php",
+      "reason": "قفل، فحص موافقة، حالات تسليم وإعادة محاولة محدودة.",
+      "sha256": "265d3bc78ba3789d8c913584388e8e8383c941d3a0f8e56752ae2c6c78886708"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Models/MarketingConsent.php",
+      "reason": "موافقة حسب الغرض/البيئة/السياسة مع إسناد مشفّر.",
+      "sha256": "12e1664e0542e2d85ef50105a47e733d8aed3bb001a003ee39243c4c68fb22dd"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Observers/MarketingSourceObserver.php",
+      "reason": "مراقبة مصادر القياس بعد نجاح commit.",
+      "sha256": "26de4f7af89721c57cba4f5626d198724dd3de9bedd7870585a53a4deb5b3205"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Providers/AppServiceProvider.php",
+      "reason": "تسجيل المسارات ومراقبي المصادر بعد المعاملة.",
+      "sha256": "5388899e9255ee7045ea488f616636ae112f5dc212b795f743ba9160b5dfb321"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/ConsentService.php",
+      "reason": "إيصال عشوائي مجزأ، سحب الموافقة ومسح الإسناد.",
+      "sha256": "9eaed2f443ad1b08a2e5279b56f16cbb56f00ec59426341026909c7e39af9d6c"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/ConversionRecorder.php",
+      "reason": "تحويلات من إيصالات مالية موثوقة ومنع تكرار دلالي.",
+      "sha256": "1302d52a7cccfa838d997d7aba84d71d3c83aa5b2674d6ae0cc80e70f4dfab83"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/FinancialEventPolicy.php",
+      "reason": "سياسة اكتمال التحصيل وتوزيع مبلغ الإيصال.",
+      "sha256": "70540c991ea30e1209451c9e6757b3d5ac1cb3bad8a95b9082bf4510b6009a54"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/MarketingSettings.php",
+      "reason": "إرجاع flags وIDs العامة فقط حسب النطاق والبيئة.",
+      "sha256": "3cc50938b9b809c6f861df44291e90ab08f654aa8cc0484279a55f6460cdfd2a"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/PlatformConnector.php",
+      "reason": "موصلات Meta/TikTok/Snap اختيارية بحواجز الموافقة وبيئة الاختبار.",
+      "sha256": "a2313b7847b76234ad9c5ee02c68fb77d4d2a067a013886036e3a0d1ac2ee588"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/SnapMatchingData.php",
+      "reason": "عقد امتداد مطابقات Snap دون جمع افتراضي لبيانات العملاء.",
+      "sha256": "383ea18556c03d0493c92ef628ad0b6b2b8702deb37c5f4554281278db9166b0"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "app/Services/Marketing/WebEventOrigin.php",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "283884e416b153cbedeccb2041d301c590e4fc4993481c3f57c9c2b5c366b7da"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "config/marketing.php",
+      "reason": "إعدادات محمية ومسارات تسويق؛ لا أسرار في الاستجابة.",
+      "sha256": "a7ed7b17277dd1364146f24fe138e8c55ac69d884eaf96500cc5515cb354b0fb"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "database/migrations/2026_11_05_000001_create_marketing_tracking_tables.php",
+      "reason": "جداول التسويق المستقلة وفهارسها ومسار rollback؛ لم تطبق على قاعدة المشروع.",
+      "sha256": "064869853f796752e5c8d8faf0387bc0ef45cecedb2b29dbb62f0ca7e30238e0"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "public/assets/marketing/tracking.js",
+      "reason": "جسر Web مشترك، موافقة وخرائط أحداث ومزودين عبر GTM.",
+      "sha256": "fc0ec7c897e8b0b4281fea448ce54334fc433140ee8fd9f1cdefac07108050de"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "resources/views/layouts/landing/app.blade.php",
+      "reason": "جسر الموافقة في Landing وروابط الانتقال الموثوقة.",
+      "sha256": "7f141c16e2eb139be2a27da17195531964065aef3eb62d79ef12a234ad76d85a"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "resources/views/marketing/integrations.blade.php",
+      "reason": "واجهة الإعدادات ومراقبة الحالات دون عرض payload/PII.",
+      "sha256": "16a11fe79432aeb9ded1d8b0e4c45a3b843224be8a7bb74e5f43ca651e8f937d"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "resources/views/welcome.blade.php",
+      "reason": "تمييز روابط انتقال العميل لنقل إيصال الموافقة.",
+      "sha256": "ace936abb663e72949d44182dcd450d759f3fb105f57b1c65f10ebd9674b8e38"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "routes/console.php",
+      "reason": "أوامر Outbox والاستدراك والتنظيف دون تشغيلها.",
+      "sha256": "ff8cd35e33f699341998248309e2a84942c96bb85065eb29b5fd1ebc8f181c8b"
+    },
+    {
+      "repository": "Admin Panel",
+      "path": "routes/marketing.php",
+      "reason": "إعدادات محمية ومسارات تسويق؛ لا أسرار في الاستجابة.",
+      "sha256": "e238d5ec45f92e3f8b5150d9dfea9e62a3c81dfbb7b8079293f5bd38392c5940"
+    },
+    {
+      "repository": "User app and web",
+      "path": ".gitignore",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "9f08b58dc9ff25a22f8fedeab3abb10ff5b06732bca742ff98a2cccf8883bec5"
+    },
+    {
+      "repository": "User app and web",
+      "path": "android/app/build.gradle.kts",
+      "reason": "توليد موارد Meta من إعدادات النشر.",
+      "sha256": "d50766526d6d11119e3673198e979d1b8d7cd872ddacec3f43ea003ce7fd7174"
+    },
+    {
+      "repository": "User app and web",
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "reason": "تعطيل الجمع التلقائي والأغراض الإعلانية افتراضياً.",
+      "sha256": "04fc78fe7d404d0536386c8b6a8bbf5dcecacd2920319c9a9daf11c243934c19"
+    },
+    {
+      "repository": "User app and web",
+      "path": "android/app/src/main/res/values/string.xml",
+      "reason": "إزالة قيم Meta التجريبية؛ تُولَّد الموارد من Gradle.",
+      "sha256": "ad3c49fdb45280d7d6e0bdae55246ec807efd6105cb215f37b5b87f919dcea51"
+    },
+    {
+      "repository": "User app and web",
+      "path": "config/marketing.native.example.json",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "840cafd3b990058b95f31b18bd522dfadb56c450f04b6005d25abe73283a45cd"
+    },
+    {
+      "repository": "User app and web",
+      "path": "ios/Flutter/Debug.xcconfig",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "c96d27af494ac54d08ebde7b28fbfe13d1684d4d3185d662d8f9e470e2b3d00c"
+    },
+    {
+      "repository": "User app and web",
+      "path": "ios/Flutter/Marketing.xcconfig",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "53acab08821dfd2ad4c158d3095bbecfc07bfee9fddd52fe94961da0260d9f80"
+    },
+    {
+      "repository": "User app and web",
+      "path": "ios/Flutter/Release.xcconfig",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "4e2bb8161acff239aa284a08490dcad4f9cf67f9be50f4079d8776794ffee6f3"
+    },
+    {
+      "repository": "User app and web",
+      "path": "ios/Runner/Info.plist",
+      "reason": "موافقة افتراضية مرفوضة وهوية Meta من إعدادات Xcode.",
+      "sha256": "dd8abc5b76621724313c0a18c78d95a0fd5d96ae1c264fb86be54b4050d64fe5"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/api/remote/client_api.dart",
+      "reason": "إرفاق إيصال الموافقة الحالي بطلبات العميل، بما فيها multipart.",
+      "sha256": "f7c9922dce9c93d13df7b1c2a5a74ced1a649730cbcded72c0674371032479f3"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/common/widgets/cookies_view.dart",
+      "reason": "واجهة عربية/إنجليزية لتصنيفات الموافقة والرفض والتعديل.",
+      "sha256": "6c5ba79153a46d540657f6ea60eccd65aecfb7ef952b0d4f3c48a73a515bb419"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/common/widgets/service_center_dialog.dart",
+      "reason": "إزالة حدث الإضافة المفترض من الحوار.",
+      "sha256": "c73ee4233d0f99c7e921d0a641305f40cfc840b1d50198ee45b5899ebf1d9c0a"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/common/widgets/service_widget_vertical.dart",
+      "reason": "انطباع مرئي واختيار خدمة دون أسماء/نصوص حرة.",
+      "sha256": "4cb8b253dee6485c3bf3dc416cab4918b881dd3e4ba2c2df985c668e7e5d1099"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/auth/controller/facebook_login_controller.dart",
+      "reason": "قراءة ATT واستعمال Limited Login دون طلب موافقة تسويق عند الدخول.",
+      "sha256": "48612c8e3d4d96d90b5bb62fd20b6ec29d2bf9a0326af97e7d5daf445caed5c9"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/cart/controller/cart_controller.dart",
+      "reason": "نتيجة batch واضحة، وأحداث نجاح وفرق كمية وسعر موثق.",
+      "sha256": "8d21edc24536873aa6d7b51a7e93efaf0d427ea66e51b63cdae9ebc15757c07e"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/checkout/controller/checkout_controller.dart",
+      "reason": "begin_checkout بعد اعتماد لقطة السعر.",
+      "sha256": "2d0f11b69e49a7267bcad1276e585f03b40a6e6690b9ec5ac59d86abaf9cc0da"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/create_post/controller/create_post_controller.dart",
+      "reason": "generate_lead بعد نجاح طلب عرض السعر.",
+      "sha256": "895fb47c12b6140c971d983211ace2a2c3e284c7b65acb7eebd8dc5cab2cff7b"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/home/controller/banner_controller.dart",
+      "reason": "select_promotion عند اختيار البنر.",
+      "sha256": "1f2a2c7eed702677d9b16e4473c019fda621dcacd5a33041e5dc6b3ae97d0844"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/home/widget/banner_view.dart",
+      "reason": "view_promotion للبنر المرئي الفعّال.",
+      "sha256": "15b8a3a0500e0abfebfe00c8f00edea2fad9e89c51a1577fb61aa12290a85091"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/menu/account_screen.dart",
+      "reason": "إعادة فتح إعدادات الخصوصية من الحساب دون تغطية زر الحجز.",
+      "sha256": "f9a9f08c297b68553f37c42d5d89e46c4e1cb0bfe25dbe08dd26b8f49e6f330a"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/feature/service/controller/service_details_controller.dart",
+      "reason": "view_item بعد نجاح أحدث استجابة للخدمة.",
+      "sha256": "3257d8a332f58661e2c5a1dceffd0289cf2b85d21b67fc83bd4cc11eeea34de7"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/helper/analytics/analytics_helper.dart",
+      "reason": "موجّه Native/Web، موافقة وATT، عزل SDKs، أحداث موثقة وتحقق عند العودة/انتهاء الإيصال.",
+      "sha256": "4ec26060f5f881591fcabe068206ade045dad1d53671c60140209a6ca069791b"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/helper/analytics/facebook_analytics.dart",
+      "reason": "بوابة Meta App Events وأحداث شراء موثقة.",
+      "sha256": "3e9273fe4dc9197ff03fc5f3f443318ff74757e4f3795b26340252444d845b6b"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/helper/analytics/firebase_analytics.dart",
+      "reason": "مدخل قديم متوافق يمر عبر بوابات الموافقة.",
+      "sha256": "30f57ca0819f86722a7558dcf97f4243389385ca71a6d0f1b8b1875bceb3d466"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/helper/analytics/google_tag_manager.dart",
+      "reason": "جسر JSON عبر DOM دون حقن JavaScript.",
+      "sha256": "134d4fe9f12e7f5017777cad19ee68ae955c608264588e85097a09ab8956f297"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/helper/analytics/marketing_impression.dart",
+      "reason": "قياس ظهور البطاقة مرة عند ظهور نصفها في الشاشة.",
+      "sha256": "2efc1c576be5a6bb0fd55acfc1185d66ba488493eff83b27b35de9f66a834d86"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/helper/analytics/tiktok_analytics.dart",
+      "reason": "تعديل محلي ضمن مراحل التسويق.",
+      "sha256": "54cc787e6224a209569f4c9685a2940817faf6b49fa23595312269b70f680f2b"
+    },
+    {
+      "repository": "User app and web",
+      "path": "lib/main.dart",
+      "reason": "بدء القياس بعد Firebase وواجهة التطبيق، ومراقب التنقل ولوحة الموافقة الأولى.",
+      "sha256": "79bc920e7b1f96cdb92def3caf6a0952e76f760a9bf3127113f643410f4146db"
+    },
+    {
+      "repository": "User app and web",
+      "path": "tool/prepare_marketing_build.py",
+      "reason": "متابعة متطلبات Flutter وإصلاح F-01/F-02؛ راجع OWNER-ACTIVATION-CODE-CLOSURE.md.",
+      "sha256": "d58fbe753e35e595039b686c21421e762bf036196f3bae0a9332e5216ad8a30f"
+    },
+    {
+      "repository": "User app and web",
+      "path": "web/index.html",
+      "reason": "إزالة GTM placeholder وnoscript وإضافة الجسر المحلي.",
+      "sha256": "94388fdc828e93ade8b73597aa7f3237bba58abbf8ff552a2cb31c392adc70e8"
+    },
+    {
+      "repository": "User app and web",
+      "path": "web/marketing_tracking.js",
+      "reason": "جسر Web مشترك، موافقة وخرائط أحداث ومزودين عبر GTM.",
+      "sha256": "fc0ec7c897e8b0b4281fea448ce54334fc433140ee8fd9f1cdefac07108050de"
+    }
+  ]
+}
