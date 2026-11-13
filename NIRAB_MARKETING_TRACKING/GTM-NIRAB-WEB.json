@@ -29,7 +29,7 @@
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
-          "consentStatus": "needed",
+          "consentStatus": "NEEDED",
           "consentType": {
             "type": "LIST",
             "list": [
@@ -62,7 +62,7 @@
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
-          "consentStatus": "needed",
+          "consentStatus": "NEEDED",
           "consentType": {
             "type": "LIST",
             "list": [
@@ -103,7 +103,7 @@
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
-          "consentStatus": "needed",
+          "consentStatus": "NEEDED",
           "consentType": {
             "type": "LIST",
             "list": [
@@ -144,7 +144,7 @@
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
-          "consentStatus": "needed",
+          "consentStatus": "NEEDED",
           "consentType": {
             "type": "LIST",
             "list": [
@@ -185,7 +185,7 @@
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
-          "consentStatus": "needed",
+          "consentStatus": "NEEDED",
           "consentType": {
             "type": "LIST",
             "list": [
@@ -226,7 +226,7 @@
         ],
         "tagFiringOption": "ONCE_PER_EVENT",
         "consentSettings": {
-          "consentStatus": "needed",
+          "consentStatus": "NEEDED",
           "consentType": {
             "type": "LIST",
             "list": [
