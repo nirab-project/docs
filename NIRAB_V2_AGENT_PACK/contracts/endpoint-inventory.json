@@ -1,0 +1,572 @@
+{
+    "proposed_contract": false,
+    "base_path": "/api/v2/commerce",
+    "operations": [
+        {
+            "method": "GET",
+            "path": "/capabilities",
+            "operation_id": "get_capabilities"
+        },
+        {
+            "method": "POST",
+            "path": "/guest-sessions",
+            "operation_id": "post_guest_sessions"
+        },
+        {
+            "method": "GET",
+            "path": "/catalog/services",
+            "operation_id": "get_catalog_services"
+        },
+        {
+            "method": "GET",
+            "path": "/catalog/services/{id}",
+            "operation_id": "get_catalog_services_id"
+        },
+        {
+            "method": "GET",
+            "path": "/catalog/offers/{id}",
+            "operation_id": "get_catalog_offers_id"
+        },
+        {
+            "method": "GET",
+            "path": "/reference-data/{key}",
+            "operation_id": "get_reference_data_key"
+        },
+        {
+            "method": "POST",
+            "path": "/forms/validate",
+            "operation_id": "post_forms_validate"
+        },
+        {
+            "method": "POST",
+            "path": "/pricing/evaluate",
+            "operation_id": "post_pricing_evaluate"
+        },
+        {
+            "method": "POST",
+            "path": "/uploads",
+            "operation_id": "post_uploads"
+        },
+        {
+            "method": "POST",
+            "path": "/uploads/{id}/complete",
+            "operation_id": "post_uploads_id_complete"
+        },
+        {
+            "method": "POST",
+            "path": "/uploads/{id}/read-link",
+            "operation_id": "post_uploads_id_read_link"
+        },
+        {
+            "method": "GET",
+            "path": "/assets",
+            "operation_id": "get_assets"
+        },
+        {
+            "method": "POST",
+            "path": "/assets",
+            "operation_id": "post_assets"
+        },
+        {
+            "method": "PATCH",
+            "path": "/assets/{id}",
+            "operation_id": "patch_assets_id"
+        },
+        {
+            "method": "DELETE",
+            "path": "/assets/{id}",
+            "operation_id": "delete_assets_id"
+        },
+        {
+            "method": "GET",
+            "path": "/cart",
+            "operation_id": "get_cart"
+        },
+        {
+            "method": "POST",
+            "path": "/cart/merge",
+            "operation_id": "post_cart_merge"
+        },
+        {
+            "method": "POST",
+            "path": "/cart/items",
+            "operation_id": "post_cart_items"
+        },
+        {
+            "method": "PATCH",
+            "path": "/cart/items/{id}",
+            "operation_id": "patch_cart_items_id"
+        },
+        {
+            "method": "DELETE",
+            "path": "/cart/items/{id}",
+            "operation_id": "delete_cart_items_id"
+        },
+        {
+            "method": "POST",
+            "path": "/availability/days",
+            "operation_id": "post_availability_days"
+        },
+        {
+            "method": "POST",
+            "path": "/availability/slots",
+            "operation_id": "post_availability_slots"
+        },
+        {
+            "method": "POST",
+            "path": "/schedules/preview",
+            "operation_id": "post_schedules_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/checkout/preview",
+            "operation_id": "post_checkout_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/checkout/confirm",
+            "operation_id": "post_checkout_confirm"
+        },
+        {
+            "method": "GET",
+            "path": "/checkout/attempts/{id}",
+            "operation_id": "get_checkout_attempts_id"
+        },
+        {
+            "method": "GET",
+            "path": "/orders",
+            "operation_id": "get_orders"
+        },
+        {
+            "method": "GET",
+            "path": "/orders/{id}",
+            "operation_id": "get_orders_id"
+        },
+        {
+            "method": "POST",
+            "path": "/orders/{id}/bank-receipts",
+            "operation_id": "post_orders_id_bank_receipts"
+        },
+        {
+            "method": "GET",
+            "path": "/bookings",
+            "operation_id": "get_bookings"
+        },
+        {
+            "method": "GET",
+            "path": "/bookings/{id}",
+            "operation_id": "get_bookings_id"
+        },
+        {
+            "method": "POST",
+            "path": "/bookings/{id}/reschedule-preview",
+            "operation_id": "post_bookings_id_reschedule_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/bookings/{id}/reschedule",
+            "operation_id": "post_bookings_id_reschedule"
+        },
+        {
+            "method": "POST",
+            "path": "/bookings/{id}/cancel-preview",
+            "operation_id": "post_bookings_id_cancel_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/bookings/{id}/cancel",
+            "operation_id": "post_bookings_id_cancel"
+        },
+        {
+            "method": "GET",
+            "path": "/wallet",
+            "operation_id": "get_wallet"
+        },
+        {
+            "method": "POST",
+            "path": "/wallet/topups",
+            "operation_id": "post_wallet_topups"
+        },
+        {
+            "method": "GET",
+            "path": "/entitlements",
+            "operation_id": "get_entitlements"
+        },
+        {
+            "method": "GET",
+            "path": "/entitlements/{id}",
+            "operation_id": "get_entitlements_id"
+        },
+        {
+            "method": "POST",
+            "path": "/entitlements/{id}/redemption-preview",
+            "operation_id": "post_entitlements_id_redemption_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/entitlements/{id}/redeem",
+            "operation_id": "post_entitlements_id_redeem"
+        },
+        {
+            "method": "GET",
+            "path": "/renewals",
+            "operation_id": "get_renewals"
+        },
+        {
+            "method": "PATCH",
+            "path": "/renewals/{id}",
+            "operation_id": "patch_renewals_id"
+        },
+        {
+            "method": "POST",
+            "path": "/quote-requests",
+            "operation_id": "post_quote_requests"
+        },
+        {
+            "method": "GET",
+            "path": "/quote-requests",
+            "operation_id": "get_quote_requests"
+        },
+        {
+            "method": "GET",
+            "path": "/quote-requests/{id}",
+            "operation_id": "get_quote_requests_id"
+        },
+        {
+            "method": "POST",
+            "path": "/quote-requests/{id}/accept",
+            "operation_id": "post_quote_requests_id_accept"
+        },
+        {
+            "method": "POST",
+            "path": "/quote-requests/{id}/reject",
+            "operation_id": "post_quote_requests_id_reject"
+        },
+        {
+            "method": "GET",
+            "path": "/adjustments/{id}",
+            "operation_id": "get_adjustments_id"
+        },
+        {
+            "method": "POST",
+            "path": "/adjustments/{id}/review",
+            "operation_id": "post_adjustments_id_review"
+        },
+        {
+            "method": "GET",
+            "path": "/admin/services",
+            "operation_id": "get_admin_services"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services",
+            "operation_id": "post_admin_services"
+        },
+        {
+            "method": "GET",
+            "path": "/admin/services/{id}",
+            "operation_id": "get_admin_services_id"
+        },
+        {
+            "method": "PUT",
+            "path": "/admin/services/{id}",
+            "operation_id": "put_admin_services_id"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services/{id}/validate",
+            "operation_id": "post_admin_services_id_validate"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services/{id}/simulate",
+            "operation_id": "post_admin_services_id_simulate"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services/{id}/publish",
+            "operation_id": "post_admin_services_id_publish"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services/{id}/pause",
+            "operation_id": "post_admin_services_id_pause"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services/{id}/archive",
+            "operation_id": "post_admin_services_id_archive"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/services/{id}/copy",
+            "operation_id": "post_admin_services_id_copy"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/offers",
+            "operation_id": "post_admin_offers"
+        },
+        {
+            "method": "PUT",
+            "path": "/admin/offers/{id}",
+            "operation_id": "put_admin_offers_id"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/offers/{id}/publish",
+            "operation_id": "post_admin_offers_id_publish"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/cities/{id}/offers",
+            "operation_id": "post_admin_cities_id_offers"
+        },
+        {
+            "method": "GET",
+            "path": "/admin/readiness",
+            "operation_id": "get_admin_readiness"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/bookings",
+            "operation_id": "get_ops_bookings"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/bookings/{id}",
+            "operation_id": "get_ops_bookings_id"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/bookings/{id}/assign",
+            "operation_id": "post_ops_bookings_id_assign"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/bookings/{id}/reschedule",
+            "operation_id": "post_ops_bookings_id_reschedule"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/quote-requests",
+            "operation_id": "get_ops_quote_requests"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/quote-requests/{id}/versions",
+            "operation_id": "post_ops_quote_requests_id_versions"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/quote-versions/{id}/send",
+            "operation_id": "post_ops_quote_versions_id_send"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/tasks",
+            "operation_id": "get_ops_tasks"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/tasks/{id}",
+            "operation_id": "get_ops_tasks_id"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/tasks/{id}/transition",
+            "operation_id": "post_ops_tasks_id_transition"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/adjustments",
+            "operation_id": "post_ops_adjustments"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/cash-collections",
+            "operation_id": "post_ops_cash_collections"
+        },
+        {
+            "method": "POST",
+            "path": "/finance/receipts/{id}/review",
+            "operation_id": "post_finance_receipts_id_review"
+        },
+        {
+            "method": "POST",
+            "path": "/finance/refunds",
+            "operation_id": "post_finance_refunds"
+        },
+        {
+            "method": "GET",
+            "path": "/finance/refunds/{id}",
+            "operation_id": "get_finance_refunds_id"
+        },
+        {
+            "method": "POST",
+            "path": "/finance/cash-collections/{id}/remit",
+            "operation_id": "post_finance_cash_collections_id_remit"
+        },
+        {
+            "method": "GET",
+            "path": "/reports/{kind}",
+            "operation_id": "get_reports_kind"
+        },
+        {
+            "method": "PUT",
+            "path": "/uploads/{id}/bytes",
+            "operation_id": "put_uploads_id_bytes"
+        },
+        {
+            "method": "GET",
+            "path": "/uploads/{id}/content",
+            "operation_id": "get_uploads_id_content"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/resources",
+            "operation_id": "get_ops_resources"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/capacity",
+            "operation_id": "get_ops_capacity"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/shifts",
+            "operation_id": "get_ops_shifts"
+        },
+        {
+            "method": "PATCH",
+            "path": "/ops/shifts/{id}",
+            "operation_id": "patch_ops_shifts_id"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/tasks/{id}/schedule",
+            "operation_id": "post_ops_tasks_id_schedule"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/quote-requests/{id}/actions",
+            "operation_id": "post_ops_quote_requests_id_actions"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/bookings/{id}/reschedule-preview",
+            "operation_id": "post_ops_bookings_id_reschedule_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/bookings/{id}/cancel-preview",
+            "operation_id": "post_ops_bookings_id_cancel_preview"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/bookings/{id}/cancel",
+            "operation_id": "post_ops_bookings_id_cancel"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/capabilities",
+            "operation_id": "post_admin_capabilities"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/tasks/{id}/delivery-confirmation/verify",
+            "operation_id": "post_ops_tasks_id_delivery_confirmation_verify"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/capabilities",
+            "operation_id": "get_ops_capabilities"
+        },
+        {
+            "method": "GET",
+            "path": "/ops/technicians/{id}/capabilities",
+            "operation_id": "get_ops_technicians_id_capabilities"
+        },
+        {
+            "method": "PUT",
+            "path": "/ops/technicians/{id}/capabilities",
+            "operation_id": "put_ops_technicians_id_capabilities"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/tasks/{id}/delivery-confirmation/request",
+            "operation_id": "post_ops_tasks_id_delivery_confirmation_request"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/tasks/{id}/evidence",
+            "operation_id": "post_ops_tasks_id_evidence"
+        },
+        {
+            "method": "POST",
+            "path": "/ops/bookings/{id}/no-show",
+            "operation_id": "post_ops_bookings_id_no_show"
+        },
+        {
+            "method": "GET",
+            "path": "/reviews",
+            "operation_id": "get_reviews"
+        },
+        {
+            "method": "POST",
+            "path": "/bookings/{id}/review",
+            "operation_id": "post_bookings_id_review"
+        },
+        {
+            "method": "GET",
+            "path": "/quality/claims",
+            "operation_id": "get_quality_claims"
+        },
+        {
+            "method": "POST",
+            "path": "/quality/claims",
+            "operation_id": "post_quality_claims"
+        },
+        {
+            "method": "GET",
+            "path": "/quality/claims/{id}",
+            "operation_id": "get_quality_claims_id"
+        },
+        {
+            "method": "POST",
+            "path": "/quality/claims/{id}/transition",
+            "operation_id": "post_quality_claims_id_transition"
+        },
+        {
+            "method": "GET",
+            "path": "/renewals/{id}/purchase-context",
+            "operation_id": "get_renewals_id_purchase_context"
+        },
+        {
+            "method": "POST",
+            "path": "/orders/{id}/refund-consents",
+            "operation_id": "post_orders_id_refund_consents"
+        },
+        {
+            "method": "POST",
+            "path": "/checkout/attempts/{id}/cancel",
+            "operation_id": "post_checkout_attempts_id_cancel"
+        },
+        {
+            "method": "POST",
+            "path": "/finance/refunds/{id}/manual-confirm",
+            "operation_id": "post_finance_refunds_id_manual_confirm"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/offers/{id}/pause",
+            "operation_id": "post_admin_offers_id_pause"
+        },
+        {
+            "method": "POST",
+            "path": "/admin/offers/{id}/archive",
+            "operation_id": "post_admin_offers_id_archive"
+        }
+    ],
+    "runtime_verification": "not_run_by_design"
+}

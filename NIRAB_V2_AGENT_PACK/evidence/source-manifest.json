@@ -1,0 +1,302 @@
+{
+  "method": "static inspection; no application boot, database execution or production access",
+  "archives": [
+    {
+      "archive": "01-NIRAB-BACKEND-SOURCE.zip",
+      "sha256": "9019c82eeb4bf53dfec3cab0d497a070a2701c7159b4ce6caec1e3a9b3e6992e",
+      "entries": 2737
+    },
+    {
+      "archive": "02-NIRAB-CUSTOMER-SOURCE.zip",
+      "sha256": "8c30a91741e8eb53ba956647465cd94953201fd9fb71ee11b0599dff063f6be6",
+      "entries": 898
+    },
+    {
+      "archive": "03-NIRAB-PROVIDER-SOURCE.zip",
+      "sha256": "0c13e047ee3fc299db3b4a530e67096e00f40052bb1cbd695f7e80f32f9373b4",
+      "entries": 790
+    },
+    {
+      "archive": "04-NIRAB-SERVICEMAN-SOURCE.zip",
+      "sha256": "eb0804a67067c9b81d1bc7df840bd021296ad5efdf15fe6d94669f8ddc6ac359",
+      "entries": 380
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E01",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "composer.json",
+      "lines": [
+        7,
+        42
+      ],
+      "sha256": "5eefeaeab24b0d73abe0e9a0f05c89e05fd642c4b0c184fede635ec42c7531e3",
+      "finding": "Laravel ^12 وPHP ^8.2 وPassport/Modules/Spatial؛ الإصدارات الدقيقة مثبتة في composer.lock."
+    },
+    {
+      "id": "E02",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/ServiceManagement/Services/PricingEngine.php",
+      "lines": [
+        14,
+        45
+      ],
+      "sha256": "e0b912de72ca383117299f8007f3b75b72678aa5d2f82a8f6ec2ad05b06699c3",
+      "finding": "المحرك الحالي يرفض non-fixed ويستدعي ServiceRequirements ويستخدم float/round."
+    },
+    {
+      "id": "E03",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/ServiceManagement/Services/PricingEngine.php",
+      "lines": [
+        80,
+        95
+      ],
+      "sha256": "e0b912de72ca383117299f8007f3b75b72678aa5d2f82a8f6ec2ad05b06699c3",
+      "finding": "tax/total بثلاث منازل وprice source؛ مطلوب adapter مالي وإعادة بناء الحساب."
+    },
+    {
+      "id": "E04",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php",
+      "lines": [
+        54,
+        67
+      ],
+      "sha256": "96cecd27ad57db6cf327f5e8cd7340e4e408466390b9674ed8782714f20267f0",
+      "finding": "هوية guest في السلة ليست guest_id وحده؛ لا نضعف الحماية في V2."
+    },
+    {
+      "id": "E05",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/CartModule/Http/Controllers/Api/V1/Customer/CartController.php",
+      "lines": [
+        76,
+        121
+      ],
+      "sha256": "96cecd27ad57db6cf327f5e8cd7340e4e408466390b9674ed8782714f20267f0",
+      "finding": "CityCartContext والسلة الثابتة snapshots؛ لا quote cart عادي."
+    },
+    {
+      "id": "E06",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/BookingModule/Services/BranchCheckoutService.php",
+      "lines": [
+        19,
+        30
+      ],
+      "sha256": "e765ff9d62adbbb75f26707c8e3244a827a86a660e93ed6c1cda64dc1b75c821",
+      "finding": "Preview منفصلة بصلاحية 15 دقيقة في اللقطة."
+    },
+    {
+      "id": "E07",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/BookingModule/Services/BranchCheckoutService.php",
+      "lines": [
+        141,
+        176
+      ],
+      "sha256": "e765ff9d62adbbb75f26707c8e3244a827a86a660e93ed6c1cda64dc1b75c821",
+      "finding": "Confirm داخل transaction وقفل snapshot/cart/payment والتحقق من الأموال."
+    },
+    {
+      "id": "E08",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/BookingModule/Services/CheckoutScheduleInput.php",
+      "lines": [
+        11,
+        43
+      ],
+      "sha256": "aace53cd21762155b068467e55619e461729d1251cdd19777e90cb06a7b065a6",
+      "finding": "regular/repeat وقائمة dates normalized؛ هذه قاعدة انطلاق لا مواعيد لكل عنصر."
+    },
+    {
+      "id": "E09",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/ServiceManagement/Http/Controllers/Api/V1/Admin/ServiceFieldController.php",
+      "lines": [
+        62,
+        91
+      ],
+      "sha256": "7e5583dc9ae8fa62db8278cae86155746f864437302b0eafbf9b8eea575bdb4a",
+      "finding": "fields/options وتعديل السعر/المدة/عدد الفنيين؛ schema الحالي لا منشئ nested كامل."
+    },
+    {
+      "id": "E10",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/CustomerSubscriptionModule/Http/Controllers/VisitPackageController.php",
+      "lines": [
+        25,
+        40
+      ],
+      "sha256": "1a2dd4e8d5d2524c21e36128a5fe9b3671041c305e316c064723337caf0bbf0f",
+      "finding": "visits مقيدة 4/8/12، monthly=30؛ يجب فصل عدد الزيارات عن cadence."
+    },
+    {
+      "id": "E11",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "database/migrations/2026_11_13_000001_create_city_registry.php",
+      "lines": [
+        10,
+        44
+      ],
+      "sha256": "5a117f009da2759efb900268c7dbe8d3050b221acfab7e03be64ee345d736610",
+      "finding": "مدن وحدود spatial وunique المدينة/الفرع؛ نحتفظ بها."
+    },
+    {
+      "id": "E12",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "database/migrations/2026_11_13_000002_add_city_geographic_registry.php",
+      "lines": [
+        10,
+        30
+      ],
+      "sha256": "64f8d529dd31964ec7817f04931f8064dc537ef208d68f0890d71d90e37e6616",
+      "finding": "مصادر جغرافية واعتمادات وraw_geojson محمية."
+    },
+    {
+      "id": "E13",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "app/Services/City/CityMode.php",
+      "lines": [
+        8,
+        28
+      ],
+      "sha256": "df6cf1ff677ba70c64642cde83b454c17827c0f5d330eb5364b6444e0dff6284",
+      "finding": "strict config/MySQL/READ COMMITTED guards."
+    },
+    {
+      "id": "E14",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "app/Services/City/CityBranchResolver.php",
+      "lines": [
+        10,
+        27
+      ],
+      "sha256": "2e42c360d496249f1280fa6df60f9ec31c820c17646390a651f6b2a5d4923623",
+      "finding": "الفرع يشتق من المدينة مع readiness وحدود؛ لا multi branch picker."
+    },
+    {
+      "id": "E15",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/ProviderManagement/Services/BranchCapacityPolicy.php",
+      "lines": [
+        18,
+        42
+      ],
+      "sha256": "0e9299caa77fbbd65f6d80ac55f7e95fccfeb43803f536d8b25fb8b8d4393cba",
+      "finding": "dailyLoad يقرأ Booking/booking_repeats؛ lock على provider؛ يلزم تغيير مصدر القراءة V2."
+    },
+    {
+      "id": "E16",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/ProviderManagement/Entities/Provider.php",
+      "lines": [
+        95,
+        138
+      ],
+      "sha256": "67606d97be82b4f41b9ce8a99f1804df5807c495739a338b85dd15cd8970bc36",
+      "finding": "provider owner/zone/availability/servicemen relationships محمية."
+    },
+    {
+      "id": "E17",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/UserManagement/Entities/Serviceman.php",
+      "lines": [
+        24,
+        51
+      ],
+      "sha256": "27735047a785cda84940a40d1c3c3d2fd9b745fc4a07f4dab49d3ee55487c955",
+      "finding": "الفني في UserManagement ويرتبط بالمستخدم/الفرع/الفريق/المهارات/الورديات."
+    },
+    {
+      "id": "E18",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/PaymentModule/Entities/Setting.php",
+      "lines": [
+        14,
+        22
+      ],
+      "sha256": "6b8716afd124deb2dfc28894e7350cc808124925aecd5951a3b476a2fbc5f8f9",
+      "finding": "إعدادات الدفع في addon_settings؛ ليست معاملات قابلة للحذف."
+    },
+    {
+      "id": "E19",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/PaymentModule/Entities/PaymentRequest.php",
+      "lines": [
+        14,
+        17
+      ],
+      "sha256": "00bfe707e0c5ce8d39a3f43dad98650c3de58da8c717a21d73ae63844f0fc1b0",
+      "finding": "سجل الدفع وتشفير finalization_result يعتمد على إعدادات/APP_KEY."
+    },
+    {
+      "id": "E20",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "Modules/PaymentModule/Entities/PaymentRefund.php",
+      "lines": [
+        17,
+        24
+      ],
+      "sha256": "8733029115dd5182add186305c318114481786a44521a61ab3d908b9f325a498",
+      "finding": "قرارات refund immutable ولا حذف عادي؛ reset أداة محكومة منفصلة."
+    },
+    {
+      "id": "E21",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "database/seeders/DatabaseSeeder.php",
+      "lines": [
+        7,
+        17
+      ],
+      "sha256": "94fd4210312a4779630186797a338d2045e5dc9a67d11048c69ee6c3990313d4",
+      "finding": "DatabaseSeeder فارغ في الأرشيف؛ لا يعيد الشركة وحده."
+    },
+    {
+      "id": "E22",
+      "archive_root": "01-NIRAB-BACKEND-SOURCE",
+      "path": "app/Console/Commands/DatabaseRefresh.php",
+      "lines": [
+        44,
+        63
+      ],
+      "sha256": "a25c734bfdbb99a5de030619bd7c231023601e0ad69489be4b986486cadb3780",
+      "finding": "Demo reset يقوم db:wipe وحذف storage؛ ليس أداة التحويل المطلوبة."
+    },
+    {
+      "id": "E23",
+      "archive_root": "02-NIRAB-CUSTOMER-SOURCE",
+      "path": "lib/util/app_constants.dart",
+      "lines": [
+        1,
+        10
+      ],
+      "sha256": "0d7c40934cb0e5d3e6b7bc4887bb99a23082823a6b8ad74d733f8a1fdcee0d41",
+      "finding": "Customer baseUrl إنتاج ثابت في المصدر."
+    },
+    {
+      "id": "E24",
+      "archive_root": "03-NIRAB-PROVIDER-SOURCE",
+      "path": "lib/util/app_constants.dart",
+      "lines": [
+        1,
+        12
+      ],
+      "sha256": "f797f6b75d4e9d6a8b8c80c3fda27b625f5a191bf0618ac03ef10fd9c4851b56",
+      "finding": "Provider baseUrl إنتاج ثابت في المصدر."
+    },
+    {
+      "id": "E25",
+      "archive_root": "04-NIRAB-SERVICEMAN-SOURCE",
+      "path": "lib/utils/app_constants.dart",
+      "lines": [
+        1,
+        11
+      ],
+      "sha256": "a34b001c2455eb58ab808ff682f7d421bc9dfcd3ff6c91e7518278c0fc388c87",
+      "finding": "Serviceman baseUrl إنتاج ثابت؛ مسار utils مختلف."
+    }
+  ]
+}

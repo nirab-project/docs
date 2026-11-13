@@ -1,0 +1,137 @@
+{
+  "warning": "LOCAL ONLY. No real credentials, contacts, or geographic claims.",
+  "clock": "injectable; choose tomorrow relative to test clock; do not alter host clock",
+  "cities": [
+    {
+      "code": "TST_CITY_A",
+      "synthetic": true,
+      "country_code": "SA",
+      "source_reference": "local-fixture:city-a",
+      "polygon_lon_lat": [
+        [
+          46.0,
+          24.0
+        ],
+        [
+          46.1,
+          24.0
+        ],
+        [
+          46.1,
+          24.1
+        ],
+        [
+          46.0,
+          24.1
+        ],
+        [
+          46.0,
+          24.0
+        ]
+      ],
+      "one_branch": "TST_BRANCH_A"
+    },
+    {
+      "code": "TST_CITY_B",
+      "synthetic": true,
+      "country_code": "SA",
+      "source_reference": "local-fixture:city-b",
+      "polygon_lon_lat": [
+        [
+          46.2,
+          24.0
+        ],
+        [
+          46.3,
+          24.0
+        ],
+        [
+          46.3,
+          24.1
+        ],
+        [
+          46.2,
+          24.1
+        ],
+        [
+          46.2,
+          24.0
+        ]
+      ],
+      "one_branch": "TST_BRANCH_B"
+    }
+  ],
+  "identities": [
+    "local_owner",
+    "local_catalog_admin",
+    "local_finance",
+    "local_manager_a",
+    "local_manager_b",
+    "local_technician_a1",
+    "local_technician_a2",
+    "local_technician_b1",
+    "local_customer_a",
+    "local_customer_b"
+  ],
+  "credential_policy": "randomly generated locally; no static production password; do not commit private account details",
+  "customer_a_wallet_minor": 100000,
+  "workforce": {
+    "A": {
+      "technicians": 2,
+      "daily_capacity": 8,
+      "shift_local": [
+        "08:00",
+        "20:00"
+      ]
+    },
+    "B": {
+      "technicians": 1,
+      "daily_capacity": 4,
+      "shift_local": [
+        "08:00",
+        "20:00"
+      ]
+    }
+  },
+  "vehicle_reference_data": {
+    "brands": [
+      {
+        "code": "test_brand_a",
+        "label": "شركة اختبار أ"
+      },
+      {
+        "code": "test_brand_b",
+        "label": "شركة اختبار ب"
+      }
+    ],
+    "models": [
+      {
+        "code": "model_a1",
+        "brand": "test_brand_a"
+      },
+      {
+        "code": "model_b1",
+        "brand": "test_brand_b"
+      }
+    ]
+  },
+  "fake_gateway_cases": [
+    "success",
+    "decline",
+    "pending_timeout",
+    "duplicate_webhook",
+    "invalid_signature",
+    "wrong_amount",
+    "wrong_currency",
+    "late_paid_capacity_gone",
+    "partial_refund",
+    "refund_timeout"
+  ],
+  "seed_invariants": [
+    "no production geo imports",
+    "no external outbound calls",
+    "city code TST refused in production",
+    "all reference services start draft unless local scenario explicitly publishes",
+    "technician capabilities granted by test scenario not global production remap"
+  ]
+}

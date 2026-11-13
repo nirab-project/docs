@@ -1,0 +1,652 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:nirab:service-definition:v1",
+    "title": "NIRAB V2 Service Definition",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema_version",
+        "code",
+        "label",
+        "status",
+        "content",
+        "form",
+        "offers",
+        "requirements",
+        "journey",
+        "policy"
+    ],
+    "properties": {
+        "schema_version": {
+            "const": 1
+        },
+        "code": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{2,63}$"
+        },
+        "label": {
+            "$ref": "#/$defs/Localized"
+        },
+        "status": {
+            "enum": [
+                "draft",
+                "published",
+                "paused",
+                "archived"
+            ]
+        },
+        "content": {
+            "type": "object",
+            "required": [
+                "description",
+                "includes",
+                "why_us",
+                "faq"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "hero_icon": {
+                    "type": "string"
+                },
+                "gallery": {
+                    "type": "array",
+                    "maxItems": 20,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "kind",
+                            "asset_ref"
+                        ],
+                        "properties": {
+                            "kind": {
+                                "enum": [
+                                    "image",
+                                    "video"
+                                ]
+                            },
+                            "asset_ref": {
+                                "type": "string"
+                            },
+                            "alt": {
+                                "$ref": "#/$defs/Localized"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "includes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/Localized"
+                    }
+                },
+                "why_us": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "icon",
+                            "title"
+                        ],
+                        "properties": {
+                            "icon": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "$ref": "#/$defs/Localized"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "faq": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "question",
+                            "answer"
+                        ],
+                        "properties": {
+                            "question": {
+                                "$ref": "#/$defs/Localized"
+                            },
+                            "answer": {
+                                "$ref": "#/$defs/Localized"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "notice": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "short_description": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "hero_image_ref": {
+                    "type": "string"
+                },
+                "hero_image_alt": {
+                    "$ref": "#/$defs/Localized"
+                }
+            }
+        },
+        "form": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+                "$ref": "#/$defs/Field"
+            }
+        },
+        "offers": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "$ref": "#/$defs/Offer"
+            }
+        },
+        "requirements": {
+            "type": "object",
+            "required": [
+                "workflow",
+                "base_duration_minutes",
+                "technicians",
+                "capabilities"
+            ],
+            "properties": {
+                "workflow": {
+                    "enum": [
+                        "onsite",
+                        "inspection",
+                        "pickup_processing_delivery"
+                    ]
+                },
+                "base_duration_minutes": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "technicians": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "capabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "buffer_minutes": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "duration_rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "duration_per_unit": {
+                    "type": "boolean"
+                },
+                "task_definitions": {
+                    "type": "object",
+                    "maxProperties": 5,
+                    "propertyNames": {
+                        "enum": [
+                            "onsite",
+                            "inspection",
+                            "pickup",
+                            "process",
+                            "delivery"
+                        ]
+                    },
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "duration_minutes": {
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "technicians": {
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "capabilities": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "checklist": {
+                                "type": "object",
+                                "properties": {
+                                    "required": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "evidence_required": {
+                                        "type": "boolean"
+                                    },
+                                    "team_attendance_required": {
+                                        "type": "boolean"
+                                    },
+                                    "delivery_confirmation_required": {
+                                        "type": "boolean"
+                                    },
+                                    "minimum_before_evidence": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "minimum_after_evidence": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "delivery_policy": {
+                    "type": "object",
+                    "properties": {
+                        "mode": {
+                            "enum": [
+                                "expected",
+                                "confirmed"
+                            ]
+                        },
+                        "min_processing_minutes": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "expected_after_minutes": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    },
+                    "required": [
+                        "mode",
+                        "min_processing_minutes"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "journey": {
+            "type": "object",
+            "required": [
+                "modes",
+                "steps"
+            ],
+            "properties": {
+                "modes": {
+                    "type": "array",
+                    "items": {
+                        "enum": [
+                            "cart",
+                            "buy_now",
+                            "quote",
+                            "inspection",
+                            "visit_pack",
+                            "membership"
+                        ]
+                    }
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "appointment_kind": {
+                    "enum": [
+                        "appointment",
+                        "arrival_window",
+                        "pickup_window",
+                        "preferred_only"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "policy": {
+            "type": "object",
+            "required": [
+                "approved_for_production",
+                "cancellation_policy_ref",
+                "tax_policy_ref"
+            ],
+            "properties": {
+                "approved_for_production": {
+                    "type": "boolean"
+                },
+                "cancellation_policy_ref": {
+                    "type": "string"
+                },
+                "tax_policy_ref": {
+                    "type": "string"
+                },
+                "local_test_defaults": {
+                    "type": "object"
+                },
+                "minimum_lead_minutes": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "group_fee_minor": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "safety_conflicts_with": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "warranty_days": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 366
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "$defs": {
+        "Localized": {
+            "type": "object",
+            "required": [
+                "ar",
+                "en"
+            ],
+            "properties": {
+                "ar": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 10000
+                },
+                "en": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 10000
+                }
+            },
+            "additionalProperties": false
+        },
+        "Condition": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "required": [
+                        "path",
+                        "op",
+                        "value"
+                    ],
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "op": {
+                            "enum": [
+                                "eq",
+                                "in",
+                                "gt",
+                                "gte",
+                                "lt",
+                                "exists"
+                            ]
+                        },
+                        "value": []
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "all"
+                    ],
+                    "properties": {
+                        "all": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 20,
+                            "items": {
+                                "$ref": "#/$defs/Condition"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "any"
+                    ],
+                    "properties": {
+                        "any": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 20,
+                            "items": {
+                                "$ref": "#/$defs/Condition"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "not"
+                    ],
+                    "properties": {
+                        "not": {
+                            "$ref": "#/$defs/Condition"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "Field": {
+            "type": "object",
+            "required": [
+                "key",
+                "type",
+                "label"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "type": {
+                    "enum": [
+                        "text",
+                        "textarea",
+                        "integer",
+                        "decimal",
+                        "select",
+                        "multi_select",
+                        "cards",
+                        "boolean",
+                        "counter",
+                        "measurement",
+                        "date_preference",
+                        "media",
+                        "group",
+                        "repeater",
+                        "asset_selector",
+                        "address_selector"
+                    ]
+                },
+                "label": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "scope": {
+                    "enum": [
+                        "per_order",
+                        "per_item",
+                        "per_component",
+                        "per_instance"
+                    ]
+                },
+                "min": {
+                    "type": "number"
+                },
+                "max": {
+                    "type": "number"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "default": [],
+                "visible_when": {
+                    "$ref": "#/$defs/Condition"
+                },
+                "required_when": {
+                    "$ref": "#/$defs/Condition"
+                },
+                "reference_data": {
+                    "type": "string"
+                },
+                "depends_on": {
+                    "type": "string"
+                },
+                "count_from": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                        "$ref": "#/$defs/Field"
+                    }
+                },
+                "options": {
+                    "type": "array",
+                    "maxItems": 500,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "code",
+                            "label"
+                        ],
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "label": {
+                                "$ref": "#/$defs/Localized"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "help": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "input_mode": {
+                    "enum": [
+                        "text",
+                        "counter",
+                        "slider"
+                    ]
+                },
+                "sort_order": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "Offer": {
+            "type": "object",
+            "required": [
+                "code",
+                "label",
+                "kind",
+                "price_mode",
+                "pricing"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "label": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "kind": {
+                    "enum": [
+                        "single",
+                        "composite",
+                        "quantity_bundle",
+                        "visit_pack",
+                        "membership"
+                    ]
+                },
+                "price_mode": {
+                    "enum": [
+                        "fixed",
+                        "rules",
+                        "quote_required",
+                        "inspection_required"
+                    ]
+                },
+                "pricing": {
+                    "type": "object"
+                },
+                "components": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "entitlement": {
+                    "type": "object"
+                },
+                "requirements_override": {
+                    "type": "object"
+                },
+                "addon_rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "description": {
+                    "$ref": "#/$defs/Localized"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "image_ref": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

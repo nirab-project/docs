@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "example_only": true,
+  "executable": false,
+  "mode": "plan",
+  "database_identity": null,
+  "code_commit": null,
+  "schema_fingerprint": null,
+  "generation_before": null,
+  "generation_after": null,
+  "backup_reference": null,
+  "backup_restore_verified": false,
+  "protected_digest_before": null,
+  "protected_tables_confirmed_from_snapshot": [
+    "cities",
+    "city_boundary_versions",
+    "city_geographic_sources",
+    "city_branch_assignments",
+    "zones",
+    "providers",
+    "business_settings",
+    "addon_settings"
+  ],
+  "protected_row_sets": {
+    "users": "compute_reference_closure",
+    "servicemen": "preserve",
+    "teams": "preserve",
+    "team_members": "preserve",
+    "user_addresses": "preserve_if_referenced_by_protected_row"
+  },
+  "mixed_tables_require_review": [
+    "users",
+    "user_addresses",
+    "accounts",
+    "provider_settings",
+    "odoo_mappings",
+    "jobs",
+    "failed_jobs"
+  ],
+  "reset_allowlists": [],
+  "external_reconciliation": {
+    "pending_count": null,
+    "unknown_count": null,
+    "quarantined_reference_file": null
+  },
+  "skill_remap_manifest": null,
+  "media_object_allowlist": [],
+  "unknown_tables": [],
+  "owner_approval_hash": null,
+  "apply_requires": [
+    "all_tables_classified",
+    "maintenance_quiesced",
+    "owner_gate",
+    "verified_backup",
+    "matching_fingerprint",
+    "protected_closure_resolved",
+    "external_pending_resolved_or_quarantined"
+  ]
+}

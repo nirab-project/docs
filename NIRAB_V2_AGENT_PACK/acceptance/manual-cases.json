@@ -1,0 +1,1692 @@
+{
+  "suite": "NIRAB V2 manual acceptance",
+  "status": "NOT_RUN",
+  "cases": [
+    {
+      "id": "M-001",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R01",
+        "R02"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "فصل بيئة العميل",
+      "steps": "افتح نسخة local لكل تطبيق وراقب الشبكة أثناء login/catalog.",
+      "expected": "كل الطلبات إلى البيئة المحلية فقط، ولا fallback إلى api.nirabclean.com أو analytics live.",
+      "evidence": "network HAR منقح لكل تطبيق",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-002",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R01"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "منع النشر التلقائي",
+      "steps": "راجع branch و CI/entrypoints قبل أي تشغيل.",
+      "expected": "لا push ناشر ولا migration/reset تلقائي في startup/CI ؛ production untouched.",
+      "evidence": "git status + مراجعة pipeline",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-003",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R02",
+        "R03"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "حفظ إعدادات التهيئة",
+      "steps": "خذ digest محلياً لل settings والمفاتيح الصناعية قبل/بعد seed reference.",
+      "expected": "بصمات القيم المحمية متطابقة؛ لا secrets في logs.",
+      "evidence": "preservation report",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-004",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R03"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "مدينة مع فرعها",
+      "steps": "اختر عنواناً في TST_CITY_A ثم افتح catalog والموعد.",
+      "expected": "الفرع مشتق من المدينة ولا توجد قائمة مزودين؛ catalog المؤهل فقط.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-005",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R03"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "مدينة غير مدعومة",
+      "steps": "اختر نقطة خارج كل boundaries ثم حاول الإضافة/التأكيد.",
+      "expected": "رفض واضح وعدم حفظ عنوان جديد كمخدوم أو إنشاء حجز.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-006",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R03",
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "إيقاف المدينة بعد preview",
+      "steps": "أنشئ preview ثم أوقف المدينة من الأدمن وحاول confirm.",
+      "expected": "CONTEXT_CHANGED/CITY_PAUSED ولا دفع/حجز جديد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-007",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R03",
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "سعة الفرع صفر",
+      "steps": "ضع capacity=0 محلياً واطلب slot.",
+      "expected": "غير متاح، ولا fallback لسعة 1.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-008",
+      "area": "التهيئة والعزل",
+      "requirements": [
+        "R03"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "حارس العزل",
+      "steps": "على اتصال اختبار منفصل غيّر isolation إلى غير READ COMMITTED ثم حاول commit.",
+      "expected": "يرفض الالتزام دون بيانات جزئية؛ يعاد إعداد الاتصال بعد الاختبار.",
+      "evidence": "HTTP error + DB zero side effects",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-009",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R04"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "خدمة جديدة ليست من seeds",
+      "steps": "أنشئ «تنظيف خزانات تجريبي» من الأدمن، أضف عرضاً ونموذجاً ومتطلبات وانشرها محلياً.",
+      "expected": "تظهر وتعمل دون تعديل كود أو شرط باسم الخدمة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-010",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R04"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "محتوى الخدمة الكامل",
+      "steps": "أضف وصفاً وصورة وأيقونة وفيديو/includes/why_us/FAQ/notice واختبر AR و EN.",
+      "expected": "كل قسم يظهر ويختفي إن فارغ؛ icon/notice لا تُقص؛ النص المترجم متسق.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-011",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R04",
+        "R05"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "منع نشر تعريف ناقص",
+      "steps": "احذف سياسة السعر أو required dependency ثم publish.",
+      "expected": "خطأ مسار محدد؛ تبقى draft ولا تعرض للبيع.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-012",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R05"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "ثلاث غرف بإجابات مختلفة",
+      "steps": "في التأهيلية اختر 3 غرف بأحجام ودهان مختلف، راجع الملخص.",
+      "expected": "3 instances مستقلة ب IDs وإجابات صحيحة، لا نسخة واحدة تضرب في العدد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-013",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R05"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تخفيض عداد الغرف",
+      "steps": "املأ 3 غرف ثم خفضها إلى 2 ووافق على التنبيه.",
+      "expected": "تحذف إجابة الثالثة من التقييم/المدة والسعر بعد المراجعة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-014",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R05"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إخفاء النشاء",
+      "steps": "فعل starch واختر heavy ثم أطفئ starch وأعد التسعير.",
+      "expected": "المستوى المخفي لا يبقى required ولا يؤثر في السعر أو التنفيذ.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-015",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R05"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_ONLY",
+      "title": "دورة شرطية",
+      "steps": "اربط ظهور A بـ B و B بـ A داخل draft ثم validate.",
+      "expected": "يرفض cycle برسالة واضحة دون تجميد الواجهة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-016",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R06"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "مرفق صحيح وآخر مرفوض",
+      "steps": "ارفع صورة صالحة ثم ملفاً مزيف MIME/يتجاوز policy.",
+      "expected": "قبول الصالح ورفض الآخر؛ لا URL عام لمرفقات العميل.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-017",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R06",
+        "R31"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "ملف عميل آخر",
+      "steps": "بحساب C-B اطلب رابط مرفق C-A مباشرة.",
+      "expected": "403/404 دون تسريب المحتوى أو signed URL.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-018",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R07"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تغيير الإصدار بعد الشراء",
+      "steps": "احجز ثم غيّر description/price/options وانشر version جديدة.",
+      "expected": "الحجز السابق يعرض snapshot القديم والجديد يستخدم النسخة الجديدة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-019",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R07"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "أرشفة خدمة محجوزة",
+      "steps": "أرشف service منشورة لها booking ثم افتح تفاصيل ذلك booking.",
+      "expected": "لا حجز جديد للخدمة، والتفاصيل/الفاتورة السابقة سليمة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-020",
+      "area": "الكتالوج والنماذج",
+      "requirements": [
+        "R04",
+        "R29"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "الرابط التسويقي",
+      "steps": "افتح بنر لخدمة V2 ثم رابط خدمة قديمة.",
+      "expected": "الجديد يفتح التفاصيل الصحيحة؛ القديم يعالج unavailable دون 500.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-021",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R08"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "السعر بالوحدة",
+      "steps": "قيّم 3 وحدات بمعدل 6000 هللة و tax fixture=1500bps.",
+      "expected": "PG03: net18000 tax2700 total20700 بالهللة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-022",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R08"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "السعر بالمساحة",
+      "steps": "قيّم 12.5 م² بمعدل 800 هللة وفق PG04.",
+      "expected": "net10000 tax1500 total11500 ؛ لا خطأ decimal.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-023",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R09"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "سعر شامل وغير شامل",
+      "steps": "نفذ PG01/PG02 واعرض الملخص والفاتورة.",
+      "expected": "المجموع في الحالتين 11500 والتفصيل لا يضيف الضريبة مرتين.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-024",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R09"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "أفضل خصم لا الجمع",
+      "steps": "ضع campaign10% و coupon20% و membership15% دون stacking.",
+      "expected": "PG07: خصم 2000 من 10000 وليس 4500.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-025",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R09"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "هللة التخصيص",
+      "steps": "شغل حالة 3 بنود 100 هللة وخصم 100.",
+      "expected": "تخصيص 34/33/33 والإجمالي 200 ؛ متطابق في تقرير refund.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-026",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R10"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "باقة مركبة كاملة",
+      "steps": "أضف bundle الأثاث وافتح حجز الفرع والفني.",
+      "expected": "الكنب والسجاد والستائر كلها في قائمة التنفيذ؛ السعر لا يتكرر لكل مكون.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-027",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R10"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "مكيفات إضافية فعلية",
+      "steps": "اختر باقة 5 وزد وحدتين وراجع السعر والمدة ثم checkout.",
+      "expected": "7 وحدات تنفيذ، extra price معلن، والموعد يعاد فحصه عند تغير المدة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-028",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R10"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إضافة غير مسموحة",
+      "steps": "عطّل extras للعرض من الأدمن ثم أعد الطلب يدوياً ب extra_units.",
+      "expected": "الخادم يرفض؛ لا عبارة تسويقية تعد بخيار غير متاح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-029",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R11"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "السعر المجهول",
+      "steps": "اختر moving quote أو حالة carpet فوق العتبة.",
+      "expected": "total=null وطلب تسعير واضح؛ لا 0 ريال أو دفع مجاني.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-030",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R11"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "المعاينة المجانية الصريحة",
+      "steps": "اختر inspection مجانية مصرحاً بها ثم راجع الملخص.",
+      "expected": "المعاينة مجانية، والتنفيذ سعره غير محدد؛ لا إنشاء gateway charge0.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-031",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R08",
+        "R31"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "حقن السعر",
+      "steps": "أرسل total_minor أقل/quantity سالباً أو خياراً لا ينتمي للخدمة.",
+      "expected": "السعر لا يعتمد على client total ، والبيانات غير الصحيحة 422.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-032",
+      "area": "التسعير والباقات",
+      "requirements": [
+        "R09"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "رسوم المجموعة",
+      "steps": "احجز خدمتين متوافقتين في group واحد مع fee2000 fixture.",
+      "expected": "PG17: رسوم 2000 مرة واحدة لا لكل بند.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-033",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R12"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "سلة أصناف مختلفة",
+      "steps": "أضف كنب ومكيفات ومكافحة من مدينة واحدة.",
+      "expected": "كلها محفوظة في سلة واحدة دون شرط الصنف.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-034",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R12",
+        "R13"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "موعد لكل مجموعة",
+      "steps": "اختر الكنب غداً والمكيفات بعد غد ثم أكد معاً.",
+      "expected": "Order واحد و bookings بمواعيد مستقلة وتخصيص مبالغ واضح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-035",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R12"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "سلة مدينتين",
+      "steps": "أضف عنصر مدينة A ثم غيّر إلى B وأضف آخر.",
+      "expected": "بقاء القسمين؛ checkout يختار مدينة واحدة ويوضح السبب ولا يمسح غيرها.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-036",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R13"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تأكيد subset",
+      "steps": "حدد عنصراً من ثلاثة للتأكيد.",
+      "expected": "ينشأ طلب للعنصر المختار فقط، وبقية السلة باقية.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-037",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R13"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "احجز الآن",
+      "steps": "مع سلة ممتلئة افتح خدمة أخرى و buy_now.",
+      "expected": "المحرك نفسه يراجع السعر/السعة، ولا تفرغ السلة الأخرى.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-038",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R14"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "ضيف ثم حساب",
+      "steps": "أضف عنصرين كضيف ثم سجل الدخول وادمج.",
+      "expected": "حماية ملكية token ؛ لا تكرار غير مقصود ولا ضياع اختلاف configurations.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-039",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R14",
+        "R31"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "guest_id منتحل",
+      "steps": "استعمل guest_id صحيحاً لكن دون token صالح.",
+      "expected": "401 ولا نقل عناصر أو ملكية.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-040",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R15"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "ضغط تأكيد مزدوج",
+      "steps": "أرسل confirm مرتين بنفس key/body من واجهتين.",
+      "expected": "نفس order/attempt ولا خصم/حجز مكرر.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-041",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R15"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "مفتاح مع body مختلف",
+      "steps": "أعد key السابقة بعد تغيير preview_id.",
+      "expected": "409 IDEMPOTENCY_MISMATCH بلا side effect.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-042",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R16"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "تغير السعر بعد preview",
+      "steps": "زد سعر العرض بعد preview ثم أكد النسخة القديمة.",
+      "expected": "PRICE_CHANGED/إعادة موافقة، لا رفع تحصيل صامت.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-043",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R16"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_ONLY",
+      "title": "انتهاء preview",
+      "steps": "قدّم الساعة المحقونة فقط حتى انتهاء 15 دقيقة وحاول تأكيد.",
+      "expected": "رفض preview وليس إعلان الموعد محجوزاً؛ يمكن إعادة حساب.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-044",
+      "area": "السلة والشراء",
+      "requirements": [
+        "R15",
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "تعذر group من طلب متعدد",
+      "steps": "بعد preview اشغل مورد إحدى المجموعات ثم confirm.",
+      "expected": "لا إنشاء جزئي صامت ولا charge للطلب الفاشل؛ يطلب مراجعة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-045",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R17"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "نافذة وصول لا مدة تنفيذ",
+      "steps": "اختر نقل/غسيل له نافذة ساعة وعمل مقدر أطول.",
+      "expected": "الحجز التشغيلي يحتجز المدة الفعلية، والواجهة تفرق بينهما.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-046",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "آخر موعد من عميلين",
+      "steps": "بمتصفحين احجز آخر وحدة سعة بنفس الوقت.",
+      "expected": "نجاح واحد فقط أو ترتيب بلا overbooking ؛ الآخر SLOT_UNAVAILABLE.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-047",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "فريق من فنيين",
+      "steps": "احجز عمل يتطلب 2 فنيين وأحدهما غير متاح.",
+      "expected": "لا موعد كاذب ولا assignment بفني واحد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-048",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "تضارب الفني",
+      "steps": "حاول إسناد مهمتين متداخلتين لفني واحد.",
+      "expected": "يرفض التضارب حتى من لوحة الأدمن.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-049",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R19"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إعادة جدولة ناجحة",
+      "steps": "انقل booking إلى موعد متاح ثم افحص القديم والجديد.",
+      "expected": "تحرير القديم وحجز الجديد مرة واحدة؛ رسالة واحدة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-050",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R19"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "إعادة جدولة فاشلة",
+      "steps": "اختر موعداً امتلأ بين المعاينة والتأكيد.",
+      "expected": "الموعد القديم يبقى؛ لا فقد للحجز ولا خصم.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-051",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R17"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "اختلاف منطقة الجهاز",
+      "steps": "اعرض موعد سعودي بهاتف مضبوط على منطقة أخرى.",
+      "expected": "الوقت المعلن للسعودية ثابت وموسوم؛ لا تحويل مزدوج.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-052",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R20"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تكرار محدود",
+      "steps": "اختر أسبوعياً 4 مرات واعرض جميع المواعيد قبل التأكيد.",
+      "expected": "4 bookings فقط، ولا parent محتسب زيارة خامسة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-053",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R20"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "موعد متكرر متعذر",
+      "steps": "اشغل موعداً من الأربعة ثم أكد السلسلة.",
+      "expected": "لا إزاحة صامتة؛ تظهر التعارضات وخيار مراجعة صريح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-054",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R18"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "انتهاء hold بلا worker",
+      "steps": "أوقف worker محلياً وقدم test clock بعد TTL ثم اطلب availability.",
+      "expected": "ال hold المنتهي لا يحجز السعة حتى قبل cleanup job.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-055",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R18",
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "دفعة متأخرة مع نفاد السعة",
+      "steps": "حاكي verified callback بعد expiry وامتلاء نفس الفترة.",
+      "expected": "resolution_required/refund path ، لا overbook ولا paid-success شاشة صامتة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-056",
+      "area": "الجدولة والإتاحة",
+      "requirements": [
+        "R17"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "عدم توافق التنفيذ",
+      "steps": "اضبط conflict policy بين خدمتين بالمكان نفسه ثم اختر shared slot.",
+      "expected": "اقتراح فصل بدون حذف إحداهما أو فرض تنفيذ غير متوافق.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-057",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R22"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "اختيار نوع النقل بلا إرسال",
+      "steps": "افتح الخدمة واختر شقة ثم ارجع.",
+      "expected": "لا quote رسمية ولا Odoo event أو booking ناتج عن النقر فقط.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-058",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R22"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "طلب نقل متكامل",
+      "steps": "أكمل عنواني origin/destination والطوابق والمرفقات ثم submit.",
+      "expected": "request واحد للفرع الصحيح؛ جميع البيانات في quote desk.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-059",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R22"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "معاينة برسوم",
+      "steps": "اطلب inspection مدفوعة وادفع fake محلي ثم نفذ المعاينة.",
+      "expected": "حجز معاينة منفصل، والتنفيذ النهائي ليس confirmed تلقائياً.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-060",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R22",
+        "R09"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "خصم المعاينة مرة واحدة",
+      "steps": "وافق quote بسياسة credit_fee وحاول checkout/retry.",
+      "expected": "يخصم الرسم مرة واحدة فقط من التنفيذ.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-061",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R23"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إصداران وقبول نسخة",
+      "steps": "أرسل v1 ثم v2 وقبل النسخة الحالية كعميل.",
+      "expected": "لا قبول نسخة superseded ؛ accepted محفوظة لا تتغير.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-062",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R23"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "عرض منتهي أو مرفوض",
+      "steps": "جرّب accept بعد expiry ثم reject نسخة أخرى.",
+      "expected": "لا دفع أو تنفيذ بالعرض المنتهي؛ الرفض حالة واضحة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-063",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R24"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "عمل إضافي",
+      "steps": "الفني/الفرع يطلب amendment ثم العميل يرفض، ثم في حجز آخر يقبل.",
+      "expected": "لا تغير للمبلغ عند الرفض؛ عند القبول قيد/تحصيل إضافي صحيح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-064",
+      "area": "عروض الأسعار",
+      "requirements": [
+        "R22",
+        "R31"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "نقل خارج سياسة المدينة",
+      "steps": "اختر originA و destinationB.",
+      "expected": "يتحول لمراجعة/رفض آلي واضح، لا تسعير وتنفيذ عبر فرع اعتباطي.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-065",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R25"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "شراء أربع غسلات",
+      "steps": "اشتر باقة الغسيل المحلية plus_4 بسعر 60000 هللة، ثم حاكِ تأكيد الدفع.",
+      "expected": "ينشأ رصيد أربع غسلات بعد تحقق الدفع، ولا يتكرر سعر الباقة أربع مرات.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-066",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R25"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "جدولة الزيارة الأولى فقط",
+      "steps": "من باقة فعالة، حدد موعد الغسلة الأولى فقط.",
+      "expected": "الرصيد المحجوز زيارة واحدة والمتاح ثلاث؛ لا تحصيل جديد للخدمة المشمولة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-067",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R25"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إلغاء واستعادة رصيد",
+      "steps": "ألغ زيارة قبل مهلة السياسة ثم أعد طلب الإلغاء.",
+      "expected": "release واحد؛ لا يصبح الرصيد 5.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-068",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R25"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "استهلاك عند التسليم",
+      "steps": "نفذ الاستلام ثم المعالجة ثم التسليم لزيارة غسيل واحدة.",
+      "expected": "يستهلك رصيد زيارة واحدة عند اكتمال الخدمة، وليس رصيداً لكل مهمة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-069",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R25"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "موعد خارج الصلاحية",
+      "steps": "حاول جدولة زيارة بعد expires_at مع وجود رصيد.",
+      "expected": "رفض الموعد وليس نقص الرصيد؛ لا تمديد سري.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-070",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R26"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "تجديد مكرر",
+      "steps": "حاكِ إشعار نجاح الدفع للدورة نفسها مرتين.",
+      "expected": "استحقاق جديد واحد وفاتورة واحدة ورسالة واحدة دون مضاعفة الرصيد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-071",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R26"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إلغاء التجديد",
+      "steps": "أوقف auto_renew بعد شراء pack فعالة.",
+      "expected": "لا خصم دورة جديدة، والرصيد المدفوع الحالي يبقى.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-072",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R26"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "فشل التجديد",
+      "steps": "حاكِ رصيد محفظة غير كافٍ أو رفض مزود الدفع عند تجديد دورة.",
+      "expected": "تظهر حالة تعثر وإخطار، ولا تمنح زيارات جديدة أو حجوزات ممولة وهمياً.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-073",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R27"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تفضيلات مجانية ومدفوعة",
+      "steps": "اختر scent ثم organic إضافية وفق fixture.",
+      "expected": "السعر يوضح فقط المدفوعة، والتعليمات كلها في task الصحيح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-074",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R27"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "وزن زائد",
+      "steps": "سجل وزن أعلى واطلب تعديل ثمن، ثم ارفض من العميل.",
+      "expected": "لا خصم إضافي دون موافقة؛ policy تحدد معالجة النطاق الأصلي.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-075",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R27"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "فترات الاستلام والتسليم",
+      "steps": "احجز الاستلام صباحاً، ثم عيّن موعد تسليم متاحاً بصورة مستقلة.",
+      "expected": "موعدان ومهمتان بسعة مستقلة، مع تمييز الموعد المتوقع من الموعد المؤكد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-076",
+      "area": "الزيارات والغسيل",
+      "requirements": [
+        "R25",
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "استرداد زيارات غير مستخدمة",
+      "steps": "في حالة PG13، استهلك زيارتين من أربع، ثم اعتمد استرداد الزيارتين غير المستخدمتين.",
+      "expected": "يرد 30000 هللة فقط وفق بيانات الاختبار، ولا يمكن استخدام الرصيد المسترد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-077",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R28"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "بيانات سيارة محفوظة",
+      "steps": "اختر الماركة التجريبية A والطراز A1، ثم بدّل الماركة إلى B.",
+      "expected": "لا يبقى الطراز A1 صالحاً للماركة الجديدة؛ الحجز المؤكد يحتفظ بنسخته السابقة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-078",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R29"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "العميل يعيد فتح الدفع",
+      "steps": "أغلق التطبيق أثناء الدفع الوهمي، ثم افتحه بعد تحقق الخادم من نجاح الدفع.",
+      "expected": "يستعيد الطلب ومحاولة الدفع نفسيهما دون تحصيل أو حجز مكرر.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-079",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R29"
+      ],
+      "priority": "P2",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "العربية والاستجابة",
+      "steps": "افتح صفحات الخدمة والسلة والمراجعة والزيارات بعرض 360 و768 و1440 بكسل، ثم بدّل إلى الإنجليزية.",
+      "expected": "لا أزرار مقطوعة؛ الأرقام والمواعيد واضحة؛ الأسعار نفسها في اللغتين.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-080",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R30",
+        "R31"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "مدير فرع آخر",
+      "steps": "ادخل بحساب مدير الفرع B وافتح رابط حجز وعرض وتقرير للفرع A مباشرة.",
+      "expected": "رفض 403 أو 404 دون كشف محتوى يخص الفرع الآخر.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-081",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R30"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تعيين وملخص كامل",
+      "steps": "عيّن فريقاً لباقة مركبة من لوحة الفرع، ثم افتح تفاصيل المهمة بحساب الفني.",
+      "expected": "تظهر جميع المكونات والإجابات والمدة والمرفقات المطلوبة للمهمة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-082",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R30"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "فني غير مسند",
+      "steps": "ادخل بفني غير مسند للحجز وحاول تغيير حالة المهمة أو قراءة مرفقها.",
+      "expected": "يرفض الطلب حتى لو كان معرف المهمة صحيحاً.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-083",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R30"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "قائمة الإكمال",
+      "steps": "حاول إكمال مهمة قبل استيفاء القائمة والمرفقات الإلزامية، ثم استكملها وأعد الإكمال.",
+      "expected": "المحاولة الأولى مرفوضة؛ الثانية تكمل المهمة مرة واحدة فقط.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-084",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R30"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "انقطاع شبكة الفني",
+      "steps": "افصل شبكة الفني وسجل إجراءً محلياً؛ غيّر حالة المهمة من الفرع ثم أعد الاتصال.",
+      "expected": "يعرض إجراءً بانتظار المزامنة ثم تعارضاً واضحاً؛ لا يعيد الحالة السابقة بالقوة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-085",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R30",
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إكمال ليس دفعاً",
+      "steps": "أكمل حجزاً بالدفع بعد الخدمة قبل تسجيل التحصيل النقدي، ثم سجل القبض المصرح به.",
+      "expected": "يظهر مكتمل التنفيذ وغير مدفوع أولاً؛ تتغير حالة الدفع بعد حركة تحصيل فعلية فقط.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-086",
+      "area": "التطبيقات والتشغيل",
+      "requirements": [
+        "R29",
+        "R30"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "رابط إشعار",
+      "steps": "افتح رابط إشعار محلي لحجز أو عرض سعر في التطبيقات الثلاثة وبحسابات مختلفة.",
+      "expected": "يفتح الكيان الصحيح للمخول فقط، ولا يكشف بيانات حساب آخر.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-087",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "وسيلتا دفع",
+      "steps": "نفذ PG14 باستخدام 10000 هللة من المحفظة والباقي من بوابة الدفع الوهمية.",
+      "expected": "الإجمالي 31050 هللة، والبوابة 21050 هللة؛ رصيد المحفظة والقيد متوازنان.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-088",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "مبلغ أو توقيع webhook خطأ",
+      "steps": "أرسل إشعار دفع وهمياً بمبلغ خاطئ، ثم إشعاراً آخر بتوقيع غير صحيح.",
+      "expected": "لا يعتمد الدفع ولا يمنح رصيد زيارات ولا يؤكد الطلب.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-089",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "إعادة webhook صحيحة",
+      "steps": "كرر إشعار تحقق الدفع الصحيح لمرجع PaymentRequest نفسه.",
+      "expected": "ينفذ الأثر المالي والتشغيلي مرة واحدة فقط.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-090",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إيصال مرفوض/معتمد",
+      "steps": "ارفع إيصال تحويل وارفضه؛ وفي طلب آخر ارفع إيصالاً صحيحاً وحاول اعتماده مرتين.",
+      "expected": "رفع الملف ليس دفعاً؛ الرفض محفوظ؛ الاعتماد المالي يحدث مرة واحدة فقط.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-091",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تحصيل وتسليم النقد",
+      "steps": "سجل قبضاً نقدياً من العميل، ثم راجع صندوق الفرع قبل تسليم الفني للنقد وبعده.",
+      "expected": "التحصيل من العميل منفصل عن التسليم للصندوق؛ لا عمولة؛ الأرصدة متطابقة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-092",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "إلغاء حجز من طلب",
+      "steps": "ألغ حجزاً واحداً من طلب يضم حجزين، وطبق سياسة الاسترداد المعتمدة.",
+      "expected": "يسترد المبلغ المخصص للحجز الملغى فقط؛ يبقى الحجز الآخر فعالاً.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-093",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R32"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تقرير الإيراد",
+      "steps": "طابق الطلب وبنوده وزيارات الباقة والتحصيل والاستردادات مع التقرير المالي.",
+      "expected": "لا احتساب مزدوج للباقة وزياراتها أو للطلب وحجوزاته؛ كل إجمالي معرف بوضوح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-094",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R32"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تصدير وطباعة",
+      "steps": "صدّر تقرير فرع وفاتورة بالعربية والإنجليزية، وافتح الملفات الناتجة.",
+      "expected": "الإجماليات والتنسيق ونطاق الصلاحية صحيحة، ولا بيانات تخص فرعاً آخر.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-095",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R33"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "تعطل Odoo ثم عودته",
+      "steps": "اجعل مزود Odoo الوهمي يفشل مرة، ثم أعد المحاولة وأرسل الحدث نفسه مجدداً.",
+      "expected": "فاتورة أو قيد وهمي واحد بمرجع ثابت؛ لا يضيع الحجز بسبب فشل الشبكة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-096",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R33"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_ONLY",
+      "title": "إشعار مرة واحدة",
+      "steps": "غيّر موعد حجز، ثم أعد إرسال الحدث نفسه إلى مستهلك الإشعارات.",
+      "expected": "رسالة واحدة للجمهور المخول، مع إعادة محاولة سليمة عند فشل الإرسال.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-097",
+      "area": "المال والتكاملات",
+      "requirements": [
+        "R31"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "سجلات منزوعة الأسرار",
+      "steps": "راجع سجلات التطبيق وملفات HAR وتقارير الاختبار بعد الدخول والدفع ورفع الملفات.",
+      "expected": "لا رموز وصول أو APP_KEY أو مفاتيح تكامل أو بيانات بطاقات أو ملفات تعريف ارتباط كاملة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-098",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "dry-run افتراضي",
+      "steps": "على قاعدة محلية ثانية، شغّل أداة التصفير دون خيار --apply.",
+      "expected": "تعرض خطة فقط؛ لا يتغير أي سجل أو عدد صفوف.",
+      "evidence": "before/after digests",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-099",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "جدول مجهول",
+      "steps": "أضف جدول اختبار غير مصنف إلى القاعدة المحلية، ثم حاول تطبيق الخطة.",
+      "expected": "ترفض الأداة قبل الحذف، وتطلب جرداً وتصنيفاً جديدين.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-100",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34",
+        "R02"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "حفظ محميات كاملة",
+      "steps": "نفذ خطة تصفير محلية معتمدة، ثم قارن الإعدادات والمدن والفروع والحسابات الداخلية والملفات المحمية.",
+      "expected": "القيم والمفاتيح والعلاقات المحمية متطابقة؛ تمسح البيانات التجارية المصرح بها فقط.",
+      "evidence": "preservation verification report",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-101",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "مستخدم مرجعي محمي",
+      "steps": "اجعل حساب عميل تجريبي مرجع اعتماد لسجل حدود مدينة، ثم خطط لتصفير العملاء.",
+      "expected": "يبقى الحساب ضمن مجموعة المراجع المحمية، ولا ينكسر اعتماد المدينة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-102",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "استئناف بعد توقف",
+      "steps": "أوقف التصفير عند نقطة تحقق اختبارية، ثم استأنفه بأمر resume.",
+      "expected": "يكمل ضمن قائمة الحذف المعتمدة نفسها، دون تجاوز المحميات أو تكرار أثر غير آمن.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-103",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34",
+        "R21"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "معاملة خارجية معلقة",
+      "steps": "أضف دفعة معلقة لها مرجع بوابة وهمي؛ وبعد تحويل محلي أرسل إشعاراً قديماً لها.",
+      "expected": "لا تحذف المعاملة المجهولة تلقائياً؛ يعزل الإشعار ولا يربط بطلب جديد.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-104",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R35"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "seed مرتين",
+      "steps": "شغّل seed المرجعية مرتين؛ عدّل مسودة من الأدمن ثم أعد التشغيل.",
+      "expected": "لا تكرار ولا كتابة فوق تعديل لا يملكه seeder، ولا تفعيل تلقائي لأسعار الإنتاج.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-105",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R35"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "local seed محظور إنتاجياً",
+      "steps": "حاكِ إعداد environment=production مع اتصال قاعدة اختبار، ثم اطلب profile=local.",
+      "expected": "يرفض قبل إضافة مدن صناعية أو حسابات تجريبية؛ لا يستعمل اتصال إنتاج فعلي.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-106",
+      "area": "التصفير والـSeeders",
+      "requirements": [
+        "R34"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "بروفة استعادة",
+      "steps": "استعد نسخة احتياطية صناعية إلى قاعدة محلية ثالثة، ثم تحقق من الإدارة والمدن وطلب الاختبار.",
+      "expected": "تثبت استعادة متسقة فعلياً، وليس مجرد وجود ملف نسخة احتياطية.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-107",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "تنظيف الأثاث منفرداً ومركباً",
+      "steps": "اشتر تنظيف مقعد منفرداً ثم باقة جلسة مركبة، ونفذ الحجزين.",
+      "expected": "لكل منهما سعر ونطاق عمل صحيحان، وتظهر جميع مكونات الباقة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-108",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "النظافة التأهيلية كاملة",
+      "steps": "أكمل نموذج غرف متكرر واحسب السعر، ثم جرّب مسار معاينة مستقلاً.",
+      "expected": "المساران يعملان؛ السعر غير المعروف لا يتحول إلى خدمة مجانية.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-109",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "المكيفات بلا تكرار خدمة",
+      "steps": "اختر وحدة مكيف منفردة، ثم باقة مع وحدات إضافية، وأنشئ حجزاً لكل حالة.",
+      "expected": "مدخل خدمة واحد وعروض متعددة؛ عدد وحدات التنفيذ والموارد صحيح.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-110",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "الصيانة منفصلة",
+      "steps": "اختر صيانة كهربائية وأرسل طلب تسعير، ثم اطلب قطعاً أو عملاً إضافياً.",
+      "expected": "لا تظهر باقات مكيفات غير مقصودة؛ السعر الإضافي يعتمد على موافقة العميل.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-111",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "مكافحة الحشرات",
+      "steps": "اختر نوع العقار وباقة زيارة مكافحة، ثم جدولها ونفذها.",
+      "expected": "لا تظهر عقود مفعلة وهمياً؛ نطاق الزيارة وسياسة الضمان واضحان.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-112",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "نقل الأثاث",
+      "steps": "أكمل نوع العقار وعنواني النقل، ثم قدم عرضاً واقبله واحجز التنفيذ.",
+      "expected": "سلسلة مترابطة دون وعد بموعد تنفيذ مؤكد قبل الاعتماد والإتاحة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-113",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "غسيل السيارات",
+      "steps": "أدخل بيانات سيارة وموقعها، ثم احسب السعر واختر الموعد وأسند العمل.",
+      "expected": "تشغيل داخلي عبر فرع نيراب دون الاعتماد على Hamim.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-114",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "غسيل الملابس",
+      "steps": "اشتر باقة غسيل، ثم نفذ الاستلام والمعالجة والتسليم حتى إغلاق الزيارة.",
+      "expected": "الرصيد والأكياس والوزن والتفضيلات والمبلغ والتحصيل متسقة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-115",
+      "area": "الخدمات المرجعية التسع",
+      "requirements": [
+        "R36"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "سجاد المساجد",
+      "steps": "جرب مساحة سجاد ضمن حد التسعير الآلي، ثم مساحة تتجاوزه.",
+      "expected": "سعر بالمساحة أو طلب مراجعة واضح؛ لا صفر بدلاً من السعر المجهول.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-116",
+      "area": "الإصدار والقبول",
+      "requirements": [
+        "R37"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "عميل V1 بعد التحويل",
+      "steps": "حاول الشراء من عميل ذي contract=1 بعد تفعيل V2، ثم اطلب إعدادات التطبيق.",
+      "expected": "تحجب الكتابة برسالة التحديث؛ لا تنهار المصادقة أو قراءة الإعدادات.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-117",
+      "area": "الإصدار والقبول",
+      "requirements": [
+        "R37"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_THEN_OWNER",
+      "title": "Cache قديم للويب",
+      "steps": "افتح نسخة ويب ذات تخزين محلي قديم، ثم حمّل إصدار V2.",
+      "expected": "لا تعرض السلة والأسعار القديمة كبيانات حالية؛ معالجة التخزين واضحة.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-118",
+      "area": "الإصدار والقبول",
+      "requirements": [
+        "R38"
+      ],
+      "priority": "P1",
+      "mode": "LOCAL_ONLY",
+      "title": "بناء التطبيقات الثلاثة",
+      "steps": "نفذ builds في PH12، ثم ثبت نسخ debug محلياً على جهاز متاح واختبر الدخول والحجز والمهام.",
+      "expected": "أدلة بناء لكل تطبيق؛ أي اختبار أصلي غير متاح يبقى معلقاً صراحة.",
+      "evidence": "build logs + device smoke report",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "M-119",
+      "area": "الإصدار والقبول",
+      "requirements": [
+        "R38"
+      ],
+      "priority": "P0",
+      "mode": "LOCAL_ONLY",
+      "title": "عدم ادعاء الاختبار الحي",
+      "steps": "راجع تقرير FINAL-DELIVERY وقائمة الأدلة وحدود بيئة الاختبار.",
+      "expected": "نجاح المزود الوهمي لا يساوي تحقق FCM أو الدفع أو Odoo الحي؛ يبقى VPS غير ممسوس.",
+      "evidence": "لقطة واجهة + request_id/رقم الكيان بلا أسرار",
+      "status": "NOT_RUN"
+    }
+  ]
+}

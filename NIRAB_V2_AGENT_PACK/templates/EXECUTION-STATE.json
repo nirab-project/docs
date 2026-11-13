@@ -1,0 +1,92 @@
+{
+  "pack_version": "1.0",
+  "status": "NOT_STARTED",
+  "production_access_authorized": false,
+  "phases": [
+    {
+      "id": "PH-00",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-01",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-02",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-03",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-04",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-05",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-06",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-07",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-08",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-09",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-10",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-11",
+      "code_status": "not_started",
+      "tests_status": "not_run_by_design",
+      "report": null
+    },
+    {
+      "id": "PH-12",
+      "code_status": "not_started",
+      "tests_status": "not_started",
+      "report": null
+    }
+  ],
+  "gates": {
+    "CODE_READY": false,
+    "LOCAL_VALIDATED": false,
+    "OWNER_VPS_CUTOVER": "not_authorized_for_agent"
+  },
+  "open_issues": [],
+  "deviations": []
+}

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Commerce V2 error envelope",
+  "type": "object",
+  "required": [
+    "error",
+    "meta"
+  ],
+  "properties": {
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message",
+        "fields",
+        "retryable"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]+$"
+        },
+        "message": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "request_id",
+        "contract_version"
+      ],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "contract_version": {
+          "const": 2
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "x-known-source-codes": [
+    "ALLOCATION_INVALID",
+    "ATTACHMENT_REJECTED",
+    "AUTHENTICATION_REQUIRED",
+    "BANK_REFERENCE_ALREADY_CREDITED",
+    "BOOKING_NOT_COMPLETED",
+    "CAPABILITY_CODE_EXISTS",
+    "CHECKOUT_ALREADY_PENDING",
+    "CHECKOUT_CITY_CONFLICT",
+    "CITY_BRANCH_NOT_READY",
+    "CITY_TRANSACTION_ISOLATION_UNSAFE",
+    "COMMERCE_INTERNAL_ERROR",
+    "COMMERCE_UNAVAILABLE",
+    "COMPONENT_CYCLE_OR_DEPTH",
+    "COMPONENT_DEPTH_INVALID",
+    "COMPONENT_REFERENCE_INVALID",
+    "CONTEXT_CHANGED",
+    "CONTRACT_UPGRADE_REQUIRED",
+    "COUPON_NOT_ELIGIBLE",
+    "CUSTOMER_FEE_CONSENT_REQUIRED",
+    "CUSTOMER_WALLET_REFUND_CONSENT_REQUIRED",
+    "DELIVERY_CONFIRMATION_REQUIRED",
+    "DELIVERY_CONFIRMATION_UNAVAILABLE",
+    "ENTITLEMENT_CONFIGURATION_INVALID",
+    "ENTITLEMENT_EXPIRED",
+    "ENTITLEMENT_INSUFFICIENT",
+    "ENTITLEMENT_MINIMUM_GAP",
+    "ENTITLEMENT_REFERENCE_INVALID",
+    "EXISTING_BOOKINGS_REQUIRE_REVIEW",
+    "FIELD_VALIDATION_FAILED",
+    "FORBIDDEN",
+    "FORM_CONDITION_INVALID",
+    "HOLD_EXPIRED",
+    "IDEMPOTENCY_KEY_REQUIRED",
+    "IDEMPOTENCY_MISMATCH",
+    "IMMUTABLE_CODE",
+    "INCOMPATIBLE_GROUP",
+    "INSPECTION_CREDIT_ALREADY_USED",
+    "LEDGER_ACCOUNT_MISSING",
+    "LEDGER_ENTRY_INVALID",
+    "LEDGER_UNBALANCED",
+    "LOCAL_FIXTURE_BRANCH_MISSING",
+    "LOCAL_FIXTURE_IDENTITY_COLLISION",
+    "LOCAL_FIXTURE_PERMISSION_COLLISION",
+    "LOCAL_ISOLATION_REQUIRED",
+    "MANUAL_REFUND_INELIGIBLE",
+    "MEMBERSHIP_REFUND_REVIEW_REQUIRED",
+    "MONEY_INVALID",
+    "MONEY_OVERFLOW",
+    "MONEY_PRECISION_INVALID",
+    "NOT_FOUND",
+    "OTP_ATTEMPTS_EXCEEDED",
+    "OTP_EXPIRED",
+    "OTP_INVALID",
+    "OTP_RESEND_TOO_SOON",
+    "PAYMENT_AMOUNT_MISMATCH",
+    "PAYMENT_CAPABILITY_UNAVAILABLE",
+    "PAYMENT_METHOD_INELIGIBLE",
+    "PAYMENT_PENDING",
+    "PAYMENT_RECONCILIATION_REQUIRED",
+    "PAYMENT_UNVERIFIED",
+    "POLICY_REVIEW_REQUIRED",
+    "PREVIEW_EXPIRED",
+    "PRICE_CHANGED",
+    "PRICE_CONFIGURATION_INVALID",
+    "PROMOTION_EXPIRED",
+    "PROMOTION_LIMIT_REACHED",
+    "PROMOTION_POLICY_CHANGED",
+    "PROTECTED_DATA_CHANGED",
+    "QUALITY_SOURCE_TASKS_MISSING",
+    "QUOTE_ALREADY_CHECKED_OUT",
+    "QUOTE_EXPIRED",
+    "QUOTE_REQUIRED",
+    "QUOTE_SCHEDULE_MODE_UNSUPPORTED",
+    "RATE_LIMITED",
+    "REFUND_ACCOUNTING_REVIEW_REQUIRED",
+    "REFUND_AMOUNT_MISMATCH",
+    "REFUND_LIMIT_EXCEEDED",
+    "REFUND_REFERENCE_ALREADY_USED",
+    "RESET_GUARD_FAILED",
+    "REVIEW_ALREADY_EXISTS",
+    "REWORK_NOT_COMPLETED",
+    "SCHEMA_CHANGED",
+    "SERVICE_NOT_READY",
+    "SLOT_UNAVAILABLE",
+    "TEAM_ATTENDANCE_REQUIRED",
+    "TRANSITION_NOT_ALLOWED",
+    "UNAUTHORIZED",
+    "UNKNOWN_CAPABILITY",
+    "VERSION_CONFLICT",
+    "WALLET_INSUFFICIENT",
+    "WARRANTY_CHAIN_REQUIRES_REVIEW",
+    "WARRANTY_EXPIRED"
+  ],
+  "x-runtime-validation": "not_run_by_design"
+}

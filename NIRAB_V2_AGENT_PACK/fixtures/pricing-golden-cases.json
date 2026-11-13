@@ -1,0 +1,319 @@
+{
+  "fixture_version": 1,
+  "money_scale": 2,
+  "currency": "SAR",
+  "rounding": "HALF_UP at line boundary; largest remainder for allocations",
+  "test_tax_policy_only": true,
+  "cases": [
+    {
+      "id": "PG01",
+      "description": "سعر غير شامل ضريبة اختبارية",
+      "input": {
+        "base_minor": 10000,
+        "tax_bps": 1500,
+        "tax_inclusive": false
+      },
+      "expected": {
+        "net_minor": 10000,
+        "tax_minor": 1500,
+        "total_minor": 11500
+      }
+    },
+    {
+      "id": "PG02",
+      "description": "سعر شامل",
+      "input": {
+        "gross_minor": 11500,
+        "tax_bps": 1500,
+        "tax_inclusive": true
+      },
+      "expected": {
+        "net_minor": 10000,
+        "tax_minor": 1500,
+        "total_minor": 11500
+      }
+    },
+    {
+      "id": "PG03",
+      "description": "كمية وحدات",
+      "input": {
+        "unit_minor": 6000,
+        "quantity": 3,
+        "tax_bps": 1500
+      },
+      "expected": {
+        "net_minor": 18000,
+        "tax_minor": 2700,
+        "total_minor": 20700
+      }
+    },
+    {
+      "id": "PG04",
+      "description": "مساحة عشرية",
+      "input": {
+        "unit_minor": 800,
+        "area": "12.5",
+        "tax_bps": 1500
+      },
+      "expected": {
+        "net_minor": 10000,
+        "tax_minor": 1500,
+        "total_minor": 11500
+      }
+    },
+    {
+      "id": "PG05",
+      "description": "باقة كمية + وحدتين",
+      "input": {
+        "base_minor": 60000,
+        "included_units": 5,
+        "extra_units": 2,
+        "extra_unit_minor": 12500,
+        "tax_bps": 1500
+      },
+      "expected": {
+        "units_to_execute": 7,
+        "net_minor": 85000,
+        "tax_minor": 12750,
+        "total_minor": 97750
+      }
+    },
+    {
+      "id": "PG06",
+      "description": "minimum قبل الخصم",
+      "input": {
+        "calculated_minor": 7000,
+        "minimum_minor": 10000,
+        "discount_bps": 1000,
+        "tax_bps": 1500
+      },
+      "expected": {
+        "after_minimum_minor": 10000,
+        "discount_minor": 1000,
+        "net_minor": 9000,
+        "tax_minor": 1350,
+        "total_minor": 10350
+      }
+    },
+    {
+      "id": "PG07",
+      "description": "اختيار أفضل خصم لا الجمع",
+      "input": {
+        "base_minor": 10000,
+        "campaign_bps": 1000,
+        "coupon_bps": 2000,
+        "membership_bps": 1500,
+        "stacking": false,
+        "tax_bps": 0
+      },
+      "expected": {
+        "discount_minor": 2000,
+        "total_minor": 8000
+      }
+    },
+    {
+      "id": "PG08",
+      "description": "تخصيص خصم بأكبر البواقي",
+      "input": {
+        "line_codes": [
+          "a",
+          "b",
+          "c"
+        ],
+        "line_minor": [
+          100,
+          100,
+          100
+        ],
+        "discount_minor": 100
+      },
+      "expected": {
+        "allocated_discount_minor": [
+          34,
+          33,
+          33
+        ],
+        "line_net_minor": [
+          66,
+          67,
+          67
+        ],
+        "sum_net_minor": 200
+      }
+    },
+    {
+      "id": "PG09",
+      "description": "مصدر سعر مجهول",
+      "input": {
+        "price_mode": "quote_required"
+      },
+      "expected": {
+        "pricing_state": "quote_required",
+        "total_minor": null,
+        "checkout_allowed": false
+      }
+    },
+    {
+      "id": "PG10",
+      "description": "مجاني مصرح به لا مجهول",
+      "input": {
+        "base_minor": 0,
+        "explicit_free": true,
+        "approval_present": true
+      },
+      "expected": {
+        "pricing_state": "priced",
+        "total_minor": 0,
+        "gateway_required": false
+      }
+    },
+    {
+      "id": "PG11",
+      "description": "صفر غير مصرح",
+      "input": {
+        "base_minor": 0,
+        "explicit_free": false
+      },
+      "expected": {
+        "error": "PRICE_CONFIGURATION_INVALID"
+      }
+    },
+    {
+      "id": "PG12",
+      "description": "زيارة من رصيد مدفوع لا تدفع مرتين",
+      "input": {
+        "pack_total_minor": 60000,
+        "pack_units": 4,
+        "use_units": 1,
+        "paid_extra_minor": 0
+      },
+      "expected": {
+        "new_charge_minor": 0,
+        "allocated_visit_value_minor": 15000,
+        "reserved_units_delta": 1
+      }
+    },
+    {
+      "id": "PG13",
+      "description": "استرداد زيارتين غير مستعملتين",
+      "input": {
+        "pack_total_minor": 60000,
+        "pack_units": 4,
+        "consumed_units": 2,
+        "reserved_units": 0,
+        "refund_unused": 2
+      },
+      "expected": {
+        "refund_minor": 30000,
+        "remaining_units_after_refund": 0
+      }
+    },
+    {
+      "id": "PG14",
+      "description": "سلة وتخصيص وسيلتي دفع",
+      "input": {
+        "line_minor": [
+          10000,
+          20000
+        ],
+        "discount_minor": 3000,
+        "tax_bps": 1500,
+        "wallet_minor": 10000
+      },
+      "expected": {
+        "net_minor": 27000,
+        "tax_minor": 4050,
+        "total_minor": 31050,
+        "gateway_minor": 21050,
+        "line_gross_minor": [
+          10350,
+          20700
+        ]
+      }
+    },
+    {
+      "id": "PG15",
+      "description": "تقريب شامل بالهللة",
+      "input": {
+        "gross_minor": 101,
+        "tax_bps": 1500,
+        "tax_inclusive": true
+      },
+      "expected": {
+        "net_minor": 88,
+        "tax_minor": 13,
+        "total_minor": 101
+      }
+    },
+    {
+      "id": "PG16",
+      "description": "لا خصم على المجهول",
+      "input": {
+        "price_mode": "quote_required",
+        "coupon_code": "LOCAL10"
+      },
+      "expected": {
+        "total_minor": null,
+        "coupon_consumed": false
+      }
+    },
+    {
+      "id": "PG17",
+      "description": "رسوم زيارة واحدة لمجموعة",
+      "input": {
+        "line_minor": [
+          10000,
+          20000
+        ],
+        "group_count": 1,
+        "fee_per_group_minor": 2000,
+        "tax_bps": 0
+      },
+      "expected": {
+        "fee_minor": 2000,
+        "total_minor": 32000
+      }
+    },
+    {
+      "id": "PG18",
+      "description": "إلغاء حجز ضمن طلب لا كامل الطلب",
+      "input": {
+        "booking_gross_minor": [
+          10350,
+          20700
+        ],
+        "cancel_index": 0,
+        "policy_refund_bps": 10000
+      },
+      "expected": {
+        "refund_minor": 10350,
+        "other_booking_gross_minor": 20700
+      }
+    },
+    {
+      "id": "PG19",
+      "description": "over-refund يمنع",
+      "input": {
+        "verified_paid_minor": 10000,
+        "already_refunded_minor": 8000,
+        "new_refund_minor": 3000
+      },
+      "expected": {
+        "error": "REFUND_LIMIT_EXCEEDED"
+      }
+    },
+    {
+      "id": "PG20",
+      "description": "تجاوز عتبة المساحة مراجعة لا قص سعر",
+      "input": {
+        "area": "1200",
+        "review_above_area": "1000",
+        "unit_minor": 700
+      },
+      "expected": {
+        "pricing_state": "quote_required",
+        "total_minor": null
+      }
+    }
+  ]
+}

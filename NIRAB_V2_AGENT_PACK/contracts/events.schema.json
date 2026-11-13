@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Commerce durable event envelope",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "schema_version",
+    "generation",
+    "aggregate_type",
+    "aggregate_id",
+    "aggregate_version",
+    "occurred_at",
+    "correlation_id",
+    "payload"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "generation": {
+      "type": "string"
+    },
+    "aggregate_type": {
+      "type": "string"
+    },
+    "aggregate_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregate_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "x-event-catalog": [
+    "adjustment.accepted",
+    "booking.assigned",
+    "booking.cancelled",
+    "booking.completed",
+    "booking.no_show",
+    "booking.rescheduled",
+    "booking.scheduled",
+    "cash.collected",
+    "cash.remitted",
+    "catalog.published",
+    "entitlement.",
+    "entitlement.expired",
+    "entitlement.granted",
+    "marketing.consent_bound",
+    "order.cancelled",
+    "order.confirmed",
+    "payment.resolution_required",
+    "payment.verified",
+    "quality.claim_changed",
+    "quality.claim_opened",
+    "quality.claim_overdue",
+    "quality.review_created",
+    "quality.rework_scheduled",
+    "quote.accepted",
+    "quote.expired",
+    "quote.information_requested",
+    "quote.sent",
+    "refund.completed",
+    "refund.requested",
+    "renewal.available",
+    "renewal.cancelled",
+    "renewal.failed",
+    "task.changed",
+    "task.evidence_added",
+    "task.scheduled",
+    "workforce.capabilities.updated"
+  ],
+  "x-notes": [
+    "schema_version 1 is the internal event envelope; public Commerce API contract is 2",
+    "Consumer must authorize current recipient/branch/assignment and generation before delivery",
+    "Stable event identities deduplicate adapters; network delivery occurs outside the commerce transaction",
+    "Computed transition names are additionally constrained by the source state machines"
+  ],
+  "x-runtime-validation": "not_run_by_design"
+}

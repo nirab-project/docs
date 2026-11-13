@@ -1,0 +1,2023 @@
+{
+  "fixture_version": 1,
+  "usage": "ORIGINAL_SYNTHETIC_REFERENCE_DRAFTS_NOT_PRODUCTION_PRICING",
+  "source": "proposed NIRAB configuration; not copied competitor data",
+  "profile": "reference",
+  "production_publish": false,
+  "services": [
+    {
+      "schema_version": 1,
+      "code": "furniture_cleaning",
+      "label": {
+        "ar": "تنظيف الأثاث",
+        "en": "Furniture cleaning"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة تنظيف الأثاث؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Furniture cleaning; review content and pricing before publication."
+        },
+        "hero_icon": "furniture_cleaning",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "notes",
+          "type": "textarea",
+          "label": {
+            "ar": "ملاحظات",
+            "en": "Notes"
+          }
+        },
+        {
+          "key": "attachments",
+          "type": "media",
+          "label": {
+            "ar": "صور الأثاث",
+            "en": "Furniture images"
+          },
+          "max": 6
+        }
+      ],
+      "offers": [
+        {
+          "code": "sofa_seat",
+          "label": {
+            "ar": "مقعد كنب",
+            "en": "Sofa seat"
+          },
+          "kind": "single",
+          "price_mode": "rules",
+          "pricing": {
+            "strategy": "unit_rate",
+            "unit_minor": 3000,
+            "unit": "seat",
+            "max_quantity": 30
+          }
+        },
+        {
+          "code": "lounge_bundle",
+          "label": {
+            "ar": "باقة جلسة نيراب",
+            "en": "NIRAB lounge bundle"
+          },
+          "kind": "composite",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 60000,
+            "allocation_strategy": "fixed_weights",
+            "currency": "SAR"
+          },
+          "components": [
+            {
+              "code": "sofa_seats",
+              "unit": "seat",
+              "included_quantity": "8",
+              "allocation_weight": 4
+            },
+            {
+              "code": "curtains",
+              "unit": "panel",
+              "included_quantity": "2",
+              "allocation_weight": 1
+            },
+            {
+              "code": "rug_area",
+              "unit": "m2",
+              "included_quantity": "15",
+              "allocation_weight": 1
+            }
+          ]
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 90,
+        "technicians": 1,
+        "capabilities": [
+          "fabric_cleaning"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "rehabilitation_cleaning",
+      "label": {
+        "ar": "النظافة التأهيلية",
+        "en": "Rehabilitation cleaning"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة النظافة التأهيلية؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Rehabilitation cleaning; review content and pricing before publication."
+        },
+        "hero_icon": "rehabilitation_cleaning",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "property_type",
+          "type": "cards",
+          "label": {
+            "ar": "نوع العقار",
+            "en": "Property type"
+          },
+          "required": true,
+          "options": [
+            {
+              "code": "apartment",
+              "label": {
+                "ar": "شقة",
+                "en": "Apartment"
+              }
+            },
+            {
+              "code": "floor",
+              "label": {
+                "ar": "دور",
+                "en": "Floor"
+              }
+            },
+            {
+              "code": "villa",
+              "label": {
+                "ar": "فيلا",
+                "en": "Villa"
+              }
+            }
+          ]
+        },
+        {
+          "key": "site_area",
+          "type": "measurement",
+          "label": {
+            "ar": "المساحة التقريبية",
+            "en": "Approximate area"
+          },
+          "required": true,
+          "unit": "m2",
+          "min": 1,
+          "max": 3000
+        },
+        {
+          "key": "rooms_count",
+          "type": "counter",
+          "label": {
+            "ar": "عدد الغرف",
+            "en": "Room count"
+          },
+          "required": true,
+          "min": 0,
+          "max": 20
+        },
+        {
+          "key": "rooms",
+          "type": "repeater",
+          "label": {
+            "ar": "تفاصيل الغرف",
+            "en": "Room details"
+          },
+          "count_from": "rooms_count",
+          "fields": [
+            {
+              "key": "area_band",
+              "type": "select",
+              "label": {
+                "ar": "مساحة الجزء",
+                "en": "Room area"
+              },
+              "required": true,
+              "scope": "per_instance",
+              "options": [
+                {
+                  "code": "small",
+                  "label": {
+                    "ar": "صغير",
+                    "en": "Small"
+                  }
+                },
+                {
+                  "code": "medium",
+                  "label": {
+                    "ar": "متوسط",
+                    "en": "Medium"
+                  }
+                },
+                {
+                  "code": "large",
+                  "label": {
+                    "ar": "كبير",
+                    "en": "Large"
+                  }
+                }
+              ]
+            },
+            {
+              "key": "window_size",
+              "type": "select",
+              "label": {
+                "ar": "حجم النافذة",
+                "en": "Window size"
+              },
+              "required": true,
+              "scope": "per_instance",
+              "options": [
+                {
+                  "code": "small",
+                  "label": {
+                    "ar": "صغيرة",
+                    "en": "Small"
+                  }
+                },
+                {
+                  "code": "large",
+                  "label": {
+                    "ar": "كبيرة",
+                    "en": "Large"
+                  }
+                }
+              ]
+            },
+            {
+              "key": "paint",
+              "type": "select",
+              "label": {
+                "ar": "بقايا دهان",
+                "en": "Paint residue"
+              },
+              "required": true,
+              "scope": "per_instance",
+              "options": [
+                {
+                  "code": "none",
+                  "label": {
+                    "ar": "لا يوجد",
+                    "en": "None"
+                  }
+                },
+                {
+                  "code": "light",
+                  "label": {
+                    "ar": "خفيف",
+                    "en": "Light"
+                  }
+                },
+                {
+                  "code": "medium",
+                  "label": {
+                    "ar": "متوسط",
+                    "en": "Medium"
+                  }
+                },
+                {
+                  "code": "heavy",
+                  "label": {
+                    "ar": "شديد",
+                    "en": "Heavy"
+                  }
+                }
+              ]
+            },
+            {
+              "key": "cement",
+              "type": "select",
+              "label": {
+                "ar": "بقايا أسمنت",
+                "en": "Cement residue"
+              },
+              "required": true,
+              "scope": "per_instance",
+              "options": [
+                {
+                  "code": "none",
+                  "label": {
+                    "ar": "لا يوجد",
+                    "en": "None"
+                  }
+                },
+                {
+                  "code": "light",
+                  "label": {
+                    "ar": "خفيف",
+                    "en": "Light"
+                  }
+                },
+                {
+                  "code": "medium",
+                  "label": {
+                    "ar": "متوسط",
+                    "en": "Medium"
+                  }
+                },
+                {
+                  "code": "heavy",
+                  "label": {
+                    "ar": "شديد",
+                    "en": "Heavy"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "halls_count",
+          "type": "counter",
+          "label": {
+            "ar": "عدد الصالات",
+            "en": "Hall count"
+          },
+          "min": 0,
+          "max": 10
+        },
+        {
+          "key": "kitchens_count",
+          "type": "counter",
+          "label": {
+            "ar": "عدد المطابخ",
+            "en": "Kitchen count"
+          },
+          "min": 0,
+          "max": 10
+        },
+        {
+          "key": "bathrooms_count",
+          "type": "counter",
+          "label": {
+            "ar": "دورات المياه",
+            "en": "Bathroom count"
+          },
+          "min": 0,
+          "max": 20
+        },
+        {
+          "key": "attachments",
+          "type": "media",
+          "label": {
+            "ar": "مرفقات الموقع",
+            "en": "Site attachments"
+          },
+          "max": 10
+        }
+      ],
+      "offers": [
+        {
+          "code": "form_price",
+          "label": {
+            "ar": "تقدير من البيانات",
+            "en": "Form estimate"
+          },
+          "kind": "single",
+          "price_mode": "rules",
+          "pricing": {
+            "strategy": "component_sum",
+            "rates_minor": {
+              "rooms_count": 16000,
+              "halls_count": 24000,
+              "kitchens_count": 42000,
+              "bathrooms_count": 13000
+            },
+            "minimum_by_property_minor": {
+              "apartment": 90000,
+              "floor": 150000,
+              "villa": 250000
+            },
+            "review_above_area": "800"
+          }
+        },
+        {
+          "code": "inspection",
+          "label": {
+            "ar": "زيارة معاينة",
+            "en": "Inspection"
+          },
+          "kind": "single",
+          "price_mode": "inspection_required",
+          "pricing": {
+            "inspection_fee_minor": 0,
+            "explicit_free_inspection": true
+          }
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 180,
+        "technicians": 1,
+        "capabilities": [
+          "deep_cleaning"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now",
+          "quote",
+          "inspection"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "ac_cleaning",
+      "label": {
+        "ar": "تنظيف المكيفات",
+        "en": "AC cleaning"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة تنظيف المكيفات؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for AC cleaning; review content and pricing before publication."
+        },
+        "hero_icon": "ac_cleaning",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "unit_type",
+          "type": "cards",
+          "label": {
+            "ar": "نوع المكيف",
+            "en": "AC type"
+          },
+          "required": true,
+          "options": [
+            {
+              "code": "split",
+              "label": {
+                "ar": "سبليت",
+                "en": "Split"
+              }
+            },
+            {
+              "code": "window",
+              "label": {
+                "ar": "شباك",
+                "en": "Window"
+              }
+            }
+          ]
+        }
+      ],
+      "offers": [
+        {
+          "code": "single_unit",
+          "label": {
+            "ar": "مكيف واحد",
+            "en": "One AC"
+          },
+          "kind": "single",
+          "price_mode": "rules",
+          "pricing": {
+            "strategy": "unit_rate",
+            "unit_minor": 16000,
+            "unit": "unit",
+            "max_quantity": 30
+          }
+        },
+        {
+          "code": "bundle_3",
+          "label": {
+            "ar": "باقة 3 مكيفات",
+            "en": "3 AC bundle"
+          },
+          "kind": "quantity_bundle",
+          "price_mode": "fixed",
+          "pricing": {
+            "included_quantity": 3,
+            "base_minor": 42000,
+            "extra_unit_minor": 14000,
+            "max_extra_quantity": 10,
+            "unit": "unit"
+          }
+        },
+        {
+          "code": "bundle_5",
+          "label": {
+            "ar": "باقة 5 مكيفات",
+            "en": "5 AC bundle"
+          },
+          "kind": "quantity_bundle",
+          "price_mode": "fixed",
+          "pricing": {
+            "included_quantity": 5,
+            "base_minor": 65000,
+            "extra_unit_minor": 13000,
+            "max_extra_quantity": 10,
+            "unit": "unit"
+          }
+        },
+        {
+          "code": "bundle_10",
+          "label": {
+            "ar": "باقة 10 مكيفات",
+            "en": "10 AC bundle"
+          },
+          "kind": "quantity_bundle",
+          "price_mode": "fixed",
+          "pricing": {
+            "included_quantity": 10,
+            "base_minor": 120000,
+            "extra_unit_minor": 12000,
+            "max_extra_quantity": 10,
+            "unit": "unit"
+          }
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 45,
+        "technicians": 1,
+        "capabilities": [
+          "ac_cleaning"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": [
+          {
+            "basis": "total_included_and_extra_units",
+            "minutes_per_unit": 35
+          }
+        ]
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "home_maintenance",
+      "label": {
+        "ar": "الصيانة المنزلية",
+        "en": "Home maintenance"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة الصيانة المنزلية؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Home maintenance; review content and pricing before publication."
+        },
+        "hero_icon": "home_maintenance",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "trade",
+          "type": "cards",
+          "label": {
+            "ar": "نوع الصيانة",
+            "en": "Trade"
+          },
+          "required": true,
+          "options": [
+            {
+              "code": "electrical",
+              "label": {
+                "ar": "كهرباء",
+                "en": "Electrical"
+              }
+            },
+            {
+              "code": "plumbing",
+              "label": {
+                "ar": "سباكة",
+                "en": "Plumbing"
+              }
+            },
+            {
+              "code": "hvac",
+              "label": {
+                "ar": "تكييف",
+                "en": "HVAC"
+              }
+            }
+          ]
+        },
+        {
+          "key": "problem",
+          "type": "textarea",
+          "label": {
+            "ar": "وصف المشكلة",
+            "en": "Problem description"
+          },
+          "required": true
+        },
+        {
+          "key": "attachments",
+          "type": "media",
+          "label": {
+            "ar": "صور المشكلة",
+            "en": "Problem images"
+          },
+          "max": 8
+        }
+      ],
+      "offers": [
+        {
+          "code": "repair_quote",
+          "label": {
+            "ar": "طلب صيانة",
+            "en": "Repair quote"
+          },
+          "kind": "single",
+          "price_mode": "quote_required",
+          "pricing": {}
+        },
+        {
+          "code": "diagnostic",
+          "label": {
+            "ar": "زيارة تشخيص",
+            "en": "Diagnostic visit"
+          },
+          "kind": "single",
+          "price_mode": "inspection_required",
+          "pricing": {
+            "inspection_fee_minor": 7500
+          }
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 60,
+        "technicians": 1,
+        "capabilities": [
+          "maintenance"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "quote",
+          "inspection"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "pest_control",
+      "label": {
+        "ar": "مكافحة الحشرات",
+        "en": "Pest control"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة مكافحة الحشرات؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Pest control; review content and pricing before publication."
+        },
+        "hero_icon": "pest_control",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "problem_notes",
+          "type": "textarea",
+          "label": {
+            "ar": "تفاصيل الحالة",
+            "en": "Case details"
+          }
+        }
+      ],
+      "offers": [
+        {
+          "code": "apartment_visit",
+          "label": {
+            "ar": "زيارة شقة",
+            "en": "Apartment visit"
+          },
+          "kind": "single",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 28000
+          }
+        },
+        {
+          "code": "villa_visit",
+          "label": {
+            "ar": "زيارة فيلا",
+            "en": "Villa visit"
+          },
+          "kind": "single",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 39000
+          }
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 75,
+        "technicians": 1,
+        "capabilities": [
+          "pest_control"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "furniture_moving",
+      "label": {
+        "ar": "نقل الأثاث",
+        "en": "Furniture moving"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة نقل الأثاث؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Furniture moving; review content and pricing before publication."
+        },
+        "hero_icon": "furniture_moving",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "property_type",
+          "type": "cards",
+          "label": {
+            "ar": "نوع النقل",
+            "en": "Moving type"
+          },
+          "required": true,
+          "options": [
+            {
+              "code": "apartment",
+              "label": {
+                "ar": "شقة",
+                "en": "Apartment"
+              }
+            },
+            {
+              "code": "floor",
+              "label": {
+                "ar": "دور",
+                "en": "Floor"
+              }
+            },
+            {
+              "code": "villa",
+              "label": {
+                "ar": "فيلا",
+                "en": "Villa"
+              }
+            }
+          ]
+        },
+        {
+          "key": "origin",
+          "type": "address_selector",
+          "label": {
+            "ar": "موقع الاستلام",
+            "en": "Origin"
+          },
+          "required": true
+        },
+        {
+          "key": "destination",
+          "type": "address_selector",
+          "label": {
+            "ar": "موقع التسليم",
+            "en": "Destination"
+          },
+          "required": true
+        },
+        {
+          "key": "from_floor",
+          "type": "integer",
+          "label": {
+            "ar": "طابق البداية",
+            "en": "Origin floor"
+          },
+          "min": 0,
+          "max": 50
+        },
+        {
+          "key": "to_floor",
+          "type": "integer",
+          "label": {
+            "ar": "طابق الوجهة",
+            "en": "Destination floor"
+          },
+          "min": 0,
+          "max": 50
+        },
+        {
+          "key": "has_elevator",
+          "type": "boolean",
+          "label": {
+            "ar": "يوجد مصعد",
+            "en": "Elevator"
+          }
+        },
+        {
+          "key": "needs_packing",
+          "type": "boolean",
+          "label": {
+            "ar": "تغليف",
+            "en": "Packing"
+          }
+        },
+        {
+          "key": "attachments",
+          "type": "media",
+          "label": {
+            "ar": "مرفقات النقل",
+            "en": "Moving attachments"
+          },
+          "max": 10
+        }
+      ],
+      "offers": [
+        {
+          "code": "moving_quote",
+          "label": {
+            "ar": "طلب عرض نقل",
+            "en": "Moving quote"
+          },
+          "kind": "single",
+          "price_mode": "quote_required",
+          "pricing": {}
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 240,
+        "technicians": 2,
+        "capabilities": [
+          "moving"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "quote",
+          "inspection"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "preferred_only"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "car_wash",
+      "label": {
+        "ar": "غسيل السيارات",
+        "en": "Car wash"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة غسيل السيارات؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Car wash; review content and pricing before publication."
+        },
+        "hero_icon": "car_wash",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "saved_vehicle",
+          "type": "asset_selector",
+          "label": {
+            "ar": "سيارة محفوظة",
+            "en": "Saved vehicle"
+          }
+        },
+        {
+          "key": "brand",
+          "type": "select",
+          "label": {
+            "ar": "الماركة",
+            "en": "Brand"
+          },
+          "required": true,
+          "reference_data": "vehicle_brands"
+        },
+        {
+          "key": "model",
+          "type": "select",
+          "label": {
+            "ar": "الطراز",
+            "en": "Model"
+          },
+          "required": true,
+          "reference_data": "vehicle_models",
+          "depends_on": "brand"
+        },
+        {
+          "key": "color",
+          "type": "select",
+          "label": {
+            "ar": "اللون",
+            "en": "Color"
+          },
+          "required": true,
+          "options": [
+            {
+              "code": "black",
+              "label": {
+                "ar": "أسود",
+                "en": "Black"
+              }
+            },
+            {
+              "code": "white",
+              "label": {
+                "ar": "أبيض",
+                "en": "White"
+              }
+            },
+            {
+              "code": "other",
+              "label": {
+                "ar": "آخر",
+                "en": "Other"
+              }
+            }
+          ]
+        },
+        {
+          "key": "plate",
+          "type": "text",
+          "label": {
+            "ar": "اللوحة",
+            "en": "Plate"
+          },
+          "required": true
+        },
+        {
+          "key": "size",
+          "type": "cards",
+          "label": {
+            "ar": "حجم السيارة",
+            "en": "Vehicle size"
+          },
+          "required": true,
+          "options": [
+            {
+              "code": "small",
+              "label": {
+                "ar": "صغيرة",
+                "en": "Small"
+              }
+            },
+            {
+              "code": "large",
+              "label": {
+                "ar": "كبيرة",
+                "en": "Large"
+              }
+            }
+          ]
+        }
+      ],
+      "offers": [
+        {
+          "code": "full_wash",
+          "label": {
+            "ar": "غسيل كامل",
+            "en": "Full wash"
+          },
+          "kind": "single",
+          "price_mode": "rules",
+          "pricing": {
+            "strategy": "option_price",
+            "field": "size",
+            "prices_minor": {
+              "small": 6000,
+              "large": 8000
+            }
+          }
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 60,
+        "technicians": 1,
+        "capabilities": [
+          "car_wash"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "laundry",
+      "label": {
+        "ar": "غسيل الملابس",
+        "en": "Laundry"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة غسيل الملابس؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Laundry; review content and pricing before publication."
+        },
+        "hero_icon": "laundry",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "scent",
+          "type": "boolean",
+          "label": {
+            "ar": "عطر",
+            "en": "Scent"
+          },
+          "default": true
+        },
+        {
+          "key": "mirzam",
+          "type": "boolean",
+          "label": {
+            "ar": "مرزام",
+            "en": "Mirzam preference"
+          },
+          "default": true
+        },
+        {
+          "key": "organic",
+          "type": "boolean",
+          "label": {
+            "ar": "منظف عضوي",
+            "en": "Organic detergent"
+          },
+          "default": false
+        },
+        {
+          "key": "starch",
+          "type": "boolean",
+          "label": {
+            "ar": "نشاء",
+            "en": "Starch"
+          },
+          "default": false
+        },
+        {
+          "key": "starch_level",
+          "type": "select",
+          "label": {
+            "ar": "مستوى النشاء",
+            "en": "Starch level"
+          },
+          "visible_when": {
+            "path": "starch",
+            "op": "eq",
+            "value": true
+          },
+          "required_when": {
+            "path": "starch",
+            "op": "eq",
+            "value": true
+          },
+          "options": [
+            {
+              "code": "light",
+              "label": {
+                "ar": "خفيف",
+                "en": "Light"
+              }
+            },
+            {
+              "code": "medium",
+              "label": {
+                "ar": "متوسط",
+                "en": "Medium"
+              }
+            },
+            {
+              "code": "heavy",
+              "label": {
+                "ar": "مرتفع",
+                "en": "Heavy"
+              }
+            }
+          ]
+        },
+        {
+          "key": "protection",
+          "type": "boolean",
+          "label": {
+            "ar": "طبقة حماية",
+            "en": "Protection"
+          },
+          "default": false
+        }
+      ],
+      "offers": [
+        {
+          "code": "mini_1",
+          "label": {
+            "ar": "ميني — 1 غسلات",
+            "en": "Mini — 1 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 11000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 1,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 3,
+            "bags_count_per_visit": 1,
+            "approximate_pieces": 18,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "mini_4",
+          "label": {
+            "ar": "ميني — 4 غسلات",
+            "en": "Mini — 4 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 40000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 4,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 3,
+            "bags_count_per_visit": 1,
+            "approximate_pieces": 18,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "basic_1",
+          "label": {
+            "ar": "أساسية — 1 غسلات",
+            "en": "Basic — 1 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 15000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 1,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 5,
+            "bags_count_per_visit": 1,
+            "approximate_pieces": 30,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "basic_4",
+          "label": {
+            "ar": "أساسية — 4 غسلات",
+            "en": "Basic — 4 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 56000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 4,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 5,
+            "bags_count_per_visit": 1,
+            "approximate_pieces": 30,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "plus_1",
+          "label": {
+            "ar": "بلس — 1 غسلات",
+            "en": "Plus — 1 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 17000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 1,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 7,
+            "bags_count_per_visit": 1,
+            "approximate_pieces": 42,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "plus_4",
+          "label": {
+            "ar": "بلس — 4 غسلات",
+            "en": "Plus — 4 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 60000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 4,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 7,
+            "bags_count_per_visit": 1,
+            "approximate_pieces": 42,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "max_1",
+          "label": {
+            "ar": "ماكس — 1 غسلات",
+            "en": "Max — 1 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 23000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 1,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 10,
+            "bags_count_per_visit": 2,
+            "approximate_pieces": 60,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        },
+        {
+          "code": "max_4",
+          "label": {
+            "ar": "ماكس — 4 غسلات",
+            "en": "Max — 4 washes"
+          },
+          "kind": "visit_pack",
+          "price_mode": "fixed",
+          "pricing": {
+            "base_minor": 84000,
+            "unit": "wash"
+          },
+          "entitlement": {
+            "total_visits": 4,
+            "validity_days": 30,
+            "minimum_gap_days": 0,
+            "bag_size_kg_definition": "total_capacity_per_visit",
+            "capacity_kg_per_visit": 10,
+            "bags_count_per_visit": 2,
+            "approximate_pieces": 60,
+            "schedule_all_required": false
+          },
+          "addon_rules": [
+            {
+              "field": "organic",
+              "when": true,
+              "amount_minor": 1000,
+              "scope": "per_visit"
+            },
+            {
+              "field": "protection",
+              "when": true,
+              "amount_minor": 500,
+              "scope": "per_visit"
+            }
+          ]
+        }
+      ],
+      "requirements": {
+        "workflow": "pickup_processing_delivery",
+        "base_duration_minutes": 30,
+        "technicians": 1,
+        "capabilities": [
+          "laundry_pickup",
+          "laundry_processing",
+          "laundry_delivery"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now",
+          "visit_pack"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "pickup_window"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    },
+    {
+      "schema_version": 1,
+      "code": "mosque_carpets",
+      "label": {
+        "ar": "تنظيف سجاد المساجد",
+        "en": "Mosque carpet cleaning"
+      },
+      "status": "draft",
+      "content": {
+        "description": {
+          "ar": "قالب نيراب التجريبي لخدمة تنظيف سجاد المساجد؛ يراجع المحتوى والسعر قبل النشر.",
+          "en": "Original NIRAB test template for Mosque carpet cleaning; review content and pricing before publication."
+        },
+        "hero_icon": "mosque_carpets",
+        "gallery": [],
+        "includes": [
+          {
+            "ar": "نطاق عمل موضح في ملخص الطلب",
+            "en": "Scope shown in the order summary"
+          },
+          {
+            "ar": "متابعة حالة التنفيذ من الحساب",
+            "en": "Execution status in the account"
+          }
+        ],
+        "why_us": [
+          {
+            "icon": "checklist",
+            "title": {
+              "ar": "قائمة تنفيذ موثقة",
+              "en": "Documented work checklist"
+            }
+          }
+        ],
+        "faq": [
+          {
+            "question": {
+              "ar": "هل هذه أسعار معتمدة؟",
+              "en": "Are these approved prices?"
+            },
+            "answer": {
+              "ar": "لا، هذه بيانات اختبار لا تنشر للبيع دون اعتماد الإدارة.",
+              "en": "No. These test fixtures require approval before sale."
+            }
+          }
+        ],
+        "notice": {
+          "ar": "بيانات تأسيسية تجريبية — غير قابلة للبيع حالياً",
+          "en": "Test reference data — not ready for sale"
+        }
+      },
+      "form": [
+        {
+          "key": "area",
+          "type": "measurement",
+          "label": {
+            "ar": "مساحة السجاد",
+            "en": "Carpet area"
+          },
+          "required": true,
+          "unit": "m2",
+          "min": 1,
+          "max": 5000
+        },
+        {
+          "key": "site_notes",
+          "type": "textarea",
+          "label": {
+            "ar": "ظروف الوصول",
+            "en": "Access notes"
+          }
+        }
+      ],
+      "offers": [
+        {
+          "code": "area_cleaning",
+          "label": {
+            "ar": "تنظيف بالمساحة",
+            "en": "Area cleaning"
+          },
+          "kind": "single",
+          "price_mode": "rules",
+          "pricing": {
+            "strategy": "area_rate",
+            "unit_minor": 700,
+            "minimum_minor": 40000,
+            "review_above_area": "1000"
+          }
+        }
+      ],
+      "requirements": {
+        "workflow": "onsite",
+        "base_duration_minutes": 120,
+        "technicians": 1,
+        "capabilities": [
+          "carpet_cleaning"
+        ],
+        "buffer_minutes": 15,
+        "duration_rules": []
+      },
+      "journey": {
+        "modes": [
+          "cart",
+          "buy_now",
+          "quote",
+          "inspection"
+        ],
+        "steps": [
+          "content",
+          "configuration",
+          "address",
+          "estimate",
+          "schedule",
+          "review",
+          "confirm"
+        ],
+        "appointment_kind": "appointment"
+      },
+      "policy": {
+        "approved_for_production": false,
+        "cancellation_policy_ref": "owner_approval_required",
+        "tax_policy_ref": "owner_existing_tax_policy",
+        "local_test_defaults": {
+          "tax_rate_bps": 1500,
+          "minimum_lead_minutes": 120,
+          "free_cancel_before_hours": 24
+        }
+      }
+    }
+  ],
+  "local_activation_policy": "Only CommerceLocalFixtureSeeder may approve synthetic test configuration; reference seeder leaves drafts."
+}
