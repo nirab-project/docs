@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
   title: 'NIRAB Commerce V2 — proposed implementation contract'
-  version: 2.0-code-only
+  version: '2.0'
   description: |-
     عقد مطلوب تنفيذه. لا endpoints مؤكدة الآن. dynamic form/pricing definitions تخضع أيضاً لـJSON Schema والتحقق الدلالي؛ مصدر الأسعار هو الخادم.
-    Implementation contracts for PH-00..PH-11. Runtime validation has not run; PH-12 is excluded by the user.
+    Implementation contracts for PH-00..PH-11. Local runtime validation evidence is recorded separately in the PH-12 reports. Native application tests are excluded by the owner.
 servers:
   -
     url: 'http://127.0.0.1:8080/api/v2/commerce'
@@ -1086,8 +1086,6 @@ paths:
       security:
         -
           BearerAuth: []
-        -
-          GuestSession: []
       requestBody:
         required: true
         content:
@@ -1136,8 +1134,6 @@ paths:
       security:
         -
           BearerAuth: []
-        -
-          GuestSession: []
       requestBody:
         required: true
         content:
@@ -1186,14 +1182,12 @@ paths:
       security:
         -
           BearerAuth: []
-        -
-          GuestSession: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AvailabilityInput'
+              $ref: '#/components/schemas/SchedulePreviewInput'
       responses:
         200:
           description: 'Result; not proof of payment unless explicit verified state.'
@@ -1388,6 +1382,8 @@ paths:
           in: query
           schema:
             type: string
+            format: uuid
+          description: 'Last returned entity ID from the same authorized filtered list; next_cursor is null at the end. Equal timestamps use the ID as a stable tie-break.'
       responses:
         200:
           description: 'Result; not proof of payment unless explicit verified state.'
@@ -1537,12 +1533,14 @@ paths:
             type: integer
             minimum: 1
             maximum: 100
-            default: 20
+            default: 100
         -
           name: cursor
           in: query
           schema:
             type: string
+            format: uuid
+          description: 'Last returned entity ID from the same authorized filtered list; next_cursor is null at the end. Equal timestamps use the ID as a stable tie-break.'
       responses:
         200:
           description: 'Result; not proof of payment unless explicit verified state.'
@@ -3415,13 +3413,15 @@ paths:
           schema:
             type: integer
             minimum: 1
-            maximum: 100
-            default: 20
+            maximum: 200
+            default: 200
         -
           name: cursor
           in: query
           schema:
             type: string
+            format: uuid
+          description: 'Last returned entity ID from the same authorized filtered list; next_cursor is null at the end. Equal timestamps use the ID as a stable tie-break.'
       responses:
         200:
           description: 'Result; not proof of payment unless explicit verified state.'
@@ -5812,6 +5812,7 @@ components:
             - 2
         next_cursor:
           type: string
+          format: uuid
           nullable: true
       required:
         - request_id
@@ -6232,6 +6233,14 @@ components:
         delivery_policy:
           type: object
           additionalProperties: true
+        service_id:
+          type: string
+          format: uuid
+          nullable: true
+        offer_id:
+          type: string
+          format: uuid
+          nullable: true
       required:
         - id
         - city_id
@@ -6333,14 +6342,17 @@ components:
         task_type:
           type: string
           enum:
-            - pickup
             - delivery
-            - onsite
-            - inspection
         pickup_starts_at:
           type: string
           format: date-time
         quote_version_id:
+          type: string
+          format: uuid
+        booking_id:
+          type: string
+          format: uuid
+        entitlement_id:
           type: string
           format: uuid
       required:
@@ -6385,6 +6397,26 @@ components:
         expires_at:
           type: string
           format: date-time
+        arrival_window:
+          type: object
+          required:
+            - start_at
+            - end_at
+            - timezone
+          properties:
+            start_at:
+              type: string
+              format: date-time
+            end_at:
+              type: string
+              format: date-time
+            timezone:
+              type: string
+          additionalProperties: false
+          nullable: true
+        estimated_work_minutes:
+          type: integer
+          minimum: 0
       required:
         - slot_token
         - start_at
@@ -6444,6 +6476,44 @@ components:
             format: date-time
         breakdown:
           $ref: '#/components/schemas/Breakdown'
+        arrival_window:
+          type: object
+          required:
+            - start_at
+            - end_at
+            - timezone
+          properties:
+            start_at:
+              type: string
+              format: date-time
+            end_at:
+              type: string
+              format: date-time
+            timezone:
+              type: string
+          additionalProperties: false
+          nullable: true
+        estimated_work_minutes:
+          type: integer
+          minimum: 0
+        arrival_windows:
+          type: array
+          items:
+            type: object
+            required:
+              - start_at
+              - end_at
+              - timezone
+            properties:
+              start_at:
+                type: string
+                format: date-time
+              end_at:
+                type: string
+                format: date-time
+              timezone:
+                type: string
+            additionalProperties: false
       required:
         - group_key
         - branch_id
@@ -6784,6 +6854,31 @@ components:
           minimum: 0
         settlement_state:
           type: string
+        adjustments:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        arrival_window:
+          type: object
+          required:
+            - start_at
+            - end_at
+            - timezone
+          properties:
+            start_at:
+              type: string
+              format: date-time
+            end_at:
+              type: string
+              format: date-time
+            timezone:
+              type: string
+          additionalProperties: false
+          nullable: true
+        estimated_work_minutes:
+          type: integer
+          minimum: 0
       required:
         - id
         - number
@@ -7215,6 +7310,17 @@ components:
         delivery_policy:
           type: object
           additionalProperties: true
+        inspection_configuration:
+          $ref: '#/components/schemas/ConfigurationInput'
+          nullable: true
+        quote_policy:
+          type: object
+          additionalProperties: true
+        inspection_bookings:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
       required:
         - id
         - state
@@ -7241,6 +7347,13 @@ components:
         expires_at:
           type: string
           format: date-time
+        inspection_booking_id:
+          type: string
+          format: uuid
+          nullable: true
+        inspection_credit_minor:
+          type: integer
+          minimum: 0
       required:
         - id
         - revision
@@ -7390,6 +7503,39 @@ components:
           minimum: 0
         currency:
           type: string
+        booking_state:
+          type: string
+          nullable: true
+        notes:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        components:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        arrival_window:
+          type: object
+          required:
+            - start_at
+            - end_at
+            - timezone
+          properties:
+            start_at:
+              type: string
+              format: date-time
+            end_at:
+              type: string
+              format: date-time
+            timezone:
+              type: string
+          additionalProperties: false
+          nullable: true
+        estimated_work_minutes:
+          type: integer
+          minimum: 0
       required:
         - id
         - booking_id
@@ -7417,7 +7563,8 @@ components:
           $ref: '#/components/schemas/Answers'
         notes:
           type: string
-          maxLength: 2000
+          nullable: true
+          maxLength: 4000
         delivery_confirmation_token:
           type: string
       required:
@@ -7677,6 +7824,28 @@ components:
         version:
           type: integer
           minimum: 1
+        currency:
+          type: string
+        requirements_delta:
+          type: object
+          additionalProperties: true
+        payment_attempt_id:
+          type: string
+          format: uuid
+          nullable: true
+        payment_state:
+          type: string
+          nullable: true
+        settlement_state:
+          type: string
+          nullable: true
+        payment_method:
+          type: string
+          nullable: true
+        eligible_payment_methods:
+          type: array
+          items:
+            type: string
       required:
         - id
         - booking_id
@@ -8068,6 +8237,11 @@ components:
                 - arrival_window
                 - pickup_window
                 - preferred_only
+            arrival_window_minutes:
+              type: integer
+              minimum: 1
+              maximum: 1440
+              description: 'Explicit arrival/pickup window duration, separate from operational work time.'
           additionalProperties: false
         policy:
           type: object
@@ -8099,6 +8273,10 @@ components:
               type: integer
               minimum: 0
               maximum: 366
+            inspection_credit_enabled:
+              type: boolean
+              default: false
+              description: 'Central published policy permits crediting an owned, paid, completed inspection once.'
           additionalProperties: false
     SD_Localized:
       type: object
@@ -8304,6 +8482,10 @@ components:
           type: string
         image_ref:
           type: string
+        customer_visible:
+          type: boolean
+          default: true
+          description: 'False marks an internal component offer that cannot be selected for standalone customer purchase. Server-controlled component expansion remains available.'
         id:
           type: string
           format: uuid
@@ -8676,6 +8858,7 @@ components:
         notes:
           type: string
           maxLength: 2000
+          nullable: true
       additionalProperties: false
     ManualRefundInput:
       type: object
@@ -8721,4 +8904,31 @@ components:
         expected_version:
           type: integer
           minimum: 1
+      additionalProperties: false
+    SchedulePreviewInput:
+      type: object
+      required:
+        - configurations
+        - schedules
+      properties:
+        configurations:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/ConfigurationInput'
+        schedules:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ScheduleInput'
+        quote_version_id:
+          type: string
+          format: uuid
+        booking_id:
+          type: string
+          format: uuid
+        entitlement_id:
+          type: string
+          format: uuid
       additionalProperties: false

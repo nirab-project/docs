@@ -568,5 +568,5 @@
             "operation_id": "post_admin_offers_id_archive"
         }
     ],
-    "runtime_verification": "not_run_by_design"
+    "runtime_verification": "Recorded separately in reports/NIRAB-V2/PH-12/RUNTIME-ISOLATION-AND-VERSIONS.json"
 }
